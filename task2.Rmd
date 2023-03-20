@@ -28,7 +28,7 @@ We develop a modified Newton-Raphson algorithm including a step-halving step. *(
 	\caption{Newton-Raphson algorithm including a step-halving step}
 	\begin{algorithmic}[1]
 	  \Require $f(\boldsymbol{\beta})$ - target function as given in (\ref{func}); $\boldsymbol{\beta}_0$ - starting value
-	  \Ensure $\widehat{\boldsymbol{\beta}}_{approx}$ such that $\widehat{\boldsymbol{\beta}}_{approx} \approx \arg\max_{\boldsymbol{\beta}}\; f(\boldsymbol{\beta})$
+	  \Ensure $\widehat{\boldsymbol{\beta}}$ such that $\widehat{\boldsymbol{\beta}} \approx \arg\max_{\boldsymbol{\beta}}\; f(\boldsymbol{\beta})$
 	  \State $i\leftarrow 0$, where $i$ is the current number of iterations
 	  \State $f(\boldsymbol{\beta}_{-1})\leftarrow -\infty$
 	  \While {convergence criterion is not met}
@@ -41,7 +41,7 @@ We develop a modified Newton-Raphson algorithm including a step-halving step. *(
 	      \State $\boldsymbol{\beta}_i \leftarrow \boldsymbol{\beta}_{i-1} + \lambda_i\mathbf{d}_i$
 	    \EndWhile
 	  \EndWhile
-	  \State $\widehat{\boldsymbol{\beta}}_{approx}\leftarrow \boldsymbol{\beta}_i$
+	  \State $\widehat{\boldsymbol{\beta}}\leftarrow \boldsymbol{\beta}_i$
 	\end{algorithmic}
 \end{algorithm}
 
