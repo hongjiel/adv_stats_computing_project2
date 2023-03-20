@@ -1,0 +1,189 @@
+---
+title: "Task 2"
+output: pdf_document
+header-includes:
+  - \usepackage{algorithm}
+  - \usepackage{algpseudocode}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(caret)
+library(sigmoid) # function `sigmoid` to compute exp(x)/(1 + exp(x))
+library(qgam) # function `log1pexp` to compute log(1 + exp(x)))
+library(pROC)
+```
+
+**Task 2:** Develop a Newton-Raphson algorithm to estimate your model.
+
+The target function $f$ given in task 1:
+\begin{equation}\label{func}
+f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\top\boldsymbol{\beta}-\log\left(1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}\right)\right].
+\end{equation}
+
+We develop a modified Newton-Raphson algorithm including a step-halving step. *(we probably don't need to ensure that the direction of the step is an ascent direction, since in this example Hessian is always negative-definite. but Hessian could be computationally singular when the starting points are bad)*
+
+\begin{algorithm}
+	\caption{Newton-Raphson algorithm including a step-halving step}
+	\begin{algorithmic}[1]
+	  \Require $f(\boldsymbol{\beta})$ - target function as given in (\ref{func}); $\boldsymbol{\beta}_0$ - starting value
+	  \Ensure $\widehat{\boldsymbol{\beta}}_{approx}$ such that $\widehat{\boldsymbol{\beta}}_{approx} \approx \arg\max_{\boldsymbol{\beta}}\; f(\boldsymbol{\beta})$
+	  \State $i\leftarrow 0$, where $i$ is the current number of iterations
+	  \State $f(\boldsymbol{\beta}_{-1})\leftarrow -\infty$
+	  \While {convergence criterion is not met}
+	    \State $i \leftarrow i+1$
+	    \State $\mathbf{d}_i\leftarrow-[\nabla^2f(\boldsymbol{\beta}_{i-1})]^{-1}\nabla f(\boldsymbol{\beta}_{i-1})$, where $\mathbf{d}_i$ is the direction in the $i$-th iteration
+	    \State $\lambda_i \leftarrow 1$, where $\lambda_i$ is the multiplier in the $i$-th iteration
+	    \State $\boldsymbol{\beta}_i \leftarrow \boldsymbol{\beta}_{i-1} + \lambda_i\mathbf{d}_i$
+	    \While {$f(\boldsymbol{\beta}_i)\le f(\boldsymbol{\beta}_{i-1})$}
+	      \State $\lambda_i \leftarrow \lambda_i/2$
+	      \State $\boldsymbol{\beta}_i \leftarrow \boldsymbol{\beta}_{i-1} + \lambda_i\mathbf{d}_i$
+	    \EndWhile
+	  \EndWhile
+	  \State $\widehat{\boldsymbol{\beta}}_{approx}\leftarrow \boldsymbol{\beta}_i$
+	\end{algorithmic}
+\end{algorithm}
+
+We write an **R**-function `NewtonRaphson` to implement the algorithm. 
+
+```{r}
+NewtonRaphson <- function(dat, func, start, tol = 1e-10) {
+  i <- 0
+  cur <- start
+  stuff <- func(dat, cur)
+  res <- c(0, stuff$f, cur)
+  prevf <- -Inf
+  while (abs(stuff$f - prevf) > tol) {
+    i <- i + 1
+    prevf <- stuff$f
+    prev <- cur
+    d <- -solve(stuff$Hess) %*% stuff$grad
+    cur <- prev + d
+    lambda <- 1
+    maxhalv <- 0
+    while (func(dat, cur)$f < prevf && maxhalv < 50) {
+      maxhalv <- maxhalv + 1
+      lambda <- lambda / 2
+      cur <- prev + lambda * d
+    }
+    stuff <- func(dat, cur)
+    res <- rbind(res, c(i, stuff$f, cur))
+  }
+  colnames(res) <- c("iter", "target_function", "(Intercept)", names(dat)[-1])
+  return(res)
+}
+```
+
+Data preprocessing and data partition.
+
+```{r}
+bc_df <- read.csv("breast-cancer.csv")[-c(1, 33)] %>% # remove variable ID and an NA column
+  mutate(diagnosis = ifelse(diagnosis == "M", 1, 0)) # code malignant cases as 1
+bc_df[, -1] <- scale(bc_df[, -1]) # predictors are standardized for the logistic-LASSO model in task 3
+
+set.seed(1)
+indexTrain <- createDataPartition(y = bc_df$diagnosis, p = 0.8, list = FALSE)
+Training <- bc_df[indexTrain, ]
+Test <- bc_df[-indexTrain, ]
+
+# correlation coefficients close to 1. need to remove some variables to make the algorithm converge
+glm(diagnosis ~ ., family = binomial(link = "logit"), data = Training)
+```
+
+Remove some variables. Here we select all mean predictors as an example (still have highly-correlated variables). **(Should remove variables that are highly correlated. NOT DECIDED!)**
+
+```{r}
+# select some variables. should decide which variables to choose
+useful <- names(bc_df)[1:11] # e.g., select all mean variables
+bc_df2 <-
+  bc_df %>% 
+  select(all_of(useful))
+
+set.seed(1)
+indexTrain <- createDataPartition(y = bc_df2$diagnosis, p = 0.8, list = FALSE)
+Training <- bc_df2[indexTrain, ]
+Test <- bc_df2[-indexTrain, ]
+
+glm(diagnosis ~ ., family = binomial(link = "logit"), data = Training)
+
+logisticstuff <- function(dat, betavec) {
+  dat <- as.matrix(dat)
+  n <- nrow(dat)
+  p <- ncol(dat) - 1
+  X <- cbind(rep(1, n), dat[, -1]) # design matrix
+  y <- dat[, 1] # response vector
+  u <- X %*% betavec # x_i^T beta, i=1,...,n
+  f <- sum(y * u - log1pexp(u)) # function `log1pexp` to compute log(1 + exp(x)))
+  p_vec <- sigmoid(u) # function `sigmoid` to compute exp(x)/(1 + exp(x))
+  grad <- t(X) %*% (y - p_vec)
+  Hess <- -t(X) %*% diag(c(p_vec * (1 - p_vec))) %*% X
+  return(list(f = f, grad = grad, Hess = Hess))
+}
+```
+
+We fit a logistic regression model on the training data using our `NewtonRaphson` function.
+
+```{r}
+res <- NewtonRaphson(dat = Training, func = logisticstuff, start = rep(0, ncol(Training)))
+res
+```
+
+We compare the results of using the `glm` function and our `NewtonRaphson` function.
+
+```{r warning=FALSE}
+tibble(
+  predictor = c("(Intercept)", names(Training)[-1]),
+  ours = res[nrow(res), -c(1, 2)],
+  glm = glm(diagnosis ~ ., family = binomial(link = "logit"), data = Training)$coefficients
+) %>% 
+  knitr::kable()
+```
+
+Compute the test AUC. (should NOT be used for model comparison)
+
+```{r message=FALSE}
+betavec.logit <- res[nrow(res), 3:ncol(res)]
+# test data
+X_test <- cbind(rep(1, nrow(Test)), model.matrix(diagnosis ~ ., Test)[, -1])
+y_test <- Test$diagnosis
+# AUC
+u_test <- X_test %*% betavec.logit
+phat_test <- sigmoid(u_test)[, 1]
+roc.logit.test <- roc(response = y_test, predictor = phat_test)
+auc.logit.test <- roc.logit.test$auc[1]
+```
+
+Resampling on training data: *Does the following resampling method work?*
+
+```{r eval=FALSE}
+?caret::resamples
+```
+
+Hothorn et al. The design and analysis of benchmark experiments. Journal of Computational and Graphical Statistics (2005) vol. 14 (3) pp. 675-699
+
+https://ro.uow.edu.au/cgi/viewcontent.cgi?article=3494&context=commpapers
+
+RW-OOB
+
+```{r message=FALSE}
+B = 100 # number of bootstrap samples
+set.seed(1)
+auc.logit <- rep(NA, B)
+for (i in 1:B) {
+  index_bs <- sample(nrow(Training), replace = TRUE)
+  sample <- Training[index_bs, ]
+  out <- Training[-index_bs, ]
+  res <- NewtonRaphson(dat = sample, func = logisticstuff, start = rep(0, ncol(sample)))
+  betavec <- res[nrow(res), 3:ncol(res)]
+  X <- cbind(rep(1, nrow(out)), model.matrix(diagnosis ~ ., out)[, -1])
+  y <- out$diagnosis
+  u <- X %*% betavec
+  phat <- sigmoid(u)[, 1]
+  roc <- roc(response = y, predictor = phat)
+  auc <- roc$auc[1]
+  auc.logit[i] <- auc
+}
+summary(auc.logit)
+boxplot(auc.logit)
+```
