@@ -1,0 +1,246 @@
+---
+title: "Task 3"
+output: pdf_document
+header-includes:
+  - \usepackage{algorithm}
+  - \usepackage{algpseudocode}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(caret)
+library(sigmoid)
+library(qgam)
+library(glmnet)
+```
+
+**Task 3:** Build a logistic-LASSO model to select features, and implement a path-wise coordinate-wise optimization algorithm to obtain a path of solutions with a sequence of descending $\lambda$’s.
+
+Reference: Friedman J, Hastie T, Tibshirani R. Regularization Paths for Generalized Linear Models via Coordinate Descent. J Stat Softw. 2010;33(1):1-22. PMID: 20808728; PMCID: PMC2929880.
+
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2929880/#FD14
+
+## Algorithm
+
+Log-likelihood $f$ in task 1:
+\begin{equation}\label{func}
+f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\top\boldsymbol{\beta}-\log\left(1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}\right)\right].
+\end{equation}
+
+LASSO estimates the logistic model parameters $\boldsymbol{\beta}$ by optimizing a penalized loss function:
+\begin{equation}\label{opt.lasso}
+\min_{\boldsymbol{\beta}}\; -\frac{1}{n}f(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|.
+\end{equation}
+where $\lambda\ge 0$ is the tuning parameter. Note that the intercept is not penalized and all predictors are standardized.
+
+
+### Algorithm Structure
+
+OUTER LOOP: Decrement $\lambda$.  
+MIDDLE LOOP: Update $\tilde{w}_i$, $\tilde{p}_i$, and thus the quadratic approximation $\ell$ using the current parameters $\tilde{\boldsymbol{\beta}}$.  
+INNER LOOP: Run the coordinate descent algorithm on the penalized weighted-least-squares problem.
+
+**OUTER LOOP** 
+In the outer loop, we compute the solutions of the optimization problem (\ref{opt.lasso}) for a decreasing sequence of values for $\lambda$: $\{\lambda_1,\ldots,\lambda_m\}$, starting at the smallest value $\lambda_1 = \lambda_{max}$ for which the estimates of all coefficients $\hat{\beta}_j = 0,\; j=1,2,\ldots,p$, which is
+\begin{equation}\label{maxlambda}
+\lambda_{max} = \max_j\left|\left \langle \mathbf{x}_{\cdot j}, \mathbf{y} \right \rangle\right|,
+\end{equation}
+where $\mathbf{x}_{\cdot j}$ is the $j$-th column of the design matrix $\mathbf{X}$, for $j=1,\ldots,p$.  
+For tuning parameter value $\lambda_{k+1}$, we initialize coordinate descent algorithm at the computed solution for $\lambda_k$ (warm start). Apart from giving us a path of solutions, this scheme exploits warm starts, and leads to a more stable algorithm.
+
+
+**MIDDLE LOOP**
+In the middle loop, we find the estimates of $\boldsymbol{\beta}$ by solving the optimization problem (\ref{opt.lasso}) for a fixed $\lambda$. For each iteration of the middle loop, based on the current parameter estimates $\tilde{\boldsymbol{\beta}}$, we form a quadratic approximation to the log-likelihood $f$ using a Taylor expansion:
+\begin{align*}
+f(\boldsymbol{\beta})\approx\ell(\boldsymbol{\beta})&=f(\tilde{\boldsymbol{\beta}})+(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})^\top\nabla f(\tilde{\boldsymbol{\beta}})+\frac{1}{2}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})^\top\nabla^2 f(\tilde{\boldsymbol{\beta}})(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})\\
+&=f(\tilde{\boldsymbol{\beta}})+[\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})]^\top(\mathbf{y}-\tilde{\mathbf{p}})-\frac{1}{2}[\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})]^\top\tilde{\mathbf{W}}\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})\\
+&=f(\tilde{\boldsymbol{\beta}})+\sum_{i=1}^n(Y_i-\tilde{p}_i)\mathbf{x}_i^\top(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}} )-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left[\mathbf{x}_i^\top(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})\right]^2\\
+&=-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left\{\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})\right]^2+2\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})\right]\right\}+f(\tilde{\boldsymbol{\beta}})\\
+&=-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})+\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\right]+\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left(\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\right)^2+f(\tilde{\boldsymbol{\beta}}),
+\end{align*}
+where $\tilde{\mathbf{p}}=(\tilde{p}_1,\ldots,\tilde{p}_n)^\top$ and $\tilde{\mathbf{W}}=\mathrm{diag}(\tilde{w}_1,\ldots,\tilde{w}_n)$ are the estimates of $\mathbf{p}$ and $\mathbf{W}$ based on $\tilde{\boldsymbol{\beta}}$.  
+We rewrite the function $\ell(\boldsymbol{\beta})$ as follows:
+\begin{equation}\label{func.lasso}
+\ell(\boldsymbol{\beta})=-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i(\tilde{z}_i-\mathbf{x}_i^\top\boldsymbol{\beta})^2+C(\tilde{\boldsymbol{\beta}}),
+\end{equation}
+where
+$$\tilde{z}_i=\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}+\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}$$
+is the working response, $\tilde{w}_i$ is the working weight, and $C$ is a function that does not depend on $\boldsymbol{\beta}$.
+
+**INNER LOOP.**
+In the inner loop, we find the estimates of $\boldsymbol{\beta}$ by solving a modified optimization problem of (\ref{opt.lasso}). With fixed $\tilde{w}_i$'s, $\tilde{z}_i$'s, and a fixed form of $\ell$ based on the estimates of $\boldsymbol{\beta}$ in the previous iteration of the middle loop, we use coordinate descent to solve the penalized weighted least-squares problem
+\begin{equation}\label{opt.inner}
+\min_{\boldsymbol{\beta}}\; -\frac{1}{n}\ell(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|,
+\end{equation}
+and update the estimates of $\boldsymbol{\beta}$. For each iteration of the inner loop, suppose we have the current estimates $\tilde{\beta}_k$ for $k\ne j$ and we wish to partially optimize with respect to $\beta_j$:
+$$\min_{\beta_j}\; \frac{1}{2n}\sum_{i=1}^n\tilde{w}_i\left(\tilde{z}_i-x_{ij}\beta_j-\sum_{k\ne j}x_{ik}\tilde{\beta}_k\right)^2+\lambda|\beta_j|+\lambda\sum_{k\ne j}|\beta_k|.$$
+Updates:
+\begin{align*}
+\tilde{\beta}_0&\leftarrow\frac{\sum_{i=1}^n\tilde{w}_{i}(\tilde{z}_{i}-\sum_{k= 1}^px_{ik}\tilde{\beta}_k)}{\sum_{i=1}^n\tilde{w}_{i}},\\
+\tilde{\beta}_j&\leftarrow\frac{S\left(\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}x_{ij}(\tilde{z}_{i}-\sum_{k\ne j}x_{ik}\tilde{\beta}_k),\lambda\right)}{\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}x_{ij}^2},\; j=1,\ldots,p
+\end{align*}
+where $S(z,\gamma)$ is the soft-thresholding operator with value
+$$S(z,\gamma)=\mathrm{sign}(z)(|z|-\gamma)_+=\begin{cases}z-\gamma,&\text{if }z>0\text{ and }\gamma<|z|\\z+\gamma,&\text{if }z<0\text{ and }\gamma<|z|\\0,&\text{if }\gamma\ge|z|\end{cases}$$
+We can then update estimates of $\beta_j$'s repeatedly for $j = 0,1,2,...,p,0,1,2,...$ until
+convergence.
+
+Note: Care is taken to avoid coefficients diverging in order to achieve fitted probabilities of 0 or 1. When a probability is within $\epsilon=10^{-5}$ of 1, we set it to 1, and set the weights to $\epsilon$. 0 is treated similarly.
+
+
+\begin{algorithm}
+	\caption{Path-wise coordinate-wise optimization algorithm}
+	\begin{algorithmic}[1]
+	  \Require $g(\boldsymbol{\beta},\lambda)=-\frac{1}{n}f(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|$ - target function, where $f(\boldsymbol{\beta})$ is given in (\ref{func}); $\boldsymbol{\beta}_0$ - starting value; $\{\lambda_1,\ldots,\lambda_m\}$ - a sequence of descending $\lambda$'s, where $\lambda_1=\lambda_{max}$ is given in (\ref{maxlambda}); $\epsilon$ - tolerance
+	  \Ensure $\widehat{\boldsymbol{\beta}}(\lambda_r)$ such that $\widehat{\boldsymbol{\beta}}(\lambda_r) \approx \arg\min_{\boldsymbol{\beta}}\; g(\boldsymbol{\beta},\lambda_r),\; r=1,\ldots,m$
+	  \State $\tilde{\boldsymbol{\beta}}_0(\lambda_{1})\leftarrow\boldsymbol{\beta}_0$
+	  \State OUTER LOOP
+	  \For {$r\in\{1,\ldots,m\}$, where $r$ is the current number of iterations of the outer loop,}
+	    \State $s \leftarrow 0$, where $s$ is the current number of iterations of the middle loop
+	    \State $g(\tilde{\boldsymbol{\beta}}_{-1}(\lambda_{r}),\lambda_{r})\leftarrow \infty$
+	    \State MIDDLE LOOP
+	  	\While {convergence criterion of the middle loop is not met: $\left|g(\tilde{\boldsymbol{\beta}}_{s}(\lambda_{r}),\lambda_{r}) - g(\tilde{\boldsymbol{\beta}}_{s-1}(\lambda_{r}),\lambda_{r})\right|>\epsilon$}
+	  	  \State $s \leftarrow s+1$
+	      \State Update $\tilde{w}_i^{(s)}$, $\tilde{z}_i^{(s)}$ ($i=1,\ldots,n$), and thus $\ell_{s}(\boldsymbol{\beta})$ as given in (\ref{func.lasso}) based on $\tilde{\boldsymbol{\beta}}_{s-1}(\lambda_{r})$
+	      \State $t \leftarrow 0$, where $t$ is the current number of iterations of the inner loop
+	      \State $\tilde{\boldsymbol{\beta}}_s^{(0)}(\lambda_{r})\leftarrow \tilde{\boldsymbol{\beta}}_{s-1}(\lambda_{r})$
+	      \State $h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(-1)}(\lambda_{r}),\lambda_{r})\leftarrow \infty$, where $h_{s}(\boldsymbol{\beta},\lambda)=-\frac{1}{n}\ell_{s}(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|$
+	      \State INNER LOOP
+	      \While {convergence criterion of the inner loop is not met: $\left|h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(t)}(\lambda_{r}),\lambda_{r}) - h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(t-1)}(\lambda_{r}),\lambda_{r})\right|>\epsilon$}
+	  	    \State $t \leftarrow t+1$
+	        \State $\tilde{\beta}_0^{(t)}(\lambda_{r})\leftarrow\sum_{i=1}^n\tilde{w}_{i}^{(s)}\left(\tilde{z}_{i}^{(s)}-\sum_{k= 1}^px_{ik}\tilde{\beta}_k^{(t-1)}(\lambda_{r})\right)\bigg/\sum_{i=1}^n\tilde{w}_{i}^{(s)}$
+	        \For {$j \in\{1,\ldots,p\}$}
+	        \State $\tilde{\beta}_j^{(t)}(\lambda_{r})\leftarrow S\left(\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}^{(s)}x_{ij}\left(\tilde{z}_{i}^{(s)}-\sum_{k<j}x_{ik}\tilde{\beta}_k^{(t)}(\lambda_{r})-\sum_{k>j}x_{ik}\tilde{\beta}_k^{(t-1)}(\lambda_{r})\right),\lambda_r\right)\bigg/\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}^{(s)}x_{ij}^2$
+	        \EndFor
+	      \EndWhile
+	      \State $\tilde{\boldsymbol{\beta}}_s(\lambda_{r})\leftarrow\tilde{\boldsymbol{\beta}}_s^{(t)}(\lambda_{r})$
+	    \EndWhile
+	    \State $\widehat{\boldsymbol{\beta}}(\lambda_r)\leftarrow\tilde{\boldsymbol{\beta}}_s(\lambda_r)$
+	    \State $\tilde{\boldsymbol{\beta}}_0(\lambda_{r+1})\leftarrow\widehat{\boldsymbol{\beta}}(\lambda_r)$
+	  \EndFor
+	\end{algorithmic}
+\end{algorithm}
+
+
+## Implementation in **R**
+
+target functions needed to be optimized and soft-threshold operator
+
+```{r}
+# function -f/n with penalties (minimize!) used in middle loop's convergence criterion
+logitLASSO_func <- function(u, y, betavec, lambda) {
+  -sum(y * u - log1pexp(u)) / length(y) + lambda * sum(abs(betavec[-1]))
+}
+
+# function -ell/n (without C) with penalties (minimize!) used in inner loop's convergence criterion
+coordinate_func <- function(X, z, w, betavec, lambda) {
+  0.5 * sum(w * (z - X %*% betavec)^2) / nrow(X) + lambda * sum(abs(betavec[-1]))
+}
+
+# soft-threshold operator used in inner loop
+soft.threshold <- function(z, gamma) {
+  sign(z) * (abs(z) - gamma) * (abs(z) - gamma > 0)
+}
+```
+
+We implement the algorithm in **R**.
+
+```{r}
+# outer loop
+LogisticLASSO <- function(dat, start, lambda) {
+  k <- length(lambda)
+  X <- as.matrix(cbind(rep(1, nrow(dat)), dat[, -1])) # design matrix
+  y <- dat[, 1] # response vector
+  res <- matrix(NA, nrow = k, ncol = ncol(dat) + 1)
+  for (i in 1:k) {
+    betavec <- MiddleLoop(X = X, y = y, start = start, lambda = lambda[i])
+    res[i, ] <- c(lambda[i], betavec)
+    start <- betavec
+  }
+  colnames(res) <- c("lambda", "(Intercept)", names(dat)[-1])
+  return(res)
+}
+
+# middle loop
+MiddleLoop <- function(X, y, start, lambda, tol = 1e-10) {
+  prevfunc <- Inf
+  betavec <- start
+  u <- X %*% betavec
+  p_vec <- sigmoid(u) # function `sigmoid` to compute exp(x)/(1 + exp(x))
+  w <- p_vec * (1 - p_vec)
+  eps <- 1e-5
+  # see note
+  p_vec[p_vec < eps] <- 0
+  p_vec[p_vec > 1 - eps] <- 1
+  w[p_vec == 1 | p_vec == 0] <- eps
+  z <- u + (y - p_vec) / w
+  curfunc <- logitLASSO_func(u = u, y = y, betavec = betavec, lambda = lambda)
+  while (abs(curfunc - prevfunc) > tol) {
+    prevfunc <- curfunc
+    betavec <- InnerLoop(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
+    u <- X %*% betavec
+    curfunc <- logitLASSO_func(u = u, y = y, betavec = betavec, lambda = lambda)
+  }
+  return(betavec)
+}
+
+# inner loop
+InnerLoop <- function(X, z, w, betavec, lambda, tol = 1e-10) {
+  prevfunc <- Inf
+  curfunc <- coordinate_func(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
+  while (abs(curfunc - prevfunc) > tol) {
+    prevfunc <- curfunc
+    betavec[1] <- sum(w * (z - X[, -1] %*% betavec[-1])) / sum(w)
+    for (j in 2:length(betavec)) {
+      betavec[j] <- soft.threshold(z = sum(w / nrow(X) * X[, j] * (z - X[, -j] %*% betavec[-j])), gamma = lambda) / sum(w / nrow(X) * X[, j]^2)
+    }
+    curfunc <- coordinate_func(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
+  }
+  return(betavec)
+}
+```
+
+## Model fit on training data
+
+```{r include=FALSE}
+# data preprocessing and data partition
+bc_df <- read.csv("breast-cancer.csv")[-c(1, 33)] %>%
+  mutate(diagnosis = ifelse(diagnosis == "M", 1, 0))
+bc_df[, -1] <- scale(bc_df[, -1]) # predictors are standardized
+
+
+# select some variables. should decide which variables to choose
+useful <- names(bc_df)[1:11] # e.g., select all mean variables
+bc_df2 <-
+  bc_df %>% 
+  select(all_of(useful))
+
+set.seed(1)
+indexTrain <- createDataPartition(y = bc_df2$diagnosis, p = 0.8, list = FALSE)
+Training <- bc_df2[indexTrain, ]
+Test <- bc_df2[-indexTrain, ]
+```
+
+We fit a logistic-LASSO model on the training data using our function `LogisticLASSO` with a sequence of descending $\lambda$’s.
+
+```{r}
+X <- as.matrix(Training[, -1])
+y <- Training[, 1]
+lambda_max <- max(t(X) %*% y) / length(y)
+
+lambdas <- exp(seq(log(lambda_max), -15, length = 20))
+res <- LogisticLASSO(dat = Training, start = rep(0, ncol(Training)),
+                     lambda = lambdas)
+res
+```
+
+Compare the results of logistic-LASSO model with $\lambda=e^{-15}$ using our function and logistic model (i.e., $\lambda = 0$) using the `glm` function:
+
+```{r warning=FALSE}
+tibble(
+  predictor = c("(Intercept)", names(Training)[-1]),
+  ours_lambda.exp.neg.15 = res[nrow(res), -1],
+  glm_lambda.0 = glm(diagnosis ~ ., family = binomial(link = "logit"), data = Training)$coefficients
+) %>% 
+  knitr::kable()
+```
