@@ -1,0 +1,197 @@
+---
+title: "Task 4"
+output: pdf_document
+header-includes:
+  - \usepackage{algorithm}
+  - \usepackage{algpseudocode}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(caret)
+library(sigmoid)
+library(qgam)
+library(glmnet)
+library(pROC)
+```
+
+**Task 4:** Use 5-fold cross-validation to select the best $\lambda$. Compare the prediction performance between the "optimal" model and "full" model.
+
+## 5-fold CV
+
+```{r include=FALSE}
+# function -f/n with penalties (minimize!) used in middle loop's convergence criterion
+logitLASSO_func <- function(u, y, betavec, lambda) {
+  -sum(y * u - log1pexp(u)) / length(y) + lambda * sum(abs(betavec[-1]))
+}
+
+# function -ell/n (without C) with penalties (minimize!) used in inner loop's convergence criterion
+coordinate_func <- function(X, z, w, betavec, lambda) {
+  0.5 * sum(w * (z - X %*% betavec)^2) / nrow(X) + lambda * sum(abs(betavec[-1]))
+}
+
+# soft-threshold operator used in inner loop
+soft.threshold <- function(z, gamma) {
+  sign(z) * (abs(z) - gamma) * (abs(z) - gamma > 0)
+}
+
+
+
+# outer loop
+LogisticLASSO <- function(dat, start, lambda) {
+  k <- length(lambda)
+  X <- as.matrix(cbind(rep(1, nrow(dat)), dat[, -1])) # design matrix
+  y <- dat[, 1] # response vector
+  res <- matrix(NA, nrow = k, ncol = ncol(dat) + 1)
+  for (i in 1:k) {
+    betavec <- MiddleLoop(X = X, y = y, start = start, lambda = lambda[i])
+    res[i, ] <- c(lambda[i], betavec)
+    start <- betavec
+  }
+  colnames(res) <- c("lambda", "(Intercept)", names(dat)[-1])
+  return(res)
+}
+
+# middle loop
+MiddleLoop <- function(X, y, start, lambda, tol = 1e-10) {
+  prevfunc <- Inf
+  betavec <- start
+  u <- X %*% betavec
+  p_vec <- sigmoid(u) # function `sigmoid` to compute exp(x)/(1 + exp(x))
+  w <- p_vec * (1 - p_vec)
+  eps <- 1e-5
+  # see note
+  p_vec[p_vec < eps] <- 0
+  p_vec[p_vec > 1 - eps] <- 1
+  w[p_vec == 1 | p_vec == 0] <- eps
+  z <- u + (y - p_vec) / w
+  curfunc <- logitLASSO_func(u = u, y = y, betavec = betavec, lambda = lambda)
+  while (abs(curfunc - prevfunc) > tol) {
+    prevfunc <- curfunc
+    betavec <- InnerLoop(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
+    u <- X %*% betavec
+    curfunc <- logitLASSO_func(u = u, y = y, betavec = betavec, lambda = lambda)
+  }
+  return(betavec)
+}
+
+# inner loop
+InnerLoop <- function(X, z, w, betavec, lambda, tol = 1e-10) {
+  prevfunc <- Inf
+  curfunc <- coordinate_func(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
+  while (abs(curfunc - prevfunc) > tol) {
+    prevfunc <- curfunc
+    betavec[1] <- sum(w * (z - X[, -1] %*% betavec[-1])) / sum(w)
+    for (j in 2:length(betavec)) {
+      betavec[j] <- soft.threshold(z = sum(w / nrow(X) * X[, j] * (z - X[, -j] %*% betavec[-j])), gamma = lambda) / sum(w / nrow(X) * X[, j]^2)
+    }
+    curfunc <- coordinate_func(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
+  }
+  return(betavec)
+}
+```
+
+
+```{r include=FALSE}
+# data preprocessing and data partition
+bc_df <- read.csv("breast-cancer.csv")[-c(1, 33)] %>% # remove variable ID and an NA column
+  mutate(diagnosis = ifelse(diagnosis == "M", 1, 0)) # code malignant cases as 1
+bc_df[, -1] <- scale(bc_df[, -1]) # predictors are standardized for the logistic-LASSO model in task 3
+
+set.seed(1)
+indexTrain <- createDataPartition(y = bc_df$diagnosis, p = 0.8, list = FALSE)
+Training <- bc_df[indexTrain, ]
+Test <- bc_df[-indexTrain, ]
+
+
+# select some variables. should decide which variables to choose
+useful <- names(bc_df)[1:11] # e.g., select all mean variables
+bc_df2 <-
+  bc_df %>% 
+  select(all_of(useful))
+
+set.seed(1)
+indexTrain <- createDataPartition(y = bc_df2$diagnosis, p = 0.8, list = FALSE)
+Training <- bc_df2[indexTrain, ]
+Test <- bc_df2[-indexTrain, ]
+x <- model.matrix(diagnosis ~ ., Training)[, -1]
+y <- Training$diagnosis
+```
+
+We write an **R** function `cv.logit.lasso` to conduct 5-fold cross-validation to select the best $\lambda$.
+
+```{r}
+cv.logit.lasso <- function(x, y, nfolds = 5, lambda) {
+  auc <- data.frame(matrix(ncol = 3, nrow = 0))
+  colnames(auc) <- c("lambda", "fold", "auc")
+  folds <- createFolds(y, k = nfolds)
+  for (i in 1:nfolds) {
+    valid_index <- folds[[i]]
+    x_training <- x[-valid_index, ]
+    y_training <- y[-valid_index]
+    training_dat <- data.frame(cbind(y_training, x_training))
+    x_valid <- cbind(rep(1, length(valid_index)), x[valid_index, ])
+    y_valid <- y[valid_index]
+    res <- LogisticLASSO(dat = training_dat, start = rep(0, ncol(training_dat)), lambda = lambda)
+    for (k in 1:nrow(res)) {
+      betavec <- res[k, 2:ncol(res)]
+      u_valid <- x_valid %*% betavec
+      phat_valid <- sigmoid(u_valid)[, 1]
+      roc <- roc(response = y_valid, predictor = phat_valid)
+      auc <- rbind(auc, c(lambda[k], i, roc$auc[1]))
+    }
+  }
+  colnames(auc) <- c("lambda", "fold", "auc")
+  cv_res <- auc %>% 
+    group_by(lambda) %>% 
+    summarize(auc_mean = mean(auc)) %>% 
+    mutate(auc_ranking = min_rank(desc(auc_mean)))
+  bestlambda <- min(cv_res$lambda[cv_res$auc_ranking == 1])
+  return(cv_res)
+}
+```
+
+Compare the results of cross-validation using `glmnet` and using our algorithm.
+
+1. Our function `cv.logit.lasso`:
+
+```{r message=FALSE}
+lambda_max <- max(t(x) %*% y) / length(y)
+lambdas <- exp(seq(log(lambda_max), log(lambda_max) - 8, length = 30))
+set.seed(1)
+res = cv.logit.lasso(x, y, nfolds = 5, lambda = lambdas)
+as.matrix(res %>% arrange(-lambda))
+# best lambda
+res$lambda[res$auc_ranking == 1]
+plot(log(res$lambda), res$auc_mean, pch = 16, col = "red")
+```
+
+2. `glmnet` from **R** package `caret`
+
+```{r message=FALSE}
+set.seed(1)
+fit.logit.lasso = cv.glmnet(x, y,
+                            nfolds = 5, alpha = 1,
+                            lambda = lambdas,
+                            family = "binomial", type.measure = "auc")
+# best lambda
+fit.logit.lasso$lambda.min
+plot(fit.logit.lasso)
+```
+
+The results are slightly different (mean AUC values).
+
+```{r}
+tibble(
+  lambda = lambdas,
+  ours_AUC = res %>% arrange(-lambda) %>% .$auc_mean,
+  cv.glmnet_AUC = fit.logit.lasso$cvm
+) %>% 
+  knitr::kable()
+```
+
+
+## Prediction performance comparison
+
+**NOT FINISHED!**
