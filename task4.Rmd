@@ -124,7 +124,6 @@ We write an **R** function `cv.logit.lasso` to conduct 5-fold cross-validation t
 ```{r}
 cv.logit.lasso <- function(x, y, nfolds = 5, lambda) {
   auc <- data.frame(matrix(ncol = 3, nrow = 0))
-  colnames(auc) <- c("lambda", "fold", "auc")
   folds <- createFolds(y, k = nfolds)
   for (i in 1:nfolds) {
     valid_index <- folds[[i]]
@@ -160,24 +159,31 @@ Compare the results of cross-validation using `glmnet` and using our algorithm.
 lambda_max <- max(t(x) %*% y) / length(y)
 lambdas <- exp(seq(log(lambda_max), log(lambda_max) - 8, length = 30))
 set.seed(1)
-res = cv.logit.lasso(x, y, nfolds = 5, lambda = lambdas)
-as.matrix(res %>% arrange(-lambda))
+res_cv = cv.logit.lasso(x, y, nfolds = 5, lambda = lambdas)
+as.matrix(res_cv %>% arrange(-lambda))
 # best lambda
-res$lambda[res$auc_ranking == 1]
-plot(log(res$lambda), res$auc_mean, pch = 16, col = "red")
+best_lambda <- res_cv$lambda[res_cv$auc_ranking == 1]
+best_lambda
+plot(log(res_cv$lambda), res_cv$auc_mean, pch = 16, col = "red")
+# coefficients of the best model
+res_coef <- LogisticLASSO(dat = Training, start = rep(0, ncol(Training)),
+                          lambda = lambdas) %>% as.data.frame
+res_coef[res_coef$lambda == best_lambda, -1]
 ```
 
 2. `glmnet` from **R** package `caret`
 
 ```{r message=FALSE}
 set.seed(1)
-fit.logit.lasso = cv.glmnet(x, y,
-                            nfolds = 5, alpha = 1,
-                            lambda = lambdas,
-                            family = "binomial", type.measure = "auc")
+fit.logit.lasso <- cv.glmnet(x, y,
+                             nfolds = 5, alpha = 1,
+                             lambda = lambdas,
+                             family = "binomial", type.measure = "auc")
 # best lambda
 fit.logit.lasso$lambda.min
 plot(fit.logit.lasso)
+# coefficients of the best model
+coef(fit.logit.lasso, fit.logit.lasso$lambda.min)
 ```
 
 The results are slightly different (mean AUC values).
@@ -185,8 +191,35 @@ The results are slightly different (mean AUC values).
 ```{r}
 tibble(
   lambda = lambdas,
-  ours_AUC = res %>% arrange(-lambda) %>% .$auc_mean,
+  ours_AUC = res_cv %>% arrange(-lambda) %>% .$auc_mean,
   cv.glmnet_AUC = fit.logit.lasso$cvm
+) %>% 
+  knitr::kable()
+```
+
+The coefficients of the two final models are different because the best $\lambda$'s of the two methods are different (but close).
+
+```{r}
+# our best lambda
+best_lambda
+# cv.glmnet's best lambda
+fit.logit.lasso$lambda.min
+tibble(
+  predictor = c("(Intercept)", names(Training)[-1]),
+  ours_coef = res_coef[res_coef$lambda == best_lambda, -1] %>% as.vector %>% as.numeric,
+  cv.glmnet_coef = coef(fit.logit.lasso, fit.logit.lasso$lambda.min) %>% as.vector
+) %>% 
+  knitr::kable()
+```
+
+If the best $\lambda$'s are the same (here we take the best $\lambda$ of `cv.glmnet`), the coefficients are very similar but still slightly different. This difference may cause the slight difference of the CV results (mean AUC), and thus the $\lambda$'s that has the largest mean AUC values of the two methods are not the same. (Or maybe due to different 5 folds or other reasons)
+
+```{r}
+# use cv.glmnet's best lambda
+tibble(
+  predictor = c("(Intercept)", names(Training)[-1]),
+  ours_coef = res_coef[res_coef$lambda == fit.logit.lasso$lambda.min, -1] %>% as.vector %>% as.numeric,
+  cv.glmnet_coef = coef(fit.logit.lasso, fit.logit.lasso$lambda.min) %>% as.vector
 ) %>% 
   knitr::kable()
 ```
@@ -194,4 +227,85 @@ tibble(
 
 ## Prediction performance comparison
 
-**NOT FINISHED!**
+```{r include=FALSE}
+NewtonRaphson <- function(dat, func, start, tol = 1e-10) {
+  i <- 0
+  cur <- start
+  stuff <- func(dat, cur)
+  res <- c(0, stuff$f, cur)
+  prevf <- -Inf
+  while (abs(stuff$f - prevf) > tol) {
+    i <- i + 1
+    prevf <- stuff$f
+    prev <- cur
+    d <- -solve(stuff$Hess) %*% stuff$grad
+    cur <- prev + d
+    lambda <- 1
+    maxhalv <- 0
+    while (func(dat, cur)$f < prevf && maxhalv < 50) {
+      maxhalv <- maxhalv + 1
+      lambda <- lambda / 2
+      cur <- prev + lambda * d
+    }
+    stuff <- func(dat, cur)
+    res <- rbind(res, c(i, stuff$f, cur))
+  }
+  colnames(res) <- c("iter", "target_function", "(Intercept)", names(dat)[-1])
+  return(res)
+}
+
+logisticstuff <- function(dat, betavec) {
+  dat <- as.matrix(dat)
+  n <- nrow(dat)
+  p <- ncol(dat) - 1
+  X <- cbind(rep(1, n), dat[, -1]) # design matrix
+  y <- dat[, 1] # response vector
+  u <- X %*% betavec # x_i^T beta, i=1,...,n
+  f <- sum(y * u - log1pexp(u)) # function `log1pexp` to compute log(1 + exp(x)))
+  p_vec <- sigmoid(u) # function `sigmoid` to compute exp(x)/(1 + exp(x))
+  grad <- t(X) %*% (y - p_vec)
+  Hess <- -t(X) %*% diag(c(p_vec * (1 - p_vec))) %*% X
+  return(list(f = f, grad = grad, Hess = Hess))
+}
+```
+
+**We probably need resampling methods (conducted in training data) to select the best model. Is the resampling methods in task 2 correct?**
+
+
+
+Below is the prediction performance on the test data. *(I suppose this should not be used for model comparison)*
+
+```{r message=FALSE}
+# test data
+X_test <- cbind(rep(1, nrow(Test)), model.matrix(diagnosis ~ ., Test)[, -1])
+y_test <- Test$diagnosis
+
+# logistic model
+res_logit <- NewtonRaphson(dat = Training, func = logisticstuff, start = rep(0, ncol(Training)))
+betavec_logit <- res_logit[nrow(res_logit), 3:ncol(res_logit)]
+u <- X_test %*% betavec_logit
+phat <- sigmoid(u)[, 1]
+roc.logit <- roc(response = y_test, predictor = phat)
+
+# logistic LASSO model
+betavec_logit.lasso <- res_coef[res_coef$lambda == best_lambda, -1] %>% as.vector %>% as.numeric
+u <- X_test %*% betavec_logit.lasso
+phat <- sigmoid(u)[, 1]
+roc.logitlasso <- roc(response = y_test, predictor = phat)
+
+# logistic LASSO model (cv.glmnet)
+betavec_logit.lasso.glm <- coef(fit.logit.lasso, fit.logit.lasso$lambda.min) %>% as.vector
+u <- X_test %*% betavec_logit.lasso.glm
+phat <- sigmoid(u)[, 1]
+roc.logitlasso.glm <- roc(response = y_test, predictor = phat)
+
+# draw rocs
+auc <- c(roc.logit$auc[1], roc.logitlasso$auc[1], roc.logitlasso.glm$auc[1])
+plot(roc.logit, legacy.axes = TRUE)
+plot(roc.logitlasso, col = 2, add = TRUE)
+plot(roc.logitlasso.glm, col = 3, add = TRUE)
+modelNames <- c("logistic", "logistic LASSO", "logistic LASSO (cv.glmnet)")
+legend("bottomright", legend = paste0(modelNames, ": ", round(auc, 3)),
+col = 1:3, lwd = 2)
+```
+
