@@ -91,7 +91,7 @@ Note: Care is taken to avoid coefficients diverging in order to achieve fitted p
 \begin{algorithm}
 	\caption{Path-wise coordinate-wise optimization algorithm}
 	\begin{algorithmic}[1]
-	  \Require $g(\boldsymbol{\beta},\lambda)=-\frac{1}{n}f(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|$ - target function, where $f(\boldsymbol{\beta})$ is given in (\ref{func}); $\boldsymbol{\beta}_0$ - starting value; $\{\lambda_1,\ldots,\lambda_m\}$ - a sequence of descending $\lambda$'s, where $\lambda_1=\lambda_{max}$ is given in (\ref{maxlambda}); $\epsilon$ - tolerance
+	  \Require $g(\boldsymbol{\beta},\lambda)=-\frac{1}{n}f(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|$ - target function, where $f(\boldsymbol{\beta})$ is given in (\ref{func}); $\boldsymbol{\beta}_0$ - starting value; $\{\lambda_1,\ldots,\lambda_m\}$ - a sequence of descending $\lambda$'s, where $\lambda_1=\lambda_{max}$ is given in (\ref{maxlambda}); $\epsilon$ - tolerance; $N_s$, $N_t$ - maximum number of iterations of the middle and inner loops
 	  \Ensure $\widehat{\boldsymbol{\beta}}(\lambda_r)$ such that $\widehat{\boldsymbol{\beta}}(\lambda_r) \approx \arg\min_{\boldsymbol{\beta}}\; g(\boldsymbol{\beta},\lambda_r),\; r=1,\ldots,m$
 	  \State $\tilde{\boldsymbol{\beta}}_0(\lambda_{1})\leftarrow\boldsymbol{\beta}_0$
 	  \State OUTER LOOP
@@ -99,14 +99,14 @@ Note: Care is taken to avoid coefficients diverging in order to achieve fitted p
 	    \State $s \leftarrow 0$, where $s$ is the current number of iterations of the middle loop
 	    \State $g(\tilde{\boldsymbol{\beta}}_{-1}(\lambda_{r}),\lambda_{r})\leftarrow \infty$
 	    \State MIDDLE LOOP
-	  	\While {convergence criterion of the middle loop is not met: $\left|g(\tilde{\boldsymbol{\beta}}_{s}(\lambda_{r}),\lambda_{r}) - g(\tilde{\boldsymbol{\beta}}_{s-1}(\lambda_{r}),\lambda_{r})\right|>\epsilon$}
+	  	\While {$t\ge2$ and $s<N_s$}
 	  	  \State $s \leftarrow s+1$
 	      \State Update $\tilde{w}_i^{(s)}$, $\tilde{z}_i^{(s)}$ ($i=1,\ldots,n$), and thus $\ell_{s}(\boldsymbol{\beta})$ as given in (\ref{func.lasso}) based on $\tilde{\boldsymbol{\beta}}_{s-1}(\lambda_{r})$
 	      \State $t \leftarrow 0$, where $t$ is the current number of iterations of the inner loop
 	      \State $\tilde{\boldsymbol{\beta}}_s^{(0)}(\lambda_{r})\leftarrow \tilde{\boldsymbol{\beta}}_{s-1}(\lambda_{r})$
 	      \State $h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(-1)}(\lambda_{r}),\lambda_{r})\leftarrow \infty$, where $h_{s}(\boldsymbol{\beta},\lambda)=-\frac{1}{n}\ell_{s}(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|$
 	      \State INNER LOOP
-	      \While {convergence criterion of the inner loop is not met: $\left|h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(t)}(\lambda_{r}),\lambda_{r}) - h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(t-1)}(\lambda_{r}),\lambda_{r})\right|>\epsilon$}
+	      \While {$\left|h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(t)}(\lambda_{r}),\lambda_{r}) - h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(t-1)}(\lambda_{r}),\lambda_{r})\right|>\epsilon$ and $t<N_t$}
 	  	    \State $t \leftarrow t+1$
 	        \State $\tilde{\beta}_0^{(t)}(\lambda_{r})\leftarrow\sum_{i=1}^n\tilde{w}_{i}^{(s)}\left(\tilde{z}_{i}^{(s)}-\sum_{k= 1}^px_{ik}\tilde{\beta}_k^{(t-1)}(\lambda_{r})\right)\bigg/\sum_{i=1}^n\tilde{w}_{i}^{(s)}$
 	        \For {$j \in\{1,\ldots,p\}$}
@@ -127,11 +127,6 @@ Note: Care is taken to avoid coefficients diverging in order to achieve fitted p
 target functions needed to be optimized and soft-threshold operator
 
 ```{r}
-# function -f/n with penalties (minimize!) used in middle loop's convergence criterion
-logitLASSO_func <- function(u, y, betavec, lambda) {
-  -sum(y * u - log1pexp(u)) / length(y) + lambda * sum(abs(betavec[-1]))
-}
-
 # function -ell/n (without C) with penalties (minimize!) used in inner loop's convergence criterion
 coordinate_func <- function(X, z, w, betavec, lambda) {
   0.5 * sum(w * (z - X %*% betavec)^2) / nrow(X) + lambda * sum(abs(betavec[-1]))
@@ -139,7 +134,7 @@ coordinate_func <- function(X, z, w, betavec, lambda) {
 
 # soft-threshold operator used in inner loop
 soft.threshold <- function(z, gamma) {
-  sign(z) * (abs(z) - gamma) * (abs(z) - gamma > 0)
+  sign(z) * max(abs(z) - gamma, 0)
 }
 ```
 
@@ -148,11 +143,11 @@ We implement the algorithm in **R**.
 ```{r}
 # outer loop
 LogisticLASSO <- function(dat, start, lambda) {
-  k <- length(lambda)
+  r <- length(lambda)
   X <- as.matrix(cbind(rep(1, nrow(dat)), dat[, -1])) # design matrix
   y <- dat[, 1] # response vector
-  res <- matrix(NA, nrow = k, ncol = ncol(dat) + 1)
-  for (i in 1:k) {
+  res <- matrix(NA, nrow = r, ncol = ncol(dat) + 1)
+  for (i in 1:r) {
     betavec <- MiddleLoop(X = X, y = y, start = start, lambda = lambda[i])
     res[i, ] <- c(lambda[i], betavec)
     start <- betavec
@@ -162,8 +157,8 @@ LogisticLASSO <- function(dat, start, lambda) {
 }
 
 # middle loop
-MiddleLoop <- function(X, y, start, lambda, tol = 1e-10) {
-  prevfunc <- Inf
+
+MiddleLoop <- function(X, y, start, lambda, maxiter = 100) {
   betavec <- start
   u <- X %*% betavec
   p_vec <- sigmoid(u) # function `sigmoid` to compute exp(x)/(1 + exp(x))
@@ -174,29 +169,33 @@ MiddleLoop <- function(X, y, start, lambda, tol = 1e-10) {
   p_vec[p_vec > 1 - eps] <- 1
   w[p_vec == 1 | p_vec == 0] <- eps
   z <- u + (y - p_vec) / w
-  curfunc <- logitLASSO_func(u = u, y = y, betavec = betavec, lambda = lambda)
-  while (abs(curfunc - prevfunc) > tol) {
-    prevfunc <- curfunc
+  s <- 0
+  t <- 2
+  while (t > 1 && s < maxiter) { # if number of iterations of inner loop = 1, converge.
+    s <- s + 1
     betavec <- InnerLoop(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
+    t <- betavec[1]
+    betavec <- betavec[-1]
     u <- X %*% betavec
-    curfunc <- logitLASSO_func(u = u, y = y, betavec = betavec, lambda = lambda)
   }
   return(betavec)
 }
 
 # inner loop
-InnerLoop <- function(X, z, w, betavec, lambda, tol = 1e-10) {
+InnerLoop <- function(X, z, w, betavec, lambda, tol = 1e-10, maxiter = 1000) {
   prevfunc <- Inf
   curfunc <- coordinate_func(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
-  while (abs(curfunc - prevfunc) > tol) {
+  t <- 0
+  while (abs(curfunc - prevfunc) > tol && t < maxiter) {
+    t <- t + 1
     prevfunc <- curfunc
     betavec[1] <- sum(w * (z - X[, -1] %*% betavec[-1])) / sum(w)
     for (j in 2:length(betavec)) {
-      betavec[j] <- soft.threshold(z = sum(w / nrow(X) * X[, j] * (z - X[, -j] %*% betavec[-j])), gamma = lambda) / sum(w / nrow(X) * X[, j]^2)
+      betavec[j] <- soft.threshold(z = sum(w * X[, j] * (z - X[, -j] %*% betavec[-j])) / nrow(X), gamma = lambda) * nrow(X) / sum(w * X[, j]^2)
     }
     curfunc <- coordinate_func(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
   }
-  return(betavec)
+  return(c(t, betavec))
 }
 ```
 
@@ -209,41 +208,21 @@ bc_df <- read.csv("breast-cancer.csv")[-c(1, 33)] %>%
 bc_df[, -1] <- scale(bc_df[, -1]) # predictors are standardized
 
 
-# select some variables. should decide which variables to choose
-useful <- names(bc_df)[1:11] # e.g., select all mean variables
-bc_df2 <-
-  bc_df %>% 
-  select(all_of(useful))
-
-# using original data
-bc_df2 = bc_df
-
 set.seed(1)
-indexTrain <- createDataPartition(y = bc_df2$diagnosis, p = 0.8, list = FALSE)
-Training <- bc_df2[indexTrain, ]
-Test <- bc_df2[-indexTrain, ]
+indexTrain <- createDataPartition(y = bc_df$diagnosis, p = 0.8, list = FALSE)
+Training <- bc_df[indexTrain, ]
+Test <- bc_df[-indexTrain, ]
+X <- as.matrix(Training[, -1])
+y <- Training[, 1]
 ```
 
 We fit a logistic-LASSO model on the training data using our function `LogisticLASSO` with a sequence of descending $\lambda$’s.
 
 ```{r}
-X <- as.matrix(Training[, -1])
-y <- Training[, 1]
 lambda_max <- max(t(X) %*% y) / length(y)
 
 lambdas <- exp(seq(log(lambda_max), -15, length = 20))
 res <- LogisticLASSO(dat = Training, start = rep(0, ncol(Training)),
                      lambda = lambdas)
 res
-```
-
-Compare the results of logistic-LASSO model with $\lambda=e^{-15}$ using our function and logistic model (i.e., $\lambda = 0$) using the `glm` function:
-
-```{r warning=FALSE}
-tibble(
-  predictor = c("(Intercept)", names(Training)[-1]),
-  ours_lambda.exp.neg.15 = res[nrow(res), -1],
-  glm_lambda.0 = glm(diagnosis ~ ., family = binomial(link = "logit"), data = Training)$coefficients
-) %>% 
-  knitr::kable()
 ```
