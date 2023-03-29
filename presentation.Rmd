@@ -1,0 +1,99 @@
+---
+title: |
+  | Breast Cancer Diagnosis
+author: |
+  | Hongjie Liu, Xicheng Xie, Jiajun Tao, Shaohan Chen, Yujia Li
+date: "2023-02-27"
+header-includes:
+   - \usepackage{graphicx}
+   - \usepackage{float}
+   - \usepackage{subfigure}
+output:
+  beamer_presentation:
+    colortheme: "default"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Outline
+
+- Background
+
+- Task 1
+
+- Task 2
+
+- Task 3
+
+- Task 4
+
+- Discussions
+
+- Limitations and Future Work
+
+- Reference
+
+- Q&A
+
+
+## Background
+
+```{r include=FALSE}
+# The data 
+```
+
+
+## Task 1
+
+```{r include=FALSE}
+# Task 1
+```
+
+
+## Task 2
+
+```{r include=FALSE}
+# Task 2
+```
+
+
+## Task 3
+
+```{r include=FALSE}
+# Task 3
+```
+
+
+## Task 4
+
+```{r include=FALSE}
+# Task 4
+```
+
+
+## Discussions
+
+- There is much freedom when designing the simulations.
+
+- In our algorithm, we have 5 parameters. n, p, ratio, c, corr
+
+- More parameters can be adjusted.
+
+## Limitations and Future Work
+
+- Limitation: We reproduced high-dimensional scenarios, but we still don't know the solution.
+
+- Future Work: We may adjust other parameters to investigate further.
+
+## Reference
+
+1. Li Y, Hong HG, Ahmed SE, Li Y. Weak signals in high‐dimensional regression: Detection, estimation and prediction. Appl Stochastic Models Bus Ind. 2018;1–16. https://doi.org/10.1002/asmb.2340
+
+## Q&A
+
+- Thanks for listening!
+
+- Any questions?
