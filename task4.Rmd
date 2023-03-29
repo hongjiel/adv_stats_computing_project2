@@ -21,11 +21,6 @@ library(pROC)
 ## 5-fold CV
 
 ```{r include=FALSE}
-# function -f/n with penalties (minimize!) used in middle loop's convergence criterion
-logitLASSO_func <- function(u, y, betavec, lambda) {
-  -sum(y * u - log1pexp(u)) / length(y) + lambda * sum(abs(betavec[-1]))
-}
-
 # function -ell/n (without C) with penalties (minimize!) used in inner loop's convergence criterion
 coordinate_func <- function(X, z, w, betavec, lambda) {
   0.5 * sum(w * (z - X %*% betavec)^2) / nrow(X) + lambda * sum(abs(betavec[-1]))
@@ -33,18 +28,17 @@ coordinate_func <- function(X, z, w, betavec, lambda) {
 
 # soft-threshold operator used in inner loop
 soft.threshold <- function(z, gamma) {
-  sign(z) * (abs(z) - gamma) * (abs(z) - gamma > 0)
+  sign(z) * max(abs(z) - gamma, 0)
 }
-
 
 
 # outer loop
 LogisticLASSO <- function(dat, start, lambda) {
-  k <- length(lambda)
+  r <- length(lambda)
   X <- as.matrix(cbind(rep(1, nrow(dat)), dat[, -1])) # design matrix
   y <- dat[, 1] # response vector
-  res <- matrix(NA, nrow = k, ncol = ncol(dat) + 1)
-  for (i in 1:k) {
+  res <- matrix(NA, nrow = r, ncol = ncol(dat) + 1)
+  for (i in 1:r) {
     betavec <- MiddleLoop(X = X, y = y, start = start, lambda = lambda[i])
     res[i, ] <- c(lambda[i], betavec)
     start <- betavec
@@ -54,8 +48,7 @@ LogisticLASSO <- function(dat, start, lambda) {
 }
 
 # middle loop
-MiddleLoop <- function(X, y, start, lambda, tol = 1e-10) {
-  prevfunc <- Inf
+MiddleLoop <- function(X, y, start, lambda, maxiter = 100) {
   betavec <- start
   u <- X %*% betavec
   p_vec <- sigmoid(u) # function `sigmoid` to compute exp(x)/(1 + exp(x))
@@ -66,29 +59,33 @@ MiddleLoop <- function(X, y, start, lambda, tol = 1e-10) {
   p_vec[p_vec > 1 - eps] <- 1
   w[p_vec == 1 | p_vec == 0] <- eps
   z <- u + (y - p_vec) / w
-  curfunc <- logitLASSO_func(u = u, y = y, betavec = betavec, lambda = lambda)
-  while (abs(curfunc - prevfunc) > tol) {
-    prevfunc <- curfunc
+  s <- 0
+  t <- 2
+  while (t > 1 && s < maxiter) { # if number of iterations of inner loop = 1, converge.
+    s <- s + 1
     betavec <- InnerLoop(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
+    t <- betavec[1]
+    betavec <- betavec[-1]
     u <- X %*% betavec
-    curfunc <- logitLASSO_func(u = u, y = y, betavec = betavec, lambda = lambda)
   }
   return(betavec)
 }
 
 # inner loop
-InnerLoop <- function(X, z, w, betavec, lambda, tol = 1e-10) {
+InnerLoop <- function(X, z, w, betavec, lambda, tol = 1e-10, maxiter = 1000) {
   prevfunc <- Inf
   curfunc <- coordinate_func(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
-  while (abs(curfunc - prevfunc) > tol) {
+  t <- 0
+  while (abs(curfunc - prevfunc) > tol && t < maxiter) {
+    t <- t + 1
     prevfunc <- curfunc
     betavec[1] <- sum(w * (z - X[, -1] %*% betavec[-1])) / sum(w)
     for (j in 2:length(betavec)) {
-      betavec[j] <- soft.threshold(z = sum(w / nrow(X) * X[, j] * (z - X[, -j] %*% betavec[-j])), gamma = lambda) / sum(w / nrow(X) * X[, j]^2)
+      betavec[j] <- soft.threshold(z = sum(w * X[, j] * (z - X[, -j] %*% betavec[-j])) / nrow(X), gamma = lambda) * nrow(X) / sum(w * X[, j]^2)
     }
     curfunc <- coordinate_func(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
   }
-  return(betavec)
+  return(c(t, betavec))
 }
 ```
 
@@ -103,18 +100,6 @@ set.seed(1)
 indexTrain <- createDataPartition(y = bc_df$diagnosis, p = 0.8, list = FALSE)
 Training <- bc_df[indexTrain, ]
 Test <- bc_df[-indexTrain, ]
-
-
-# select some variables. should decide which variables to choose
-useful <- names(bc_df)[1:11] # e.g., select all mean variables
-bc_df2 <-
-  bc_df %>% 
-  select(all_of(useful))
-
-set.seed(1)
-indexTrain <- createDataPartition(y = bc_df2$diagnosis, p = 0.8, list = FALSE)
-Training <- bc_df2[indexTrain, ]
-Test <- bc_df2[-indexTrain, ]
 x <- model.matrix(diagnosis ~ ., Training)[, -1]
 y <- Training$diagnosis
 ```
@@ -162,7 +147,7 @@ set.seed(1)
 res_cv = cv.logit.lasso(x, y, nfolds = 5, lambda = lambdas)
 as.matrix(res_cv %>% arrange(-lambda))
 # best lambda
-best_lambda <- res_cv$lambda[res_cv$auc_ranking == 1]
+best_lambda <- max(res_cv$lambda[res_cv$auc_ranking == 1])
 best_lambda
 plot(log(res_cv$lambda), res_cv$auc_mean, pch = 16, col = "red")
 # coefficients of the best model
@@ -197,7 +182,7 @@ tibble(
   knitr::kable()
 ```
 
-The coefficients of the two final models are different because the best $\lambda$'s of the two methods are different (but close).
+The best $\lambda$'s are the same, and the coefficients are very similar.
 
 ```{r}
 # our best lambda
@@ -212,29 +197,20 @@ tibble(
   knitr::kable()
 ```
 
-If the best $\lambda$'s are the same (here we take the best $\lambda$ of `cv.glmnet`), the coefficients are very similar but still slightly different. This difference may cause the slight difference of the CV results (mean AUC), and thus the $\lambda$'s that has the largest mean AUC values of the two methods are not the same. (Or maybe due to different 5 folds or other reasons)
-
-```{r}
-# use cv.glmnet's best lambda
-tibble(
-  predictor = c("(Intercept)", names(Training)[-1]),
-  ours_coef = res_coef[res_coef$lambda == fit.logit.lasso$lambda.min, -1] %>% as.vector %>% as.numeric,
-  cv.glmnet_coef = coef(fit.logit.lasso, fit.logit.lasso$lambda.min) %>% as.vector
-) %>% 
-  knitr::kable()
-```
-
 
 ## Prediction performance comparison
 
 ```{r include=FALSE}
-NewtonRaphson <- function(dat, func, start, tol = 1e-10) {
+NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
   i <- 0
   cur <- start
   stuff <- func(dat, cur)
   res <- c(0, stuff$f, cur)
   prevf <- -Inf
-  while (abs(stuff$f - prevf) > tol) {
+  X <- cbind(rep(1, nrow(dat)), as.matrix(dat[, -1]))
+  y <- dat[, 1]
+  warned <- 0
+  while (abs(stuff$f - prevf) > tol && i < maxiter) {
     i <- i + 1
     prevf <- stuff$f
     prev <- cur
@@ -249,6 +225,11 @@ NewtonRaphson <- function(dat, func, start, tol = 1e-10) {
     }
     stuff <- func(dat, cur)
     res <- rbind(res, c(i, stuff$f, cur))
+    y_hat <- ifelse(X %*% cur > 0, 1, 0)
+    if (warned == 0 && sum(y - y_hat) == 0) {
+      warning("Complete separation occurs. Algorithm does not converge.")
+      warned <- 1
+    }
   }
   colnames(res) <- c("iter", "target_function", "(Intercept)", names(dat)[-1])
   return(res)
