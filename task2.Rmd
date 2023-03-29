@@ -48,13 +48,16 @@ We develop a modified Newton-Raphson algorithm including a step-halving step. *(
 We write an **R**-function `NewtonRaphson` to implement the algorithm. 
 
 ```{r}
-NewtonRaphson <- function(dat, func, start, tol = 1e-10) {
+NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
   i <- 0
   cur <- start
   stuff <- func(dat, cur)
   res <- c(0, stuff$f, cur)
   prevf <- -Inf
-  while (abs(stuff$f - prevf) > tol) {
+  X <- cbind(rep(1, nrow(dat)), as.matrix(dat[, -1]))
+  y <- dat[, 1]
+  warned <- 0
+  while (abs(stuff$f - prevf) > tol && i < maxiter) {
     i <- i + 1
     prevf <- stuff$f
     prev <- cur
@@ -69,6 +72,11 @@ NewtonRaphson <- function(dat, func, start, tol = 1e-10) {
     }
     stuff <- func(dat, cur)
     res <- rbind(res, c(i, stuff$f, cur))
+    y_hat <- ifelse(X %*% cur > 0, 1, 0)
+    if (warned == 0 && sum(y - y_hat) == 0) {
+      warning("Complete separation occurs. Algorithm does not converge.")
+      warned <- 1
+    }
   }
   colnames(res) <- c("iter", "target_function", "(Intercept)", names(dat)[-1])
   return(res)
@@ -86,24 +94,6 @@ set.seed(1)
 indexTrain <- createDataPartition(y = bc_df$diagnosis, p = 0.8, list = FALSE)
 Training <- bc_df[indexTrain, ]
 Test <- bc_df[-indexTrain, ]
-
-# correlation coefficients close to 1. need to remove some variables to make the algorithm converge
-glm(diagnosis ~ ., family = binomial(link = "logit"), data = Training)
-```
-
-Remove some variables. Here we select all mean predictors as an example (still have highly-correlated variables). **(Should remove variables that are highly correlated. NOT DECIDED!)**
-
-```{r}
-# select some variables. should decide which variables to choose
-useful <- names(bc_df)[1:11] # e.g., select all mean variables
-bc_df2 <-
-  bc_df %>% 
-  select(all_of(useful))
-
-set.seed(1)
-indexTrain <- createDataPartition(y = bc_df2$diagnosis, p = 0.8, list = FALSE)
-Training <- bc_df2[indexTrain, ]
-Test <- bc_df2[-indexTrain, ]
 
 glm(diagnosis ~ ., family = binomial(link = "logit"), data = Training)
 
@@ -126,10 +116,21 @@ We fit a logistic regression model on the training data using our `NewtonRaphson
 
 ```{r}
 res <- NewtonRaphson(dat = Training, func = logisticstuff, start = rep(0, ncol(Training)))
-res
+tail(res)
 ```
 
-We compare the results of using the `glm` function and our `NewtonRaphson` function.
+Our function also does not converge, because a complete separation occurs. A complete separation in a logistic regression, sometimes also referred as perfect prediction, which occurs whenever there exists some vector of coefficients $\boldsymbol{\beta}$ such that $Y_i = 1$ whenever $\mathrm{x}_i^\top\boldsymbol{\beta} > 0$ and $Y_i = 0$ whenever $\mathrm{x}_i^\top\boldsymbol{\beta} \le 0$. In other words, complete separation occurs whenever a linear function of predictors can generate perfect predictions of response.
+
+```{r}
+X <- cbind(rep(1, nrow(Training)), model.matrix(diagnosis ~ ., Training)[, -1])
+y <- Training$diagnosis
+coef_newton <- res[nrow(res), -c(1, 2)]
+y_hat <- ifelse(X %*% coef_newton > 0, 1, 0) # predictions
+sum(y - y_hat) # prefect separation
+```
+
+
+We compare the results of using the `glm` function and our `NewtonRaphson` function. (meaningless, since both do not converge)
 
 ```{r warning=FALSE}
 tibble(
