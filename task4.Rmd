@@ -291,11 +291,26 @@ roc.logitlasso.glm <- roc(response = y_test, predictor = phat)
 
 # draw rocs
 auc <- c(roc.logit$auc[1], roc.logitlasso$auc[1], roc.logitlasso.glm$auc[1])
+auc
 plot(roc.logit, legacy.axes = TRUE)
 plot(roc.logitlasso, col = 2, add = TRUE)
 plot(roc.logitlasso.glm, col = 3, add = TRUE)
 modelNames <- c("logistic", "logistic LASSO", "logistic LASSO (cv.glmnet)")
 legend("bottomright", legend = paste0(modelNames, ": ", round(auc, 3)),
 col = 1:3, lwd = 2)
+```
+
+### Correlation Plot
+
+```{r}
+corrplot::corrplot(cor(Training[names(betavec_logit.lasso)[betavec_logit.lasso != 0]]))
+```
+
+### LASSO model coefficients
+
+Re-fit the logistic regression with the predictors selected by LASSO.
+
+```{r}
+refit_logit[nrow(refit_logit), 3:ncol(refit_logit)]
 ```
 
