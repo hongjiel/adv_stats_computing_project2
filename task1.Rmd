@@ -57,7 +57,7 @@ Thus, $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ is negative-definit
 Hence, the optimization problem (\ref{opt}) is a well-defined problem.
 
 
-```{r setup, include=FALSE}
+```{r}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(ggcorrplot)
@@ -76,7 +76,7 @@ ggcorrplot(corr, type = "upper", tl.cex = 8)
 ```
 
 
-```{r logstic full model,echo=FALSE}
+```{r logstic full model}
 library(caret)
 library(pROC)
 set.seed(1)
