@@ -1,11 +1,9 @@
 ---
 title: "Task 1"
-output: pdf_document
+output: 
+    pdf_document :
+      latex_engine : xelatex
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 **Task 1:** Build a logistic model to classify the images into malignant/benign, and write down your likelihood function, its gradient and Hessian matrix.
 
@@ -62,6 +60,7 @@ Hence, the optimization problem (\ref{opt}) is a well-defined problem.
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(ggcorrplot)
 cancer <- read.csv("C:/Users/yujia/Downloads/breast-cancer.csv") %>%
   janitor::clean_names()%>%
   select(-1,-33) %>%
