@@ -47,19 +47,43 @@ The other 30 columns correspond to mean, standard deviation and the largest valu
 ```{r include=FALSE, echo=FALSE}
 library(tidyverse)
 library(ggcorrplot)
+library(dplyr)
 cancer <- read.csv("C:/Users/yujia/Downloads/breast-cancer.csv") %>%
   select(-1,-33) %>%
+  janitor::clean_names()%>%
   mutate(diagnosis = recode(diagnosis, "M" = 1, "B" = 0)) 
 corr = cancer[2:31] %>% 
   cor()
-ggcorrplot(corr, type = "upper", tl.cex = 8)
+corr=ggcorrplot(corr, type = "upper", tl.cex = 8)
+
+cancer1 <- cancer %>%
+  select(-area_se, 
+         -perimeter_se, 
+         -area_worst, 
+         -perimeter_mean, 
+         -perimeter_worst, 
+         -area_mean, 
+         -radius_worst, 
+         -concave_points_mean, 
+         -texture_worst, 
+         -compactness_mean, 
+         -smoothness_worst)
+corr1 = cancer1[2:20] %>% 
+  cor()
+corr1=ggcorrplot(corr1, type = "upper", tl.cex = 8)
 ```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(corr,corr1, ncol=2, nrow=1, common.legend = TRUE, legend = "bottom", labels = "AUTO")
+```
+There are multicollinearity features among our predictors as shown above in the left graph that could cause unstable parameter estimation as well as perplexing the interpretation of logistic model. While we could eliminate some features for modeling as shown in the right graph, regularized logistic regression also help to tackle with it, which would be further explore in the following parts. 
 
 # 2. Methods
 ## 2.1. Logistic Model
 
 
 ## 2.2. Newton-Raphson Algorithm 
+While derivative of the likelihood function with respect to the parameters is nonlinear and difficult to solve analytically for maximum likelihood, it requires Newton-Raphson iterations.
 
 
 
@@ -72,10 +96,9 @@ ggcorrplot(corr, type = "upper", tl.cex = 8)
 
 
 # 3. Results
+## 5-fold CV Results for Logistic-LASSO
 
-## 3.1. 5-fold CV Results
-
-## 3.2. Model Comparison
+## Model Comparison
 
 
 
