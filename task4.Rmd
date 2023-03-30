@@ -18,9 +18,55 @@ library(pROC)
 
 **Task 4:** Use 5-fold cross-validation to select the best $\lambda$. Compare the prediction performance between the "optimal" model and "full" model.
 
-## 5-fold CV
-
 ```{r include=FALSE}
+NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
+  i <- 0
+  cur <- start
+  stuff <- func(dat, cur)
+  res <- c(0, stuff$f, cur)
+  prevf <- -Inf
+  X <- cbind(rep(1, nrow(dat)), as.matrix(dat[, -1]))
+  y <- dat[, 1]
+  warned <- 0
+  while (abs(stuff$f - prevf) > tol && i < maxiter) {
+    i <- i + 1
+    prevf <- stuff$f
+    prev <- cur
+    d <- -solve(stuff$Hess) %*% stuff$grad
+    cur <- prev + d
+    lambda <- 1
+    maxhalv <- 0
+    while (func(dat, cur)$f < prevf && maxhalv < 50) {
+      maxhalv <- maxhalv + 1
+      lambda <- lambda / 2
+      cur <- prev + lambda * d
+    }
+    stuff <- func(dat, cur)
+    res <- rbind(res, c(i, stuff$f, cur))
+    y_hat <- ifelse(X %*% cur > 0, 1, 0)
+    if (warned == 0 && sum(y - y_hat) == 0) {
+      warning("Complete separation occurs. Algorithm does not converge.")
+      warned <- 1
+    }
+  }
+  colnames(res) <- c("iter", "target_function", "(Intercept)", names(dat)[-1])
+  return(res)
+}
+
+logisticstuff <- function(dat, betavec) {
+  dat <- as.matrix(dat)
+  n <- nrow(dat)
+  p <- ncol(dat) - 1
+  X <- cbind(rep(1, n), dat[, -1]) # design matrix
+  y <- dat[, 1] # response vector
+  u <- X %*% betavec # x_i^T beta, i=1,...,n
+  f <- sum(y * u - log1pexp(u)) # function `log1pexp` to compute log(1 + exp(x)))
+  p_vec <- sigmoid(u) # function `sigmoid` to compute exp(x)/(1 + exp(x))
+  grad <- t(X) %*% (y - p_vec)
+  Hess <- -t(X) %*% diag(c(p_vec * (1 - p_vec))) %*% X
+  return(list(f = f, grad = grad, Hess = Hess))
+}
+
 # function -ell/n (without C) with penalties (minimize!) used in inner loop's convergence criterion
 coordinate_func <- function(X, z, w, betavec, lambda) {
   0.5 * sum(w * (z - X %*% betavec)^2) / nrow(X) + lambda * sum(abs(betavec[-1]))
@@ -89,6 +135,7 @@ InnerLoop <- function(X, z, w, betavec, lambda, tol = 1e-10, maxiter = 1000) {
 }
 ```
 
+## 5-fold CV
 
 ```{r include=FALSE}
 # data preprocessing and data partition
@@ -140,8 +187,8 @@ Compare the results of cross-validation using `glmnet` and using our algorithm.
 
 1. Our function `cv.logit.lasso`:
 
-```{r message=FALSE}
-lambda_max <- max(abs(t(x) %*% y)) / length(y)
+```{r message=FALSE, warning=FALSE}
+lambda_max <- max(abs(t(x) %*% y)) / floor(length(y) * 4/5) # cv trains model on 4/5 of the training data for 5 times
 lambdas <- exp(seq(log(lambda_max), log(lambda_max) - 8, length = 30))
 set.seed(1)
 res_cv = cv.logit.lasso(x, y, nfolds = 5, lambda = lambdas)
@@ -200,61 +247,7 @@ tibble(
 
 ## Prediction performance comparison
 
-```{r include=FALSE}
-NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
-  i <- 0
-  cur <- start
-  stuff <- func(dat, cur)
-  res <- c(0, stuff$f, cur)
-  prevf <- -Inf
-  X <- cbind(rep(1, nrow(dat)), as.matrix(dat[, -1]))
-  y <- dat[, 1]
-  warned <- 0
-  while (abs(stuff$f - prevf) > tol && i < maxiter) {
-    i <- i + 1
-    prevf <- stuff$f
-    prev <- cur
-    d <- -solve(stuff$Hess) %*% stuff$grad
-    cur <- prev + d
-    lambda <- 1
-    maxhalv <- 0
-    while (func(dat, cur)$f < prevf && maxhalv < 50) {
-      maxhalv <- maxhalv + 1
-      lambda <- lambda / 2
-      cur <- prev + lambda * d
-    }
-    stuff <- func(dat, cur)
-    res <- rbind(res, c(i, stuff$f, cur))
-    y_hat <- ifelse(X %*% cur > 0, 1, 0)
-    if (warned == 0 && sum(y - y_hat) == 0) {
-      warning("Complete separation occurs. Algorithm does not converge.")
-      warned <- 1
-    }
-  }
-  colnames(res) <- c("iter", "target_function", "(Intercept)", names(dat)[-1])
-  return(res)
-}
-
-logisticstuff <- function(dat, betavec) {
-  dat <- as.matrix(dat)
-  n <- nrow(dat)
-  p <- ncol(dat) - 1
-  X <- cbind(rep(1, n), dat[, -1]) # design matrix
-  y <- dat[, 1] # response vector
-  u <- X %*% betavec # x_i^T beta, i=1,...,n
-  f <- sum(y * u - log1pexp(u)) # function `log1pexp` to compute log(1 + exp(x)))
-  p_vec <- sigmoid(u) # function `sigmoid` to compute exp(x)/(1 + exp(x))
-  grad <- t(X) %*% (y - p_vec)
-  Hess <- -t(X) %*% diag(c(p_vec * (1 - p_vec))) %*% X
-  return(list(f = f, grad = grad, Hess = Hess))
-}
-```
-
-**We probably need resampling methods (conducted in training data) to select the best model. Is the resampling methods in task 2 correct?**
-
-
-
-Below is the prediction performance on the test data. *(I suppose this should not be used for model comparison)*
+Below is the prediction performance on the test data.
 
 ```{r message=FALSE}
 # test data
@@ -269,14 +262,30 @@ phat <- sigmoid(u)[, 1]
 roc.logit <- roc(response = y_test, predictor = phat)
 
 # logistic LASSO model
-betavec_logit.lasso <- res_coef[res_coef$lambda == best_lambda, -1] %>% as.vector %>% as.numeric
-u <- X_test %*% betavec_logit.lasso
+betavec_logit.lasso <- res_coef[res_coef$lambda == best_lambda, -c(1, 2)]
+col_nonzero <- names(betavec_logit.lasso)[betavec_logit.lasso != 0]
+df_nonzero <- Training[c("diagnosis", col_nonzero)]
+refit_logit <- NewtonRaphson(dat = df_nonzero, func = logisticstuff, start = rep(0, ncol(df_nonzero)))
+betavec_lasso.refit <- refit_logit[nrow(refit_logit), 3:ncol(refit_logit)]
+betavec_lasso.refit <- bind_rows(betavec_logit.lasso, betavec_lasso.refit)[2,] %>% select("(Intercept)",  everything())
+betavec_lasso.refit[is.na(betavec_lasso.refit)] <- 0
+betavec_lasso.refit <- as.numeric(betavec_lasso.refit)
+u <- X_test %*% betavec_lasso.refit
 phat <- sigmoid(u)[, 1]
 roc.logitlasso <- roc(response = y_test, predictor = phat)
 
 # logistic LASSO model (cv.glmnet)
-betavec_logit.lasso.glm <- coef(fit.logit.lasso, fit.logit.lasso$lambda.min) %>% as.vector
-u <- X_test %*% betavec_logit.lasso.glm
+betavec_logit.lasso.glm_temp <- coef(fit.logit.lasso, fit.logit.lasso$lambda.min)
+betavec_logit.lasso.glm <- betavec_logit.lasso.glm_temp %>% as.vector
+names(betavec_logit.lasso.glm) <- betavec_logit.lasso.glm_temp@Dimnames[[1]]
+col_nonzero <- names(betavec_logit.lasso.glm)[betavec_logit.lasso.glm != 0][-1]
+df_nonzero <- Training[c("diagnosis", col_nonzero)]
+refit_logit.glm <- NewtonRaphson(dat = df_nonzero, func = logisticstuff, start = rep(0, ncol(df_nonzero)))
+betavec_lasso.refit.glm <- refit_logit.glm[nrow(refit_logit.glm), 3:ncol(refit_logit.glm)]
+betavec_lasso.refit.glm <- bind_rows(betavec_logit.lasso, betavec_lasso.refit.glm)[2,] %>% select("(Intercept)",  everything())
+betavec_lasso.refit.glm[is.na(betavec_lasso.refit.glm)] <- 0
+betavec_lasso.refit.glm <- as.numeric(betavec_lasso.refit.glm)
+u <- X_test %*% betavec_lasso.refit.glm
 phat <- sigmoid(u)[, 1]
 roc.logitlasso.glm <- roc(response = y_test, predictor = phat)
 
