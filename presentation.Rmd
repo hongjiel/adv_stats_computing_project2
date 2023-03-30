@@ -76,11 +76,11 @@ cases (M = malignant, B = benign). There are 357 benign and 212 malignant cases.
 
 
 
-## Task 1
-
-**Objective**
+## Task 1 - Objective
+**Objective:**
 
 Build a logistic model to classify the images into malignant/benign, and write down your likelihood function, its gradient and Hessian matrix.
+
 
 ## Task 1 - Build a logistic model
 Define the "Diagnosis" variable will be coded as 1 for malignant cases and 0 for benign cases.\par
@@ -89,11 +89,15 @@ Given $n$ i.i.d. observations with $p$ predictors, we consider a logistic regres
 \begin{equation}\label{model}
 P(Y_i=1\mid \mathbf{x}_i)=\frac{e^{\mathbf{x}_i^\top\boldsymbol{\beta}}}{1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}},\; i=1,\ldots,n
 \end{equation}
+
 where $\boldsymbol{\beta}=(\beta_0,\beta_1,\ldots,\beta_p)^\top\in\mathbb{R}^{p+1}$ is the parameter vector, $\mathbf{x}_i=(1,X_{i1},\ldots,X_{ip})^\top$ is the vector of predictors in the $i$-th observation, and $Y_i\in\{0,1\}$ is the binary response in the $i$-th observation.
 
 ## Task 1 - Build a logistic model
-Let $\mathbf{y}=(Y_1,Y_2,\ldots,Y_n)^\top$ denote the response vector, $\mathbf{X}=(\mathbf{x}_1,\mathbf{x}_2,\ldots,\mathbf{x}_n)^\top\in\mathbb{R}^{n\times(p+1)}$ denote the design matrix. The observed likelihood of $\{(Y_1,\mathbf{x}_1),(Y_2,\mathbf{x}_2)\ldots,(Y_n,\mathbf{x}_n)\}$ is
-$$L(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\prod_{i=1}^n\left[\left(\frac{e^{\mathbf{x}_i^\top\boldsymbol{\beta}}}{1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}}\right)^{Y_i}\left(\frac{1}{1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}}\right)^{1-Y_i}\right].$$
+Let $\mathbf{y}=(Y_1,Y_2,\ldots,Y_n)^\top$ denote the response vector, and $\mathbf{X}=(\mathbf{x}_1,\mathbf{x}_2,\ldots,\mathbf{x}_n)^\top\in\mathbb{R}^{n\times(p+1)}$ denote the design matrix.
+
+The observed likelihood of $\{(Y_1,\mathbf{x}_1),(Y_2,\mathbf{x}_2)\ldots,(Y_n,\mathbf{x}_n)\}$ is
+$$L(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\prod_{i=1}^n\left[\left(\frac{e^{\mathbf{x}_i^\top\boldsymbol{\beta}}}{1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}}\right)^{Y_i}\left(\frac{1}{1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}}\right)^{1-Y_i}\right]$$
+
 
 ## Task 1 - Build a logistic model
 Maximizing the likelihood is equivalent to maximizing the log-likelihood function:
@@ -107,14 +111,16 @@ and the optimization problem is
 \max_{\boldsymbol{\beta}}\; f(\boldsymbol{\beta};\mathbf{y},\mathbf{X}).
 \end{equation}
 
+
 ## Task 1 - Build a logistic model
-Denote $p_i=P(Y_i=1\mid\mathbf{x}_i)$ as given in (\ref{model}) and $\mathbf{p}=(p_1,p_2,\ldots,p_n)^\top$. The gradient of $f$ is
+Denote $p_i=P(Y_i=1\mid\mathbf{x}_i)$ as given in (\ref{model}) and $\mathbf{p}=(p_1,p_2,\ldots,p_n)^\top$. The gradient of $f$ is:
 \begin{align*}
 \nabla f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})&=\mathbf{X}^\top(\mathbf{y}-\mathbf{p})\\
 &=\sum_{i=1}^n(Y_i-p_i)\mathbf{x}_i\\
 &=\begin{pmatrix}
-\sum_{i=1}^n(Y_i-p_i)\\ \sum_{i=1}^n(Y_i-p_i)X_{i1}\\ \vdots\\ \sum_{i=1}^n(Y_i-p_i)X_{ip}\end{pmatrix}.
+\sum_{i=1}^n(Y_i-p_i)\\ \sum_{i=1}^n(Y_i-p_i)X_{i1}\\ \vdots\\ \sum_{i=1}^n(Y_i-p_i)X_{ip}\end{pmatrix}
 \end{align*}
+
 
 ## Task 1 - Build a logistic model
 Denote $w_i=p_i(1-p_i)\in(0,1)$ and $\mathbf{W}=\mathrm{diag}(w_1,\ldots,w_n)$. The Hessian matrix of $f$ is given by
@@ -126,7 +132,7 @@ Denote $w_i=p_i(1-p_i)\in(0,1)$ and $\mathbf{W}=\mathrm{diag}(w_1,\ldots,w_n)$. 
 \sum_{i=1}^nw_iX_{i1} & \sum_{i=1}^nw_iX_{i1}^2 & \cdots & \sum_{i=1}^nw_iX_{i1}X_{ip} \\ 
 \vdots & \vdots & \ddots & \vdots \\ 
 \sum_{i=1}^nw_iX_{ip} & \sum_{i=1}^nw_iX_{in}X_{i1} & \cdots & \sum_{i=1}^nw_iX_{ip}^2
-\end{pmatrix}.
+\end{pmatrix}
 \end{align*}
 
 ## Task 1 - Build a logistic model
@@ -143,23 +149,38 @@ Thus, $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ is negative-definit
 Hence, the optimization problem (\ref{opt}) is a well-defined problem.
 
 
+## Task 1 - Logistic model R code
+```{r eval = FALSE, size = "tiny"}
+trainRows <- createDataPartition(y = cancer$diagnosis, p = 0.8, list = FALSE)
+train <- cancer[trainRows, ]
+test <-  cancer[-trainRows, ]
+glm.fit <- glm(diagnosis ~ ., 
+               data = train, 
+               subset = trainRows, 
+               family = binomial(link = "logit"))
+summary(glm.fit)
+pred <- predict(glm.fit, newdata = test, type = "response")
+y_test <- factor(test$diagnosis)
+auc_full <- auc(y_test, pred)
+auc_full
+```
 
 
+# Task 1 - Logistic model R code
 
 
-## Task 2
-
-**Objective**  
-
+## Task 2 - Object
+**Objective:**\par
 Develop a Newton-Raphson algorithm to estimate your model
 
-The target function $f$ given in task 1:
+- Recall The target function $f$ given in task 1 is:
 \begin{equation}\label{func}
 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\top\boldsymbol{\beta}-\log\left(1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}\right)\right].
 \end{equation}
+- We develop a modified Newton-Raphson algorithm including a step-halving step to maximize the target function.
 
-## Task 2 - Newton-Raphson algorithm
 
+## Task 2 - Newton-Raphson algorithm design
 \tiny
 \begin{algorithm}[H]
 	\caption{Newton-Raphson algorithm}
@@ -182,8 +203,9 @@ f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\t
 	\end{algorithmic}
 \end{algorithm}
 
-## Task 2 - Newton-Raphson algorithm
 
+## Task 2 - Newton-Raphson algorithm R code
+The corresponding R-function for the algorithm
 ```{r eval=FALSE, size = "tiny"}
 NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
   i <- 0
@@ -220,37 +242,37 @@ NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
 }
 ```
 
-## Task 2 - Newton-Raphson algorithm
 
-**Data preprocessing and data partition.**\par
+## Task 2 - Complete separtion
+Sometimes our algorithm does not converge because of the complete separation.
 
-```{r eval=FALSE, size = "tiny"}
-bc_df <- read.csv("breast-cancer.csv")[-c(1, 33)] %>% # remove variable ID and an NA column
-  mutate(diagnosis = ifelse(diagnosis == "M", 1, 0)) # code malignant cases as 1
-bc_df[, -1] <- scale(bc_df[, -1]) # predictors are standardized for the model in task 3
+A complete separation in a logistic regression, sometimes also referred as perfect prediction, occurs whenever there exists some vector of coefficients $\boldsymbol{\beta}$ such that $Y_i = 1$ whenever $\mathrm{x}_i^\top\boldsymbol{\beta} > 0$ and $Y_i = 0$ whenever $\mathrm{x}_i^\top\boldsymbol{\beta} \le 0$. 
 
-set.seed(1)
-indexTrain <- createDataPartition(y = bc_df$diagnosis, p = 0.8, list = FALSE)
-Training <- bc_df[indexTrain, ]
-Test <- bc_df[-indexTrain, ]
+Complete separation occur when a linear function of predictors can perfectly classify the response.
 
-glm(diagnosis ~ ., family = binomial(link = "logit"), data = Training)
 
-logisticstuff <- function(dat, betavec) {
-  dat <- as.matrix(dat)
-  n <- nrow(dat)
-  p <- ncol(dat) - 1
-  X <- cbind(rep(1, n), dat[, -1]) # design matrix
-  y <- dat[, 1] # response vector
-  u <- X %*% betavec # x_i^T beta, i=1,...,n
-  f <- sum(y * u - log1pexp(u)) # function `log1pexp` to compute log(1 + exp(x)))
-  p_vec <- sigmoid(u) # function `sigmoid` to compute exp(x)/(1 + exp(x))
-  grad <- t(X) %*% (y - p_vec)
-  Hess <- -t(X) %*% diag(c(p_vec * (1 - p_vec))) %*% X
-  return(list(f = f, grad = grad, Hess = Hess))
-}
+## Task 2 - Comparison
+When there is no complete separation, the parameters output by `glm` function and our algorithm are the same.
+
+
+## Task 2 - Comparison
+Comparison of using `glm` function and our algorithm (part1)
+```{r echo = FALSE, warning = FALSE, size = "tiny"}
+load("data/task2.RData")
+c_t = tibble(
+  predictor = c("(Intercept)", names(Training)[-1]),
+  ours = res[nrow(res), -c(1, 2)],
+  glm = glm(diagnosis ~ ., family = binomial(link = "logit"), data = Training)$coefficients
+) 
+c_t[1:15, ] %>% knitr::kable()
 ```
 
+
+## Task 2 - Comparison
+Comparison of using `glm` function and our algorithm (part2)
+```{r echo = FALSE, warning = FALSE, size = "tiny"}
+c_t[16:31, ] %>% knitr::kable()
+```
 
 
 ## Task 3
