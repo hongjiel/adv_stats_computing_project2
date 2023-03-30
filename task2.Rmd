@@ -141,19 +141,7 @@ tibble(
   knitr::kable()
 ```
 
-Compute the test AUC. (should NOT be used for model comparison)
-
-```{r message=FALSE}
-betavec.logit <- res[nrow(res), 3:ncol(res)]
-# test data
-X_test <- cbind(rep(1, nrow(Test)), model.matrix(diagnosis ~ ., Test)[, -1])
-y_test <- Test$diagnosis
-# AUC
-u_test <- X_test %*% betavec.logit
-phat_test <- sigmoid(u_test)[, 1]
-roc.logit.test <- roc(response = y_test, predictor = phat_test)
-auc.logit.test <- roc.logit.test$auc[1]
-```
+**We probably won't conduct resampling. Ignore the below.**
 
 Resampling on training data: *Does the following resampling method work?*
 
@@ -167,7 +155,7 @@ https://ro.uow.edu.au/cgi/viewcontent.cgi?article=3494&context=commpapers
 
 RW-OOB
 
-```{r message=FALSE}
+```{r warning=FALSE, message=FALSE}
 B = 100 # number of bootstrap samples
 set.seed(1)
 auc.logit <- rep(NA, B)
