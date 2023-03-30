@@ -20,9 +20,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(caret)
-library(sigmoid) # function `sigmoid` to compute exp(x)/(1 + exp(x))
-library(qgam) # function `log1pexp` to compute log(1 + exp(x)))
+library(sigmoid) 
+library(qgam) 
 library(pROC)
+
+# magic that automatically adjusts the font size
+def.chunk.hook = knitr::knit_hooks$get("chunk")
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x = def.chunk.hook(x, options)
+  ifelse(options$size != "normalsize", paste0("\n \\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
+})
 ```
 
 
@@ -52,6 +59,8 @@ library(pROC)
 ```{r include=FALSE}
 # The data
 ```
+
+**Breast Cancer Diagnosis**\par
 
 - The data is the breast cancer medical data retrieved from "breast-cancer.csv", which has 569 rows and 32 columns.  
 - The first column `ID` labels individual breast tissue images; The second column `Diagnosis` identifies if the image is coming from cancer tissue or benign
@@ -140,11 +149,9 @@ Hence, the optimization problem (\ref{opt}) is a well-defined problem.
 
 ## Task 2
 
-**Objective**
+**Objective**  
 
 Develop a Newton-Raphson algorithm to estimate your model
-
-## Task 2 - Newton-Raphson algorithm
 
 The target function $f$ given in task 1:
 \begin{equation}\label{func}
@@ -153,11 +160,31 @@ f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\t
 
 ## Task 2 - Newton-Raphson algorithm
 
-
+\tiny
+\begin{algorithm}[H]
+	\caption{Newton-Raphson algorithm}
+	\begin{algorithmic}
+	  \Require $f(\boldsymbol{\beta})$ - target function as given in (\ref{func}); $\boldsymbol{\beta}_0$ - starting value
+	  \Ensure $\widehat{\boldsymbol{\beta}}$ such that $\widehat{\boldsymbol{\beta}} \approx \arg\max_{\boldsymbol{\beta}}\; f(\boldsymbol{\beta})$
+	  \State $i\leftarrow 0$, where $i$ is the current number of iterations
+	  \State $f(\boldsymbol{\beta}_{-1})\leftarrow -\infty$
+	  \While {convergence criterion is not met}
+	    \State $i \leftarrow i+1$
+	    \State $\mathbf{d}_i\leftarrow-[\nabla^2f(\boldsymbol{\beta}_{i-1})]^{-1}\nabla f(\boldsymbol{\beta}_{i-1})$, where $\mathbf{d}_i$ is the direction in the $i$-th iteration
+	    \State $\lambda_i \leftarrow 1$, where $\lambda_i$ is the multiplier in the $i$-th iteration
+	    \State $\boldsymbol{\beta}_i \leftarrow \boldsymbol{\beta}_{i-1} + \lambda_i\mathbf{d}_i$
+	    \While {$f(\boldsymbol{\beta}_i)\le f(\boldsymbol{\beta}_{i-1})$}
+	      \State $\lambda_i \leftarrow \lambda_i/2$
+	      \State $\boldsymbol{\beta}_i \leftarrow \boldsymbol{\beta}_{i-1} + \lambda_i\mathbf{d}_i$
+	    \EndWhile
+	  \EndWhile
+	  \State $\widehat{\boldsymbol{\beta}}\leftarrow \boldsymbol{\beta}_i$
+	\end{algorithmic}
+\end{algorithm}
 
 ## Task 2 - Newton-Raphson algorithm
 
-```{r eval=FALSE}
+```{r eval=FALSE, size = "tiny"}
 NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
   i <- 0
   cur <- start
@@ -195,11 +222,12 @@ NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
 
 ## Task 2 - Newton-Raphson algorithm
 
-**Data preprocessing and data partition.**
-```{r eval=FALSE}
+**Data preprocessing and data partition.**\par
+
+```{r eval=FALSE, size = "tiny"}
 bc_df <- read.csv("breast-cancer.csv")[-c(1, 33)] %>% # remove variable ID and an NA column
   mutate(diagnosis = ifelse(diagnosis == "M", 1, 0)) # code malignant cases as 1
-bc_df[, -1] <- scale(bc_df[, -1]) # predictors are standardized for the logistic-LASSO model in task 3
+bc_df[, -1] <- scale(bc_df[, -1]) # predictors are standardized for the model in task 3
 
 set.seed(1)
 indexTrain <- createDataPartition(y = bc_df$diagnosis, p = 0.8, list = FALSE)
@@ -222,8 +250,6 @@ logisticstuff <- function(dat, betavec) {
   return(list(f = f, grad = grad, Hess = Hess))
 }
 ```
-
-# Task 2 - Newton-Raphson algorithm
 
 
 

@@ -1,0 +1,31 @@
+---
+header-includes:
+  - \usepackage{algorithm}
+  - \usepackage{algpseudocode}
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\begin{algorithm}
+	\caption{Newton-Raphson algorithm including a step-halving step}
+	\begin{algorithmic}[1]
+	  \Require $f(\boldsymbol{\beta})$ - target function as given in (\ref{func}); $\boldsymbol{\beta}_0$ - starting value
+	  \Ensure $\widehat{\boldsymbol{\beta}}$ such that $\widehat{\boldsymbol{\beta}} \approx \arg\max_{\boldsymbol{\beta}}\; f(\boldsymbol{\beta})$
+	  \State $i\leftarrow 0$, where $i$ is the current number of iterations
+	  \State $f(\boldsymbol{\beta}_{-1})\leftarrow -\infty$
+	  \While {convergence criterion is not met}
+	    \State $i \leftarrow i+1$
+	    \State $\mathbf{d}_i\leftarrow-[\nabla^2f(\boldsymbol{\beta}_{i-1})]^{-1}\nabla f(\boldsymbol{\beta}_{i-1})$, where $\mathbf{d}_i$ is the direction in the $i$-th iteration
+	    \State $\lambda_i \leftarrow 1$, where $\lambda_i$ is the multiplier in the $i$-th iteration
+	    \State $\boldsymbol{\beta}_i \leftarrow \boldsymbol{\beta}_{i-1} + \lambda_i\mathbf{d}_i$
+	    \While {$f(\boldsymbol{\beta}_i)\le f(\boldsymbol{\beta}_{i-1})$}
+	      \State $\lambda_i \leftarrow \lambda_i/2$
+	      \State $\boldsymbol{\beta}_i \leftarrow \boldsymbol{\beta}_{i-1} + \lambda_i\mathbf{d}_i$
+	    \EndWhile
+	  \EndWhile
+	  \State $\widehat{\boldsymbol{\beta}}\leftarrow \boldsymbol{\beta}_i$
+	\end{algorithmic}
+\end{algorithm}
