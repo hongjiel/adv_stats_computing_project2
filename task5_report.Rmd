@@ -1,7 +1,7 @@
 ---
 title: "P8160 - Breast Cancer Diagnosis"
 author: "Hongjie Liu, Xicheng Xie, Jiajun Tao, Shaohan Chen, Yujia Li"
-date: "3/29/2023"
+date: "3/30/2023"
 output:
   pdf_document:
     toc: yes
@@ -25,31 +25,59 @@ header-includes:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# 1. Introduction
+# 1. Objectives
+Mammography is recognized as the most effective screening method for early breast cancer detection, but its accuracy remains limited. And as the number of variables that help predict breast cancer increases, doctors are forced to rely more on their subjective experiences to make decisions. The use of computer models can detect abnormalities in mammograms to aid radiologists in breast cancer diagnosis (Freer et al. 2001). The purpose of this study was to predict breast cancer benign/malignant status by quantitative modeling based on logistic regression, which may help radiologists manage the large amount of available information, make effective decisions to detect breast cancers and reduce unnecessary biopsy.
 
-## 1.1. Background
+# 2. Background 
+The data given has 569 observations. The column 'Diagnosis' which identifies if the image is coming from cancer tissue or benign cases (M=malignant, B = benign) would be used as outcome for modeling. We denote malignant as 1 and benign cases as 0 for prediction.
+The other 30 columns correspond to mean, standard deviation and the largest values (points on the tails) of the distributions of the following 10 features computed for the cell nuclei:
+\begin{itemize}
+\item radius: mean of distances from center to points on the perimeter
+\item texture: standard deviation of gray-scale values
+\item perimeter: mean size of the core tumor
+\item area: mean area of the core tumor
+\item smoothness: local variation in radius lengths
+\item compactness: perimeter$^2/$area - 1.0
+\item concavity: severity of concave portions of the contour
+\item concave points: number of concave portions of the contour
+\item symmetry: symmetry of the tumor
+\item fractal dimension: "coastline approximation" - 1
+\end{itemize}
 
-## 1.2. Objectives
+```{r include=FALSE, echo=FALSE}
+library(tidyverse)
+library(ggcorrplot)
+cancer <- read.csv("C:/Users/yujia/Downloads/breast-cancer.csv") %>%
+  select(-1,-33) %>%
+  mutate(diagnosis = recode(diagnosis, "M" = 1, "B" = 0)) 
+corr = cancer[2:31] %>% 
+  cor()
+ggcorrplot(corr, type = "upper", tl.cex = 8)
+```
 
 # 2. Methods
+## 2.1. Logistic Model
 
-## 2.1. Data Preprocessing
 
-## 2.2. Logistic Model
+## 2.2. Newton-Raphson Algorithm 
 
-## 2.3. Newton-Raphson Algorithm 
 
-## 2.4. Logistic-LASSO Model
 
-## 2.5. Five-fold Cross Validation
+## 2.3. Logistic-LASSO Model
 
-## 2.6. Model Evaluation
+
+
+## 2.4. Five-fold Cross Validation for LASSO
+
+
 
 # 3. Results
 
 ## 3.1. 5-fold CV Results
 
-## 3.2. Model Prediction Performance Comparison
+## 3.2. Model Comparison
+
+
 
 # 4. Discussion
 
@@ -61,7 +89,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 \newpage 
 # References
+Freer, Timothy W., and Michael J. Ulissey. "Screening mammography with computer-aided detection: prospective study of 12,860 patients in a community breast center." Radiology 220.3 (2001): 781-786.
+
 
 \newpage 
 # Appendices
-
