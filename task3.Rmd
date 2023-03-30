@@ -44,7 +44,7 @@ INNER LOOP: Run the coordinate descent algorithm on the penalized weighted-least
 **OUTER LOOP** 
 In the outer loop, we compute the solutions of the optimization problem (\ref{opt.lasso}) for a decreasing sequence of values for $\lambda$: $\{\lambda_1,\ldots,\lambda_m\}$, starting at the smallest value $\lambda_1 = \lambda_{max}$ for which the estimates of all coefficients $\hat{\beta}_j = 0,\; j=1,2,\ldots,p$, which is
 \begin{equation}\label{maxlambda}
-\lambda_{max} = \max_j\left|\left \langle \mathbf{x}_{\cdot j}, \mathbf{y} \right \rangle\right|,
+\lambda_{max} = \frac{1}{n}\max_j\left|\left \langle \mathbf{x}_{\cdot j}, \mathbf{y} \right \rangle\right|,
 \end{equation}
 where $\mathbf{x}_{\cdot j}$ is the $j$-th column of the design matrix $\mathbf{X}$, for $j=1,\ldots,p$.  
 For tuning parameter value $\lambda_{k+1}$, we initialize coordinate descent algorithm at the computed solution for $\lambda_k$ (warm start). Apart from giving us a path of solutions, this scheme exploits warm starts, and leads to a more stable algorithm.
@@ -212,14 +212,14 @@ set.seed(1)
 indexTrain <- createDataPartition(y = bc_df$diagnosis, p = 0.8, list = FALSE)
 Training <- bc_df[indexTrain, ]
 Test <- bc_df[-indexTrain, ]
-X <- as.matrix(Training[, -1])
+x <- as.matrix(Training[, -1])
 y <- Training[, 1]
 ```
 
 We fit a logistic-LASSO model on the training data using our function `LogisticLASSO` with a sequence of descending $\lambda$’s.
 
 ```{r}
-lambda_max <- max(t(X) %*% y) / length(y)
+lambda_max <- max(abs(t(x) %*% y)) / length(y)
 
 lambdas <- exp(seq(log(lambda_max), -15, length = 20))
 res <- LogisticLASSO(dat = Training, start = rep(0, ncol(Training)),

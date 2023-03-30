@@ -141,7 +141,7 @@ Compare the results of cross-validation using `glmnet` and using our algorithm.
 1. Our function `cv.logit.lasso`:
 
 ```{r message=FALSE}
-lambda_max <- max(t(x) %*% y) / length(y)
+lambda_max <- max(abs(t(x) %*% y)) / length(y)
 lambdas <- exp(seq(log(lambda_max), log(lambda_max) - 8, length = 30))
 set.seed(1)
 res_cv = cv.logit.lasso(x, y, nfolds = 5, lambda = lambdas)
