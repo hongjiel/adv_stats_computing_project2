@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.9.15)  30 MAR 2023 17:20
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.9.15)  30 MAR 2023 19:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -877,11 +877,7 @@ Package: xurl 2022/01/09 v 0.10 modify URL breaks
 File: l3backend-pdftex.def 2022-02-07 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count372
 \l__pdf_internal_box=\box87
-) (./presentation.aux
-
-LaTeX Warning: Label `func' multiply defined.
-
-)
+) (./presentation.aux)
 \openout1 = `presentation.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 146.
@@ -1072,7 +1068,7 @@ Package caption Info: End \AtBeginDocument code.
 
 {/usr/local/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 LaTeX Font Info:    Trying to load font information for OT1+lmss on input line 
-171.
+173.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/lm/ot1lmss.fd
 File: ot1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
@@ -1081,34 +1077,34 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Trying to load font information for OML+lmm on input line 1
-71.
+73.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-171.
+173.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-171.
+173.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 171.
+(Font)              <10.95> on input line 173.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 171.
+(Font)              <8> on input line 173.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 171.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 171
+(Font)              <6> on input line 173.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 173
 .
 (/usr/local/texlive/2022/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 171
+LaTeX Font Info:    Trying to load font information for U+msb on input line 173
 .
 (/usr/local/texlive/2022/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
@@ -1116,107 +1112,101 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 171.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 173.
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <8> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 171.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 173.
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <6> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 171.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 173.
 [2
+
+] [3
 
 ]
 \openout4 = `presentation.vrb'.
 
 (./presentation.vrb
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
-3.
+2.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)) [3
-
-] [4
+)) [4
 
 ] [5
 
+] [6
+
 ]
 LaTeX Font Info:    Font shape `T1/lmss/b/n' in size <10.95> not available
-(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 232.
+(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 259.
 LaTeX Font Info:    Font shape `T1/lmss/b/n' in size <8> not available
-(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 232.
+(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 259.
 LaTeX Font Info:    Font shape `T1/lmss/b/n' in size <6> not available
-(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 232.
+(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 259.
 LaTeX Font Info:    Font shape `OT1/lmss/b/n' in size <10.95> not available
-(Font)              Font shape `OT1/lmss/bx/n' tried instead on input line 232.
+(Font)              Font shape `OT1/lmss/bx/n' tried instead on input line 259.
 
 LaTeX Font Info:    Font shape `OT1/lmss/b/n' in size <8> not available
-(Font)              Font shape `OT1/lmss/bx/n' tried instead on input line 232.
+(Font)              Font shape `OT1/lmss/bx/n' tried instead on input line 259.
 
 LaTeX Font Info:    Font shape `OT1/lmss/b/n' in size <6> not available
-(Font)              Font shape `OT1/lmss/bx/n' tried instead on input line 232.
+(Font)              Font shape `OT1/lmss/bx/n' tried instead on input line 259.
 
 LaTeX Font Info:    Font shape `T1/lmss/b/it' in size <10.95> not available
-(Font)              Font shape `T1/lmss/bx/it' tried instead on input line 232.
+(Font)              Font shape `T1/lmss/bx/it' tried instead on input line 259.
 
 LaTeX Font Info:    Font shape `T1/lmss/bx/it' in size <10.95> not available
-(Font)              Font shape `T1/lmss/bx/sl' tried instead on input line 232.
+(Font)              Font shape `T1/lmss/bx/sl' tried instead on input line 259.
 
 LaTeX Font Info:    Font shape `T1/lmss/b/it' in size <8> not available
-(Font)              Font shape `T1/lmss/bx/it' tried instead on input line 232.
+(Font)              Font shape `T1/lmss/bx/it' tried instead on input line 259.
 
 LaTeX Font Info:    Font shape `T1/lmss/bx/it' in size <8> not available
-(Font)              Font shape `T1/lmss/bx/sl' tried instead on input line 232.
+(Font)              Font shape `T1/lmss/bx/sl' tried instead on input line 259.
 
 LaTeX Font Info:    Font shape `T1/lmss/b/it' in size <6> not available
-(Font)              Font shape `T1/lmss/bx/it' tried instead on input line 232.
+(Font)              Font shape `T1/lmss/bx/it' tried instead on input line 259.
 
 LaTeX Font Info:    Font shape `T1/lmss/bx/it' in size <6> not available
-(Font)              Font shape `T1/lmss/bx/sl' tried instead on input line 232.
+(Font)              Font shape `T1/lmss/bx/sl' tried instead on input line 259.
 
-[6
-
-] [7
+[7
 
 ] [8
 
 ] [9
 
+] [10
+
 ]
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 28
-5.
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 31
+2.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/microtype/mt-cmr.cfg
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
 )
-Overfull \hbox (21.96188pt too wide) detected at line 285
+Overfull \hbox (21.96188pt too wide) detected at line 312
 []
  []
-
-[10
-
-]
-LaTeX Font Info:    Font shape `T1/lmss/bx/it' in size <10.95> not available
-(Font)              Font shape `T1/lmss/bx/sl' tried instead on input line 305.
 
 [11
 
 ]
+LaTeX Font Info:    Font shape `T1/lmss/bx/it' in size <10.95> not available
+(Font)              Font shape `T1/lmss/bx/sl' tried instead on input line 332.
+
+[12
+
+]
 \openout4 = `presentation.vrb'.
 
-(./presentation.vrb) [12
+(./presentation.vrb) [13
 
-] [13
-
-]
-pdfTeX warning (ext4): destination with the same identifier (name{func}) has be
-en already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.354 \end{frame}
-                  [14
+] [14
 
 ]
-Overfull \vbox (6.48187pt too high) detected at line 379
+Overfull \vbox (6.48187pt too high) detected at line 415
  []
 
 [15
@@ -1226,21 +1216,21 @@ Overfull \vbox (6.48187pt too high) detected at line 379
 
 (./presentation.vrb
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <6> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 9.
-)
-Overfull \vbox (5.0643pt too high) detected at line 426
- []
-
-[16
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 7.
+) [16
 
 ] [17
 
 ]
-\openout4 = `presentation.vrb'.
+<images/complete_separation.jpeg, id=144, 451.6875pt x 346.29375pt>
+File: images/complete_separation.jpeg Graphic file (type jpg)
+<use images/complete_separation.jpeg>
+Package pdftex.def Info: images/complete_separation.jpeg  used on input line 48
+5.
+(pdftex.def)             Requested size: 245.83282pt x 188.47536pt.
+[18
 
-(./presentation.vrb) [18
-
-]
+ <./images/complete_separation.jpeg>]
 \openout4 = `presentation.vrb'.
 
 (./presentation.vrb) [19
@@ -1272,45 +1262,41 @@ Overfull \vbox (5.0643pt too high) detected at line 426
 \tf@snm=\write8
 \openout8 = `presentation.snm'.
 
-(./presentation.aux)
-
-LaTeX Warning: There were multiply-defined labels.
-
- ) 
+(./presentation.aux) ) 
 Here is how much of TeX's memory you used:
- 27486 strings out of 478268
- 527522 string characters out of 5846347
- 804972 words of memory out of 5000000
- 44894 multiletter control sequences out of 15000+600000
- 552529 words of font info for 137 fonts, out of 8000000 for 9000
+ 27477 strings out of 478268
+ 527305 string characters out of 5846347
+ 804852 words of memory out of 5000000
+ 44878 multiletter control sequences out of 15000+600000
+ 552832 words of font info for 140 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 128i,17n,122p,1009b,621s stack positions out of 10000i,1000n,20000p,200000b,200000s
-{/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/
-texlive/2022/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{/usr/local/texlive/20
-22/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/texlive/2022/texmf-dist/
-fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/local/texlive/2022/texmf-dist/fonts/enc/
-dvips/lm/lm-mathit.enc}</usr/local/texlive/2022/texmf-dist/fonts/type1/public/l
-m/lmex10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmmi10.p
-fb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></usr/
-local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texli
-ve/2022/texmf-dist/fonts/type1/public/lm/lmss10.pfb></usr/local/texlive/2022/te
-xmf-dist/fonts/type1/public/lm/lmss12.pfb></usr/local/texlive/2022/texmf-dist/f
-onts/type1/public/lm/lmss8.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/
-public/lm/lmssbo10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/l
-m/lmssbx10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmsso1
-0.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmsso8.pfb></us
-r/local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/te
-xlive/2022/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/local/texlive/2022/
-texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2022/texmf-dist/
-fonts/type1/public/lm/lmtk10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type
-1/public/lm/lmtt10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/l
-m/lmtt8.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/sym
-bols/msam10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts
-/symbols/msbm10.pfb>
-Output written on presentation.pdf (26 pages, 328521 bytes).
+ 128i,17n,122p,1009b,620s stack positions out of 10000i,1000n,20000p,200000b,200000s
+{/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/lm/lm
+-ec.enc}{/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{/
+usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/texl
+ive/2022/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/local/texlive/2022/t
+exmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}</usr/local/texlive/2022/texmf-dist/
+fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type
+1/public/lm/lmmi10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/l
+m/lmmib10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmr10.p
+fb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmss10.pfb></usr/l
+ocal/texlive/2022/texmf-dist/fonts/type1/public/lm/lmss12.pfb></usr/local/texli
+ve/2022/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/local/texlive/2022/tex
+mf-dist/fonts/type1/public/lm/lmssbo10.pfb></usr/local/texlive/2022/texmf-dist/
+fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2022/texmf-dist/fonts/ty
+pe1/public/lm/lmsso10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/publi
+c/lm/lmsso8.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmsy1
+0.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr
+/local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texl
+ive/2022/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></usr/local/texlive/2022/t
+exmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texlive/2022/texmf-dist/
+fonts/type1/public/lm/lmtt8.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1
+/public/amsfonts/symbols/msam10.pfb></usr/local/texlive/2022/texmf-dist/fonts/t
+ype1/public/amsfonts/symbols/msbm10.pfb>
+Output written on presentation.pdf (26 pages, 365976 bytes).
 PDF statistics:
- 315 PDF objects out of 1000 (max. 8388607)
- 238 compressed objects within 3 object streams
+ 312 PDF objects out of 1000 (max. 8388607)
+ 234 compressed objects within 3 object streams
  81 named destinations out of 1000 (max. 500000)
- 51251 words of extra memory for PDF output out of 51595 (max. 10000000)
+ 51248 words of extra memory for PDF output out of 51595 (max. 10000000)
 

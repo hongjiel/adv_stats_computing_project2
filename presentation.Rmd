@@ -37,6 +37,8 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 
 - Background
 
+- Task Introduction
+
 - Task 1
 
 - Task 2
@@ -60,20 +62,32 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 # The data
 ```
 
-**Breast Cancer Diagnosis**\par
+**Breast Cancer Diagnosis:**\par
+- In this project we study the breast cancer diagnosis problem
 
-- The data is the breast cancer medical data retrieved from "breast-cancer.csv", which has 569 rows and 32 columns.  
+- The goal of the exercise is to build a predictive model based on logistic regression to facilitate cancer diagnosis
+
+- We move towards the goal with the steps of task 1, 2, 3 and 4.
+
+## Background 
+**Data Source:**\par
+- The data is the breast cancer medical data retrieved from "breast-cancer.csv", which has 569 rows and 32 columns
+
 - The first column `ID` labels individual breast tissue images; The second column `Diagnosis` identifies if the image is coming from cancer tissue or benign
-cases (M = malignant, B = benign). There are 357 benign and 212 malignant cases. 
-- The other 30 columns correspond to mean, standard deviation and the largest values (points on the tails) of the distributions of the following 10 features computed for the cellnuclei;
+cases (M = malignant, B = benign). There are 357 benign and 212 malignant cases
+
+- The other 30 columns correspond to mean, standard deviation and the largest values (points on the tails) of the distributions of the following 10 features computed for the cellnuclei
 
 
-## Objectives
+## Task Introduction
 
-- The goal of the exercise is to build a predictive model based on logistic regression to facilitate cancer diagnosis.
+- Task 1: Build a logistic model to classify the images into malignant/benign, and write down your likelihood function, its gradient and Hessian matrix.
+ 
+- Task 2: Develop a Newton-Raphson algorithm to estimate your model.
 
-- We will move towards the goal with the steps of task 1, 2, 3 and 4.
+- Task 3: Build a logistic-LASSO model to select features, and implement a path-wise coordinate-wise optimization algorithm to obtain a path of solutions with a sequence of descending $\lambda$’s.
 
+- Task 4: Use 5-fold cross-validation to select the best $\lambda$. Compare the prediction performance between the ’optimal’ model and ’full’ model
 
 
 ## Task 1 - Objective
@@ -151,6 +165,14 @@ Hence, the optimization problem (\ref{opt}) is a well-defined problem.
 
 ## Task 1 - Logistic model R code
 ```{r eval = FALSE, size = "tiny"}
+cancer <- read.csv("breast-cancer.csv") %>%
+janitor::clean_names()%>%
+select(-1,-33) %>%
+mutate(diagnosis = recode(diagnosis, "M" = 1, "B" = 0))
+cor()
+ggcorrplot(corr, type = "upper", tl.cex = 8)
+
+set.seed(1)
 trainRows <- createDataPartition(y = cancer$diagnosis, p = 0.8, list = FALSE)
 train <- cancer[trainRows, ]
 test <-  cancer[-trainRows, ]
@@ -162,21 +184,22 @@ summary(glm.fit)
 pred <- predict(glm.fit, newdata = test, type = "response")
 y_test <- factor(test$diagnosis)
 auc_full <- auc(y_test, pred)
-auc_full
+auc_full 
 ```
 
+- Final AUC of full model reaches 0.9641. 
 
-# Task 1 - Logistic model R code
+- And if we remove correlated variables, the AUC is uplifted to 0.9962.
 
 
-## Task 2 - Object
+
+
+## Task 2 - Objective
 **Objective:**\par
 Develop a Newton-Raphson algorithm to estimate your model
 
 - Recall The target function $f$ given in task 1 is:
-\begin{equation}\label{func}
-f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\top\boldsymbol{\beta}-\log\left(1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}\right)\right].
-\end{equation}
+$$f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\top\boldsymbol{\beta}-\log\left(1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}\right)\right].$$
 - We develop a modified Newton-Raphson algorithm including a step-halving step to maximize the target function.
 
 
@@ -205,7 +228,6 @@ f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\t
 
 
 ## Task 2 - Newton-Raphson algorithm R code
-The corresponding R-function for the algorithm
 ```{r eval=FALSE, size = "tiny"}
 NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
   i <- 0
@@ -244,19 +266,28 @@ NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
 
 
 ## Task 2 - Complete separtion
-Sometimes our algorithm does not converge because of the complete separation.
+- Sometimes our algorithm does not converge because of the complete separation.
 
-A complete separation in a logistic regression, sometimes also referred as perfect prediction, occurs whenever there exists some vector of coefficients $\boldsymbol{\beta}$ such that $Y_i = 1$ whenever $\mathrm{x}_i^\top\boldsymbol{\beta} > 0$ and $Y_i = 0$ whenever $\mathrm{x}_i^\top\boldsymbol{\beta} \le 0$. 
+- A complete separation in a logistic regression, sometimes also referred as perfect prediction, occurs whenever there exists some vector of coefficients $\boldsymbol{\beta}$ such that $Y_i = 1$ whenever $\mathrm{x}_i^\top\boldsymbol{\beta} > 0$ and $Y_i = 0$ whenever $\mathrm{x}_i^\top\boldsymbol{\beta} \le 0$. 
 
-Complete separation occur when a linear function of predictors can perfectly classify the response.
+- Complete separation occur when a linear function of predictors can perfectly classify the response.
 
+
+## Task 2 - Complete separation
+\begin{figure}[H] 
+\includegraphics[width=0.8\textwidth]{images/complete_separation.jpeg} 
+\end{figure}
+
+
+## Task 2 - Complete separation
+- We have proved that: when there exists a vector of coefficients $\hat{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathrm{x}_i^\top\hat{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathrm{x}_i^\top\hat{\boldsymbol{\beta}} \le 0$, there does not exist $\boldsymbol{\beta}^*\in\mathbb{R}^{(p+1)}$ such that $\boldsymbol{\beta}^* = \arg\max_{\boldsymbol{\beta}}f(\boldsymbol{\beta})$, where $f$ is given in (\ref{func}). Thus our algorithm does not converge. (proof is attached in report appendix) \par
+
+- If there is no complete separation, the parameters output by `glm` function and our algorithm are demonstrated to be the same
+
+- In practice, if complete separation occurs, we randomly pick the parameters which satisfy complete separation as our full model
 
 ## Task 2 - Comparison
-When there is no complete separation, the parameters output by `glm` function and our algorithm are the same.
-
-
-## Task 2 - Comparison
-Comparison of using `glm` function and our algorithm (part1)
+Comparison of using `glm` function and our algorithm (part of)
 ```{r echo = FALSE, warning = FALSE, size = "tiny"}
 load("data/task2.RData")
 c_t = tibble(
@@ -264,15 +295,10 @@ c_t = tibble(
   ours = res[nrow(res), -c(1, 2)],
   glm = glm(diagnosis ~ ., family = binomial(link = "logit"), data = Training)$coefficients
 ) 
-c_t[1:15, ] %>% knitr::kable()
+c_t[1:20, ]%>% knitr::kable()
 ```
 
 
-## Task 2 - Comparison
-Comparison of using `glm` function and our algorithm (part2)
-```{r echo = FALSE, warning = FALSE, size = "tiny"}
-c_t[16:31, ] %>% knitr::kable()
-```
 
 
 ## Task 3
@@ -306,6 +332,7 @@ c_t[16:31, ] %>% knitr::kable()
 ## Reference
 
 1. Li Y, Hong HG, Ahmed SE, Li Y. Weak signals in high‐dimensional regression: Detection, estimation and prediction. Appl Stochastic Models Bus Ind. 2018;1–16. https://doi.org/10.1002/asmb.2340
+
 
 ## Q&A
 
