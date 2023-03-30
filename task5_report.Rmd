@@ -1,0 +1,67 @@
+---
+title: "P8160 - Breast Cancer Diagnosis"
+author: "Hongjie Liu, Xicheng Xie, Jiajun Tao, Shaohan Chen, Yujia Li"
+date: "3/29/2023"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: 2
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '2'
+header-includes:
+- \usepackage{fancyhdr}
+- \usepackage{lipsum}
+- \pagestyle{fancy}
+- \fancyhead[R]{\thepage}
+- \fancypagestyle{plain}{\pagestyle{fancy}}
+- \usepackage{algorithm} 
+- \usepackage{algpseudocode} 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1. Introduction
+
+## 1.1. Background
+
+## 1.2. Objectives
+
+# 2. Methods
+
+## 2.1. Data Preprocessing
+
+## 2.2. Logistic Model
+
+## 2.3. Newton-Raphson Algorithm 
+
+## 2.4. Logistic-LASSO Model
+
+## 2.5. Five-fold Cross Validation
+
+## 2.6. Model Evaluation
+
+# 3. Results
+
+## 3.1. 5-fold CV Results
+
+## 3.2. Model Prediction Performance Comparison
+
+# 4. Discussion
+
+## 4.1. Summary
+
+## 4.2. Limitations
+
+## 4.3. Group Contributions
+
+\newpage 
+# References
+
+\newpage 
+# Appendices
+
