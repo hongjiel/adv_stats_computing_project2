@@ -126,8 +126,47 @@ X <- cbind(rep(1, nrow(Training)), model.matrix(diagnosis ~ ., Training)[, -1])
 y <- Training$diagnosis
 coef_newton <- res[nrow(res), -c(1, 2)]
 y_hat <- ifelse(X %*% coef_newton > 0, 1, 0) # predictions
-sum(y - y_hat) # prefect separation
+sum(y - y_hat) # complete separation
 ```
+
+
+We can prove that: when there exists a vector of coefficients $\hat{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathrm{x}_i^\top\hat{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathrm{x}_i^\top\hat{\boldsymbol{\beta}} \le 0$, there does not exist $\boldsymbol{\beta}^*\in\mathbb{R}^{(p+1)}$ such that $\boldsymbol{\beta}^* = \arg\max_{\boldsymbol{\beta}}f(\boldsymbol{\beta})$, where $f$ is given in (\ref{func}). Thus our algorithm does not converge.
+
+***Proof.***
+
+Assume such $\boldsymbol{\beta}^*$ exists, then $\forall \boldsymbol{\beta}\in\mathbb{R}^{p+1}$, we have $f(\boldsymbol{\beta})\le f(\boldsymbol{\beta}^*)$.
+
+First, we prove that: there exists a vector of coefficients $\tilde{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathrm{x}_i^\top\tilde{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathrm{x}_i^\top\tilde{\boldsymbol{\beta}} < 0$.
+
+Let $A_1=\{i: Y_i = 1\}= \{i:\mathrm{x}_i^\top\hat{\boldsymbol{\beta}}> 0\}$ and $A_0=\{i: Y_i = 0\}=\{i:\mathrm{x}_i^\top\hat{\boldsymbol{\beta}}\le0\}$. Then we have $$\epsilon:=\min_{i\in A_1}(\mathrm{x}_i^\top\hat{\boldsymbol{\beta}}) > 0.$$
+Let $\tilde{\boldsymbol{\beta}}=\hat{\boldsymbol{\beta}}-(\epsilon/2,0,\ldots,0)^\top$. Given that $X_{i1}=1$ for all $i$, we have 
+$$\begin{aligned}
+\mathrm{x}_i^\top\tilde{\boldsymbol{\beta}}=\mathrm{x}_i^\top\hat{\boldsymbol{\beta}}-\epsilon/2\cdot1\ge \epsilon-\epsilon/2=\epsilon/2>0,\quad \forall i\in A_1\\
+\mathrm{x}_i^\top\tilde{\boldsymbol{\beta}}=\mathrm{x}_i^\top\hat{\boldsymbol{\beta}}-\epsilon/2\cdot1\le 0-\epsilon/2=-\epsilon/2<0,\quad \forall i\in A_0\\
+\end{aligned}$$
+Thus we have $A_1=\{i: Y_i = 1\}= \{i:\mathrm{x}_i^\top\tilde{\boldsymbol{\beta}}> 0\}$ and $A_0=\{i: Y_i = 0\}=\{i:\mathrm{x}_i^\top\tilde{\boldsymbol{\beta}}< 0\}$.
+
+Next, we prove that 
+\begin{equation}\label{loglik}
+\lim_{k\rightarrow\infty}f(k\tilde{\boldsymbol{\beta}})=0.
+\end{equation}
+$\forall k>0$, we have $A_1= \{i:\mathrm{x}_i^\top(k\tilde{\boldsymbol{\beta}})> 0\}$ and $A_0==\{i:\mathrm{x}_i^\top(k\tilde{\boldsymbol{\beta}})< 0\}$.
+
+Thus,
+$$\begin{aligned}
+\lim_{k\rightarrow\infty}f(k\tilde{\boldsymbol{\beta}})&=\lim_{k\rightarrow\infty}\sum_{i\in A_1}\left[Y_i\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta})}-\log\left(1+e^{\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})}\right)\right]+\lim_{k\rightarrow\infty}\sum_{i\in A_0}\left[Y_i\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})-\log\left(1+e^{\mathbf{x}_i^\top (k\tilde{\boldsymbol{\beta}})}\right)\right]\\
+&=\sum_{i\in A_1}\lim_{k\rightarrow\infty}\left[k\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}-\log\left(1+e^{k\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}}\right)\right]+\sum_{i\in A_0}\lim_{k\rightarrow\infty}\left[-\log\left(1+e^{k\mathbf{x}_i^\top \tilde{\boldsymbol{\beta}}}\right)\right]\\
+&=\sum_{i\in A_1}\lim_{z\rightarrow\infty}\left[z-\log\left(1+e^z\right)\right]+\sum_{i\in A_0}\left(-\log1\right)\\
+&=0+0=0.
+\end{aligned}$$
+
+Last, we prove that: there exists $\boldsymbol{\beta}\in\mathbb{R}^{p+1}$ such that $f(\boldsymbol{\beta})>f(\boldsymbol{\beta}^*)$, which is contradictory to the statement that $\forall \boldsymbol{\beta}\in\mathbb{R}^{p+1}$, $f(\boldsymbol{\beta})\le f(\boldsymbol{\beta}^*)$.
+
+Note that $f(\boldsymbol{\beta})<0$ holds for any $\boldsymbol{\beta}\in\mathbb{R}$, then we have $f(\boldsymbol{\beta}^*)<0$.
+
+Given that $f(\boldsymbol{\beta}^*)<0$ and (\ref{loglik}) holds, there exists $N\in \mathbb{R}$ such that $\forall k>N$, $f(k\tilde{\boldsymbol{\beta}})>f(\boldsymbol{\beta}^*)$.
+
+Thus our assumption must be false. \hfill$\square$
 
 
 We compare the results of using the `glm` function and our `NewtonRaphson` function. (meaningless, since both do not converge)
