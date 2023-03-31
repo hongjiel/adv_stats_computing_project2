@@ -77,13 +77,13 @@ corr1=ggcorrplot(corr1, type = "upper", tl.cex = 8)
 ```{r echo=FALSE}
 ggpubr::ggarrange(corr,corr1, ncol=2, nrow=1, common.legend = TRUE, legend = "bottom", labels = "AUTO")
 ```
-As exploring the breast cancer data, there are many predictors are highly correlated to each other as shown in the Figure A below, such as 'area_mean', 'perimeter_worst', 'radius_mean' and so on, that could cause unstable parameter estimation as well as perplexing the interpretation of logistic model. While we could eliminate some correlated features for modeling as shown in the Figure B, regularized logistic regression also help to tackle with it, which would be further explore in the following parts. 
+As exploring the breast cancer data, there are many predictors are highly correlated to each other as shown in the Figure A, such as 'area_mean', 'perimeter_worst', 'radius_mean' and so on, that could cause unstable parameter estimation as well as perplexing the interpretation of logistic model. While we could eliminate some correlated features for modeling as shown in the Figure B, regularized logistic regression also help to tackle with it, which would be further explore in the following parts. 
 
 # 2. Methods
 ## 2.1. Logistic Model
 Logistic model measure the probability of an event taking place by having the log-odds for the event be a linear combination of one or more independent variables, and commonly used in classifying binary response variables.\par
 
-Hereby, the variable "Diagnosis" is a binary response variable indicating if the image is coming from cancer tissue or benign cases (M = malignant, B = benign). In the following logistic regression model, the "Diagnosis" variable will be coded as 1 for malignant cases and 0 for benign cases.
+Hereby, the variable "Diagnosis" is a binary response variable indicating if the image is coming from cancer tissue or benign cases (M = malignant, B = benign). In the following logistic regression model, the "Diagnosis" variable will be coded as 1 for malignant cases and 0 for benign cases.\par
 
 Given $n$ i.i.d. observations with $p$ predictors, we consider a logistic regression model
 \begin{equation}\label{model}
@@ -120,7 +120,7 @@ Denote $w_i=p_i(1-p_i)\in(0,1)$ and $\mathbf{W}=\mathrm{diag}(w_1,\ldots,w_n)$. 
 \sum_{i=1}^nw_iX_{ip} & \sum_{i=1}^nw_iX_{in}X_{i1} & \cdots & \sum_{i=1}^nw_iX_{ip}^2
 \end{pmatrix}.
 \end{align*}
-Next, we show that the Hessian matrix $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ is a negative-definite matrix if $\mathbf{X}$ has full rank.
+Next, we show that the Hessian matrix $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ is a negative-definite matrix if $\mathbf{X}$ has full rank.\par
 
 ***Proof.*** For any $(p+1)$-dimensional nonzero vector $\boldsymbol{\alpha}$, given that $\mathbf{X}$ has full rank, $\mathbf{X}\boldsymbol{\alpha}$ is also a nonzero vector. Since $\mathbf{W}$ is positive-definite, we have
 \begin{align*}
@@ -178,7 +178,8 @@ f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\t
 where $\lambda\ge 0$ is the tuning parameter. Note that the intercept is not penalized and all predictors are standardized.
 
 
-Then we could develop a path-wise coordinate descent algorithm to the penalized weighted-least-squares-problem with a sequence of nested loops:
+Then we could develop a path-wise coordinate descent algorithm to the penalized weighted-least-squares-problem with a sequence of nested loops:\par
+
 **OUTER LOOP** 
 In the outer loop, we compute the solutions of the optimization problem (\ref{opt.lasso}) for a decreasing sequence of values for $\lambda$: $\{\lambda_1,\ldots,\lambda_m\}$, starting at the smallest value $\lambda_1 = \lambda_{max}$ for which the estimates of all coefficients $\hat{\beta}_j = 0,\; j=1,2,\ldots,p$, which is
 \begin{equation}\label{maxlambda}
