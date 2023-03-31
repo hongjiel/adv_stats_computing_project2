@@ -1,3 +1,6 @@
 \beamer@slide {model}{7}
 \beamer@slide {func}{9}
 \beamer@slide {opt}{9}
+\beamer@slide {func}{21}
+\beamer@slide {opt.lasso}{21}
+\beamer@slide {maxlambda}{23}

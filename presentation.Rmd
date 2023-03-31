@@ -301,7 +301,39 @@ c_t[1:20, ]%>% knitr::kable()
 
 
 
-## Task 3
+## Task 3 - Objective
+**Objective:**\par
+Build a logistic-LASSO model to select features by implementing a path-wise coordinate-wise optimization algorithm
+
+- Recall Log-likelihood $f$ in task 1:
+\begin{equation}\label{func}
+f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\top\boldsymbol{\beta}-\log\left(1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}\right)\right].
+\end{equation}
+
+- LASSO estimates the logistic model parameters $\boldsymbol{\beta}$ by optimizing a penalized loss function:
+\begin{equation}\label{opt.lasso}
+\min_{\boldsymbol{\beta}}\; -\frac{1}{n}f(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|.
+\end{equation}
+where $\lambda\ge 0$ is the tuning parameter. Note that the intercept is not penalized and all predictors are standardized.
+
+## Task 3 - Algorithm of Logistic-LASSO Model
+**Algorithm Structure:**\par
+
+- OUTER LOOP: Decrement $\lambda$.
+
+- MIDDLE LOOP: Update $\tilde{w}_i$, $\tilde{p}_i$, and thus the quadratic approximation $\ell$ using the current
+parameters $\tilde{\boldsymbol{\beta}}$.
+
+- INNER LOOP: Run the coordinate descent algorithm on the penalized weighted-least-squares problem.
+
+## Task 3 - OUTER LOOP
+**OUTER LOOP: **\par
+Compute the solutions of the optimization problem (\ref{opt.lasso}) for a decreasing sequence of values for $\lambda$: $\{\lambda_1,\ldots,\lambda_m\}$, starting at the smallest value $\lambda_1 = \lambda_{max}$
+\begin{equation}\label{maxlambda}
+\lambda_{max} = \frac{1}{n}\max_j\left|\left \langle \mathbf{x}_{\cdot j}, \mathbf{y} \right \rangle\right|,
+\end{equation}
+where $\mathbf{x}_{\cdot j}$ is the $j$-th column of the design matrix $\mathbf{X}$, for $j=1,\ldots,p$. \par
+For tuning parameter value $\lambda_{k+1}$, we initialize coordinate descent algorithm at the computed solution for $\lambda_k$ (warm start).
 
 ```{r include=FALSE}
 # Task 3
