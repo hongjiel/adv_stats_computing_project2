@@ -268,7 +268,7 @@ NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
 ## Task 2 - Complete separtion
 - Sometimes our algorithm does not converge because of the complete separation.
 
-- A complete separation in a logistic regression, sometimes also referred as perfect prediction, occurs whenever there exists some vector of coefficients $\boldsymbol{\beta}$ such that $Y_i = 1$ whenever $\mathrm{x}_i^\top\boldsymbol{\beta} > 0$ and $Y_i = 0$ whenever $\mathrm{x}_i^\top\boldsymbol{\beta} \le 0$. 
+- A complete separation in a logistic regression, sometimes also referred as perfect prediction, occurs whenever there exists some vector of coefficients $\boldsymbol{\beta}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\boldsymbol{\beta} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\boldsymbol{\beta} \le 0$. 
 
 - Complete separation occur when a linear function of predictors can perfectly classify the response.
 
@@ -280,7 +280,7 @@ NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
 
 
 ## Task 2 - Complete separation
-- We have proved that: when there exists a vector of coefficients $\hat{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathrm{x}_i^\top\hat{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathrm{x}_i^\top\hat{\boldsymbol{\beta}} \le 0$, there does not exist $\boldsymbol{\beta}^*\in\mathbb{R}^{(p+1)}$ such that $\boldsymbol{\beta}^* = \arg\max_{\boldsymbol{\beta}}f(\boldsymbol{\beta})$, where $f$ is given in (\ref{func}). Thus our algorithm does not converge. (proof is attached in report appendix) \par
+- We have proved that: when there exists a vector of coefficients $\hat{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} \le 0$, there does not exist $\boldsymbol{\beta}^*\in\mathbb{R}^{(p+1)}$ such that $\boldsymbol{\beta}^* = \arg\max_{\boldsymbol{\beta}}f(\boldsymbol{\beta})$, where $f$ is given in (\ref{func}). Thus our algorithm does not converge. (proof is attached in report appendix) \par
 
 - If there is no complete separation, the parameters output by `glm` function and our algorithm are demonstrated to be the same
 
