@@ -335,6 +335,12 @@ Compute the solutions of the optimization problem (\ref{opt.lasso}) for a decrea
 where $\mathbf{x}_{\cdot j}$ is the $j$-th column of the design matrix $\mathbf{X}$, for $j=1,\ldots,p$. \par
 For tuning parameter value $\lambda_{k+1}$, we initialize coordinate descent algorithm at the computed solution for $\lambda_k$ (warm start).
 
+## Task 3 - MIDDLE LOOP
+**MIDDLE LOOP: **\par
+- For a fixed $\lambda$, find the estimates of $\boldsymbol{\beta}$ by solving the optimization problem (\ref{opt.lasso}).
+
+- Based on current parameter estimates $\tilde{\boldsymbol{\beta}}$
+
 ```{r include=FALSE}
 # Task 3
 ```
