@@ -339,8 +339,20 @@ For tuning parameter value $\lambda_{k+1}$, we initialize coordinate descent alg
 **MIDDLE LOOP: **\par
 - For a fixed $\lambda$, find the estimates of $\boldsymbol{\beta}$ by solving the optimization problem (\ref{opt.lasso}).
 
-- Based on current parameter estimates $\tilde{\boldsymbol{\beta}}$
+Based on current parameter estimates $\tilde{\boldsymbol{\beta}}$, we we form a quadratic approximation to the log-likelihood $f$ using a Taylor expansion:
+\fontsize{9pt}{12pt}\selectfont
+\begin{align*}
+f(\boldsymbol{\beta})\approx\ell(\boldsymbol{\beta})&=f(\tilde{\boldsymbol{\beta}})+(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})^\top\nabla f(\tilde{\boldsymbol{\beta}})+\frac{1}{2}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})^\top\nabla^2 f(\tilde{\boldsymbol{\beta}})(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})\\
+&=-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})+\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\right]+\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left(\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\right)^2+f(\tilde{\boldsymbol{\beta}}),
+\end{align*}
+where $\tilde{\mathbf{p}}=(\tilde{p}_1,\ldots,\tilde{p}_n)^\top$ and $\tilde{\mathbf{W}}=\mathrm{diag}(\tilde{w}_1,\ldots,\tilde{w}_n)$ are the estimates of $\mathbf{p}$ and $\mathbf{W}$ based on $\tilde{\boldsymbol{\beta}}$. 
 
+## Task 3 - MIDDLE LOOP
+- Let $\tilde{z}_i=\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}+\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}$, we have
+\begin{equation}\label{func.lasso}
+\ell(\boldsymbol{\beta})=-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i(\tilde{z}_i-\mathbf{x}_i^\top\boldsymbol{\beta})^2+C(\tilde{\boldsymbol{\beta}}),
+\end{equation}
+where is $\tilde{z}_i$ the working response, $\tilde{w}_i$ is the working weight, and $C$ is a function that does not depend on $\boldsymbol{\beta}$.
 ```{r include=FALSE}
 # Task 3
 ```
