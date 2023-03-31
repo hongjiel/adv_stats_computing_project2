@@ -48,9 +48,9 @@ The other 30 columns correspond to mean, standard deviation and the largest valu
 library(tidyverse)
 library(ggcorrplot)
 library(dplyr)
-cancer <- read.csv("C:/Users/yujia/Downloads/breast-cancer.csv") %>%
+cancer <- read.csv("breast-cancer.csv") %>%
   select(-1,-33) %>%
-  janitor::clean_names()%>%
+  janitor::clean_names() %>%
   mutate(diagnosis = recode(diagnosis, "M" = 1, "B" = 0)) 
 corr = cancer[2:31] %>% 
   cor()
@@ -70,7 +70,7 @@ cancer1 <- cancer %>%
          -smoothness_worst)
 corr1 = cancer1[2:20] %>% 
   cor()
-corr1=ggcorrplot(corr1, type = "upper", tl.cex = 8)
+corr1 = ggcorrplot(corr1, type = "upper", tl.cex = 8)
 ```
 
 ```{r echo=FALSE}
@@ -80,15 +80,18 @@ There are multicollinearity features among our predictors as shown above in the 
 
 # 2. Methods
 ## 2.1. Logistic Model
+Logistic model measure the probability of an event taking place by having the log-odds for the event be a linear combination of one or more independent variables, and commonly used in classifying binary response variables.\par
 
+Write $p(X) = Pr(Y=1|X)$, logistic regression uses the form $p(X) = \frac{e^{\beta_0 + \beta_1 X_1 + ... + \beta_p X_p}}{1 + e^{\beta_0+\beta_1 X + ... +\beta_p X_p}}$. By applying the logit transformation, $log(\frac{p(X)}{1-p(X)}) = \beta_0 + \beta_1 X_1 + ... + \beta_p X_p$, we use maximum likelihood to estimate the parameters.\par
 
 ## 2.2. Newton-Raphson Algorithm 
 While derivative of the likelihood function with respect to the parameters is nonlinear and difficult to solve analytically for maximum likelihood, it requires Newton-Raphson iterations.
 
 
 
-## 2.3. Logistic-LASSO Model
 
+## 2.3. Logistic-LASSO Model
+LASSO is a frequently used model in predictor selection during regression. If we add penalization to the log-likelihood function of logistic regression, then we get: $logl(\beta) - \lambda\{(1-\alpha)\frac{1}{2}\sum_{j=1}^p \beta_j^2 + \alpha\sum_{j=1}^p |\beta_j| \}$. $\lambda$ represents the total amount of penalization, and by setting $\alpha = 1$, we get the logistic-lasso regression model.\par
 
 
 ## 2.4. Five-fold Cross Validation for LASSO
@@ -96,9 +99,12 @@ While derivative of the likelihood function with respect to the parameters is no
 
 
 # 3. Results
+
 ## 5-fold CV Results for Logistic-LASSO
 
+
 ## Model Comparison
+
 
 
 
