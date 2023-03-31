@@ -74,7 +74,7 @@ In the inner loop, we find the estimates of $\boldsymbol{\beta}$ by solving a mo
 \min_{\boldsymbol{\beta}}\; -\frac{1}{n}\ell(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|,
 \end{equation}
 and update the estimates of $\boldsymbol{\beta}$. For each iteration of the inner loop, suppose we have the current estimates $\tilde{\beta}_k$ for $k\ne j$ and we wish to partially optimize with respect to $\beta_j$:
-$$\min_{\beta_j}\; \frac{1}{2n}\sum_{i=1}^n\tilde{w}_i\left(\tilde{z}_i-x_{ij}\beta_j-\sum_{k\ne j}x_{ik}\tilde{\beta}_k\right)^2+\lambda|\beta_j|+\lambda\sum_{k\ne j}|\beta_k|.$$
+$$\min_{\beta_j}\; \frac{1}{2n}\sum_{i=1}^n\tilde{w}_i\left(\tilde{z}_i-x_{ij}\beta_j-\sum_{k\ne j}x_{ik}\tilde{\beta}_k\right)^2+\lambda|\beta_j|+\lambda\sum_{k\ne j}|\tilde\beta_k|.$$
 Updates:
 \begin{align*}
 \tilde{\beta}_0&\leftarrow\frac{\sum_{i=1}^n\tilde{w}_{i}(\tilde{z}_{i}-\sum_{k= 1}^px_{ik}\tilde{\beta}_k)}{\sum_{i=1}^n\tilde{w}_{i}},\\
@@ -221,7 +221,7 @@ We fit a logistic-LASSO model on the training data using our function `LogisticL
 ```{r}
 lambda_max <- max(abs(t(x) %*% y)) / length(y)
 
-lambdas <- exp(seq(log(lambda_max), -15, length = 20))
+lambdas <- exp(seq(log(lambda_max), log(lambda_max) - 10, length = 30))
 res <- LogisticLASSO(dat = Training, start = rep(0, ncol(Training)),
                      lambda = lambdas)
 res

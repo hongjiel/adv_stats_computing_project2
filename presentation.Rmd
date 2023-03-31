@@ -306,9 +306,7 @@ c_t[1:20, ]%>% knitr::kable()
 Build a logistic-LASSO model to select features by implementing a path-wise coordinate-wise optimization algorithm
 
 - Recall Log-likelihood $f$ in task 1:
-\begin{equation}\label{func}
-f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\top\boldsymbol{\beta}-\log\left(1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}\right)\right].
-\end{equation}
+$$f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\top\boldsymbol{\beta}-\log\left(1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}\right)\right].$$
 
 - LASSO estimates the logistic model parameters $\boldsymbol{\beta}$ by optimizing a penalized loss function:
 \begin{equation}\label{opt.lasso}
@@ -364,7 +362,7 @@ With fixed $\tilde{w}_i$'s, $\tilde{z}_i$'s, and a fixed form of $\ell$ based on
 ## Task 3 - INNER LOOP
 - Coordinate-wise objective function
 Based the current estimates $\tilde{\beta}_k$ for $k\ne j$:
-$$\min_{\beta_j}\; \frac{1}{2n}\sum_{i=1}^n\tilde{w}_i\left(\tilde{z}_i-x_{ij}\beta_j-\sum_{k\ne j}x_{ik}\tilde{\beta}_k\right)^2+\lambda|\beta_j|+\lambda\sum_{k\ne j}|\beta_k|.$$
+$$\min_{\beta_j}\; \frac{1}{2n}\sum_{i=1}^n\tilde{w}_i\left(\tilde{z}_i-x_{ij}\beta_j-\sum_{k\ne j}x_{ik}\tilde{\beta}_k\right)^2+\lambda|\beta_j|+\lambda\sum_{k\ne j}|\tilde\beta_k|.$$
 - Updates:
 \begin{align*}
 \tilde{\beta}_0&\leftarrow\frac{\sum_{i=1}^n\tilde{w}_{i}(\tilde{z}_{i}-\sum_{k= 1}^px_{ik}\tilde{\beta}_k)}{\sum_{i=1}^n\tilde{w}_{i}},\\
