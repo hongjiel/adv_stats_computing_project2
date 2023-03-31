@@ -353,6 +353,28 @@ where $\tilde{\mathbf{p}}=(\tilde{p}_1,\ldots,\tilde{p}_n)^\top$ and $\tilde{\ma
 \ell(\boldsymbol{\beta})=-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i(\tilde{z}_i-\mathbf{x}_i^\top\boldsymbol{\beta})^2+C(\tilde{\boldsymbol{\beta}}),
 \end{equation}
 where is $\tilde{z}_i$ the working response, $\tilde{w}_i$ is the working weight, and $C$ is a function that does not depend on $\boldsymbol{\beta}$.
+
+## Task 3 - INNER LOOP
+**INNER LOOP: **\par
+With fixed $\tilde{w}_i$'s, $\tilde{z}_i$'s, and a fixed form of $\ell$ based on the estimates of $\boldsymbol{\beta}$ in the previous iteration of the middle loop, we use coordinate descent to update $\boldsymbol{\beta}$ by solving
+\begin{equation}\label{opt.inner}
+\min_{\boldsymbol{\beta}}\; -\frac{1}{n}\ell(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|,
+\end{equation}
+
+## Task 3 - INNER LOOP
+- Coordinate-wise objective function
+Based the current estimates $\tilde{\beta}_k$ for $k\ne j$:
+$$\min_{\beta_j}\; \frac{1}{2n}\sum_{i=1}^n\tilde{w}_i\left(\tilde{z}_i-x_{ij}\beta_j-\sum_{k\ne j}x_{ik}\tilde{\beta}_k\right)^2+\lambda|\beta_j|+\lambda\sum_{k\ne j}|\beta_k|.$$
+- Updates:
+\begin{align*}
+\tilde{\beta}_0&\leftarrow\frac{\sum_{i=1}^n\tilde{w}_{i}(\tilde{z}_{i}-\sum_{k= 1}^px_{ik}\tilde{\beta}_k)}{\sum_{i=1}^n\tilde{w}_{i}},\\
+\tilde{\beta}_j&\leftarrow\frac{S\left(\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}x_{ij}(\tilde{z}_{i}-\sum_{k\ne j}x_{ik}\tilde{\beta}_k),\lambda\right)}{\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}x_{ij}^2},\; j=1,\ldots,p
+\end{align*}
+\footnotesize
+where $S(z,\gamma)$ is the soft-thresholding operator with value
+$$S(z,\gamma)=\mathrm{sign}(z)(|z|-\gamma)_+=\begin{cases}z-\gamma,&\text{if }z>0\text{ and }\gamma<|z|\\z+\gamma,&\text{if }z<0\text{ and }\gamma<|z|\\0,&\text{if }\gamma\ge|z|\end{cases}$$
+Keep updating estimates of $\beta_j$'s repeatedly for $j = 0,1,2,...,p,0,1,2,...$ until convergence.
+
 ```{r include=FALSE}
 # Task 3
 ```
