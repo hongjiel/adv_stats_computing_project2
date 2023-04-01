@@ -373,6 +373,11 @@ where $S(z,\gamma)$ is the soft-thresholding operator with value
 $$S(z,\gamma)=\mathrm{sign}(z)(|z|-\gamma)_+=\begin{cases}z-\gamma,&\text{if }z>0\text{ and }\gamma<|z|\\z+\gamma,&\text{if }z<0\text{ and }\gamma<|z|\\0,&\text{if }\gamma\ge|z|\end{cases}$$
 Keep updating estimates of $\beta_j$'s repeatedly for $j = 0,1,2,...,p,0,1,2,...$ until convergence.
 
+## Task 3 - Path-wise coordinate-wise optimization algorithm
+\begin{figure}[H] 
+\includegraphics[width=1.0\textwidth]{images/task3_algorithm.jpeg} 
+\end{figure}
+
 ```{r include=FALSE}
 # Task 3
 ```
