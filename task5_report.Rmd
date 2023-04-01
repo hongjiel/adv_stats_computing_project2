@@ -49,7 +49,7 @@ The other 30 columns correspond to mean, standard deviation and the largest valu
 library(tidyverse)
 library(ggcorrplot)
 library(dplyr)
-cancer <- read.csv("C:/Users/yujia/Downloads/breast-cancer.csv") %>%
+cancer <- read.csv("breast-cancer.csv") %>%
   select(-1,-33) %>%
   janitor::clean_names()%>%
   mutate(diagnosis = recode(diagnosis, "M" = 1, "B" = 0)) 
@@ -117,7 +117,7 @@ Denote $w_i=p_i(1-p_i)\in(0,1)$ and $\mathbf{W}=\mathrm{diag}(w_1,\ldots,w_n)$. 
 \sum_{i=1}^nw_i & \sum_{i=1}^nw_iX_{i1} & \cdots & \sum_{i=1}^nw_iX_{i1} \\ 
 \sum_{i=1}^nw_iX_{i1} & \sum_{i=1}^nw_iX_{i1}^2 & \cdots & \sum_{i=1}^nw_iX_{i1}X_{ip} \\ 
 \vdots & \vdots & \ddots & \vdots \\ 
-\sum_{i=1}^nw_iX_{ip} & \sum_{i=1}^nw_iX_{in}X_{i1} & \cdots & \sum_{i=1}^nw_iX_{ip}^2
+\sum_{i=1}^nw_iX_{ip} & \sum_{i=1}^nw_iX_{ip}X_{i1} & \cdots & \sum_{i=1}^nw_iX_{ip}^2
 \end{pmatrix}.
 \end{align*}
 Next, we show that the Hessian matrix $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ is a negative-definite matrix if $\mathbf{X}$ has full rank.\par
@@ -166,9 +166,9 @@ Regularization is the common approach for variable selection, in which LASSO is 
 
 * Log-likelihood $f$ of logistic regression:
 
-\begin{equation}\label{func}
+$$
 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\top\boldsymbol{\beta}-\log\left(1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}\right)\right].
-\end{equation}
+$$
 
 * LASSO estimates the logistic model parameters $\boldsymbol{\beta}$ by optimizing a penalized loss function:
 

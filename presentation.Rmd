@@ -3,7 +3,7 @@ title: |
   | Breast Cancer Diagnosis
 author: |
   | Hongjie Liu, Xicheng Xie, Jiajun Tao, Shaohan Chen, Yujia Li
-date: "2023-02-27"
+date: "April 3rd, 2023"
 header-includes:
    - \usepackage{graphicx}
    - \usepackage{float}
@@ -145,7 +145,7 @@ Denote $w_i=p_i(1-p_i)\in(0,1)$ and $\mathbf{W}=\mathrm{diag}(w_1,\ldots,w_n)$. 
 \sum_{i=1}^nw_i & \sum_{i=1}^nw_iX_{i1} & \cdots & \sum_{i=1}^nw_iX_{i1} \\ 
 \sum_{i=1}^nw_iX_{i1} & \sum_{i=1}^nw_iX_{i1}^2 & \cdots & \sum_{i=1}^nw_iX_{i1}X_{ip} \\ 
 \vdots & \vdots & \ddots & \vdots \\ 
-\sum_{i=1}^nw_iX_{ip} & \sum_{i=1}^nw_iX_{in}X_{i1} & \cdots & \sum_{i=1}^nw_iX_{ip}^2
+\sum_{i=1}^nw_iX_{ip} & \sum_{i=1}^nw_iX_{ip}X_{i1} & \cdots & \sum_{i=1}^nw_iX_{ip}^2
 \end{pmatrix}
 \end{align*}
 
