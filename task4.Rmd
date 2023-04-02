@@ -188,7 +188,7 @@ Compare the results of cross-validation using `glmnet` and using our algorithm.
 1. Our function `cv.logit.lasso`:
 
 ```{r message=FALSE, warning=FALSE}
-lambda_max <- max(abs(t(x) %*% y)) / floor(length(y) * 4/5) # cv trains model on 4/5 of the training data for 5 times
+lambda_max <- max(abs(t(x) %*% (y - mean(y)))) / floor(length(y) * 4/5) # cv trains model on 4/5 of the training data for 5 times
 lambdas <- exp(seq(log(lambda_max), log(lambda_max) - 8, length = 30))
 set.seed(1)
 res_cv = cv.logit.lasso(x, y, nfolds = 5, lambda = lambdas)
@@ -200,7 +200,7 @@ best_lambda
 plot(log(res_cv$lambda), 
      res_cv$auc_mean, 
      pch = 16, 
-     xlab = "lambda",
+     xlab = "log lambda",
      ylab = "AUC",
      col = "red")
 abline(v = log(res_cv$lambda[which((res_cv$auc_ranking == 1))]), col = "gray", lty = 3)

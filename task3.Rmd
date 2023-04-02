@@ -44,10 +44,9 @@ INNER LOOP: Run the coordinate descent algorithm on the penalized weighted-least
 **OUTER LOOP** 
 In the outer loop, we compute the solutions of the optimization problem (\ref{opt.lasso}) for a decreasing sequence of values for $\lambda$: $\{\lambda_1,\ldots,\lambda_m\}$, starting at the smallest value $\lambda_1 = \lambda_{max}$ for which the estimates of all coefficients $\hat{\beta}_j = 0,\; j=1,2,\ldots,p$, which is
 \begin{equation}\label{maxlambda}
-\lambda_{max} = \frac{1}{n}\max_j\left|\left \langle \mathbf{x}_{\cdot j}, \mathbf{y} \right \rangle\right|,
+\lambda_{max} = \max_{j\in\{1,\ldots,p\}}\left|\frac{1}{n}\sum_{i=1}^n X_{ij}(Y_i-\bar{Y})\right|,
 \end{equation}
-where $\mathbf{x}_{\cdot j}$ is the $j$-th column of the design matrix $\mathbf{X}$, for $j=1,\ldots,p$.  
-For tuning parameter value $\lambda_{k+1}$, we initialize coordinate descent algorithm at the computed solution for $\lambda_k$ (warm start). Apart from giving us a path of solutions, this scheme exploits warm starts, and leads to a more stable algorithm.
+where $\bar{Y}=\frac{1}{n}\sum_{i=1}^nY_i$. For tuning parameter value $\lambda_{k+1}$, we initialize coordinate descent algorithm at the computed solution for $\lambda_k$ (warm start). Apart from giving us a path of solutions, this scheme exploits warm starts, and leads to a more stable algorithm.
 
 
 **MIDDLE LOOP**
@@ -74,11 +73,11 @@ In the inner loop, we find the estimates of $\boldsymbol{\beta}$ by solving a mo
 \min_{\boldsymbol{\beta}}\; -\frac{1}{n}\ell(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|,
 \end{equation}
 and update the estimates of $\boldsymbol{\beta}$. For each iteration of the inner loop, suppose we have the current estimates $\tilde{\beta}_k$ for $k\ne j$ and we wish to partially optimize with respect to $\beta_j$:
-$$\min_{\beta_j}\; \frac{1}{2n}\sum_{i=1}^n\tilde{w}_i\left(\tilde{z}_i-x_{ij}\beta_j-\sum_{k\ne j}x_{ik}\tilde{\beta}_k\right)^2+\lambda|\beta_j|+\lambda\sum_{k\ne j}|\tilde\beta_k|.$$
+$$\min_{\beta_j}\; \frac{1}{2n}\sum_{i=1}^n\tilde{w}_i\left(\tilde{z}_i-X_{ij}\beta_j-\sum_{k\ne j}X_{ik}\tilde{\beta}_k\right)^2+\lambda|\beta_j|+\lambda\sum_{k\ne j}|\tilde\beta_k|.$$
 Updates:
 \begin{align*}
-\tilde{\beta}_0&\leftarrow\frac{\sum_{i=1}^n\tilde{w}_{i}(\tilde{z}_{i}-\sum_{k= 1}^px_{ik}\tilde{\beta}_k)}{\sum_{i=1}^n\tilde{w}_{i}},\\
-\tilde{\beta}_j&\leftarrow\frac{S\left(\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}x_{ij}(\tilde{z}_{i}-\sum_{k\ne j}x_{ik}\tilde{\beta}_k),\lambda\right)}{\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}x_{ij}^2},\; j=1,\ldots,p
+\tilde{\beta}_0&\leftarrow\frac{\sum_{i=1}^n\tilde{w}_{i}(\tilde{z}_{i}-\sum_{k= 1}^pX_{ik}\tilde{\beta}_k)}{\sum_{i=1}^n\tilde{w}_{i}},\\
+\tilde{\beta}_j&\leftarrow\frac{S\left(\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}X_{ij}(\tilde{z}_{i}-\sum_{k\ne j}x_{ik}\tilde{\beta}_k),\lambda\right)}{\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}X_{ij}^2},\; j=1,\ldots,p
 \end{align*}
 where $S(z,\gamma)$ is the soft-thresholding operator with value
 $$S(z,\gamma)=\mathrm{sign}(z)(|z|-\gamma)_+=\begin{cases}z-\gamma,&\text{if }z>0\text{ and }\gamma<|z|\\z+\gamma,&\text{if }z<0\text{ and }\gamma<|z|\\0,&\text{if }\gamma\ge|z|\end{cases}$$
@@ -108,9 +107,9 @@ Note: Care is taken to avoid coefficients diverging in order to achieve fitted p
 	      \State INNER LOOP
 	      \While {$\left|h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(t)}(\lambda_{r}),\lambda_{r}) - h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(t-1)}(\lambda_{r}),\lambda_{r})\right|>\epsilon$ and $t<N_t$}
 	  	    \State $t \leftarrow t+1$
-	        \State $\tilde{\beta}_0^{(t)}(\lambda_{r})\leftarrow\sum_{i=1}^n\tilde{w}_{i}^{(s)}\left(\tilde{z}_{i}^{(s)}-\sum_{k= 1}^px_{ik}\tilde{\beta}_k^{(t-1)}(\lambda_{r})\right)\bigg/\sum_{i=1}^n\tilde{w}_{i}^{(s)}$
+	        \State $\tilde{\beta}_0^{(t)}(\lambda_{r})\leftarrow\sum_{i=1}^n\tilde{w}_{i}^{(s)}\left(\tilde{z}_{i}^{(s)}-\sum_{k= 1}^pX_{ik}\tilde{\beta}_k^{(t-1)}(\lambda_{r})\right)\bigg/\sum_{i=1}^n\tilde{w}_{i}^{(s)}$
 	        \For {$j \in\{1,\ldots,p\}$}
-	        \State $\tilde{\beta}_j^{(t)}(\lambda_{r})\leftarrow S\left(\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}^{(s)}x_{ij}\left(\tilde{z}_{i}^{(s)}-\sum_{k<j}x_{ik}\tilde{\beta}_k^{(t)}(\lambda_{r})-\sum_{k>j}x_{ik}\tilde{\beta}_k^{(t-1)}(\lambda_{r})\right),\lambda_r\right)\bigg/\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}^{(s)}x_{ij}^2$
+	        \State $\tilde{\beta}_j^{(t)}(\lambda_{r})\leftarrow S\left(\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}^{(s)}X_{ij}\left(\tilde{z}_{i}^{(s)}-\sum_{k<j}X_{ik}\tilde{\beta}_k^{(t)}(\lambda_{r})-\sum_{k>j}X_{ik}\tilde{\beta}_k^{(t-1)}(\lambda_{r})\right),\lambda_r\right)\bigg/\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}^{(s)}X_{ij}^2$
 	        \EndFor
 	      \EndWhile
 	      \State $\tilde{\boldsymbol{\beta}}_s(\lambda_{r})\leftarrow\tilde{\boldsymbol{\beta}}_s^{(t)}(\lambda_{r})$
@@ -219,9 +218,9 @@ y <- Training[, 1]
 We fit a logistic-LASSO model on the training data using our function `LogisticLASSO` with a sequence of descending $\lambda$’s.
 
 ```{r}
-lambda_max <- max(abs(t(x) %*% y)) / length(y)
+lambda_max <- max(abs(t(x) %*% (y - mean(y)))) / length(y) + 1e-10 # avoid computational error
 
-lambdas <- exp(seq(log(lambda_max), log(lambda_max) - 10, length = 30))
+lambdas <- exp(seq(log(lambda_max), log(lambda_max) - 4, length = 15))
 res <- LogisticLASSO(dat = Training, start = rep(0, ncol(Training)),
                      lambda = lambdas)
 res
