@@ -176,9 +176,12 @@ cv.logit.lasso <- function(x, y, nfolds = 5, lambda) {
   colnames(auc) <- c("lambda", "fold", "auc")
   cv_res <- auc %>% 
     group_by(lambda) %>% 
-    summarize(auc_mean = mean(auc)) %>% 
+    summarize(auc_mean = mean(auc),
+              auc_se = sd(auc) / sqrt(5),
+              auc_low = auc_mean - auc_se,
+              auc_high = auc_mean + auc_se) %>% 
     mutate(auc_ranking = min_rank(desc(auc_mean)))
-  bestlambda <- min(cv_res$lambda[cv_res$auc_ranking == 1])
+  bestlambda <- max(cv_res$lambda[cv_res$auc_ranking == 1])
   return(cv_res)
 }
 ```
@@ -215,6 +218,14 @@ plot(log(res_cv$lambda),
      ylab = "AUC",
      col = "red")
 abline(v = log(res_cv$lambda[which((res_cv$auc_ranking == 1))]), col = "gray", lty = 3)
+
+# plot of best lambda with std.error interval
+ggplot(res_cv, aes(log(lambda), auc_mean)) +
+  geom_point(col = "red") +
+  geom_errorbar(aes(ymin = auc_low, ymax = auc_high), col = "darkgray") +
+  geom_vline(aes(xintercept = log(lambda[which((auc_ranking == 1))])), color = "grey", linetype = "dashed") + 
+  xlab("log lambda") + 
+  ylab("AUC")
 
 # coefficients of the best model
 res_coef <- LogisticLASSO(dat = Training, start = rep(0, ncol(Training)),
