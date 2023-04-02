@@ -362,7 +362,8 @@ col = 1:2, lwd = 2)
 tibble(Model = c("full", "optimal"),
        specificity = c(logit_spec, ll_spec),
        sensitivity = c(logit_sens, ll_sens),
-       AUC = c(roc.logit$auc[1], roc.logitlasso$auc[1])) %>% 
+       AUC = c(roc.logit$auc[1], roc.logitlasso$auc[1]),
+       N_Predictors = c(30, 10)) %>% 
   knitr::kable(
   )
 ```
