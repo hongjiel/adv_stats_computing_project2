@@ -207,10 +207,11 @@ as.matrix(res_cv %>% arrange(-lambda))
 best_lambda <- max(res_cv$lambda[res_cv$auc_ranking == 1])
 best_lambda
 
+# plot of best lambda
 plot(log(res_cv$lambda), 
      res_cv$auc_mean, 
      pch = 16, 
-     xlab = "log lambda",
+     xlab = "lambda",
      ylab = "AUC",
      col = "red")
 abline(v = log(res_cv$lambda[which((res_cv$auc_ranking == 1))]), col = "gray", lty = 3)
@@ -219,6 +220,22 @@ abline(v = log(res_cv$lambda[which((res_cv$auc_ranking == 1))]), col = "gray", l
 res_coef <- LogisticLASSO(dat = Training, start = rep(0, ncol(Training)),
                           lambda = lambdas) %>% as.data.frame
 res_coef[res_coef$lambda == best_lambda, -1]
+
+# plot of coefficients
+i = 3
+plot(log(res_coef$lambda), 
+     res_coef[, 1], 
+     type = "l",
+     xlab = "log(lambda)",
+     ylab = "coefficients",
+     ylim = c(min(res_coef), max(res_coef)),
+     col = colors(1)[1])
+abline(h = 0, col = colors(1)[length(res_coef) + 1])
+abline(v = log(res_cv$lambda[which((res_cv$auc_ranking == 1))]), col = "gray", lty = 3)
+while (i < length(res_coef)) {
+  lines(log(res_coef$lambda), res_coef[, i], col = colors(1)[i], lty = 1)
+  i = i + 1
+}
 ```
 
 2. `glmnet` from **R** package `caret`
