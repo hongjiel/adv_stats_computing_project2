@@ -63,8 +63,8 @@ Variable selection is automatically conducted by LASSO in task 3 and 4.
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(ggcorrplot)
-cancer <- read.csv("C:/Users/yujia/Downloads/breast-cancer.csv") %>%
-  janitor::clean_names()%>%
+cancer <- read.csv("breast-cancer.csv") %>%
+  janitor::clean_names() %>%
   select(-1,-33) %>%
   mutate(diagnosis = recode(diagnosis, "M" = 1, "B" = 0)) 
 #ID labels individual breast tissue images; 
