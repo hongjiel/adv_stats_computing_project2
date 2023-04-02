@@ -163,37 +163,6 @@ Thus, $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ is negative-definit
 Hence, the optimization problem (\ref{opt}) is a well-defined problem.
 
 
-## Task 1 - Logistic model R code
-```{r eval = FALSE, size = "tiny"}
-cancer <- read.csv("breast-cancer.csv") %>%
-janitor::clean_names()%>%
-select(-1,-33) %>%
-mutate(diagnosis = recode(diagnosis, "M" = 1, "B" = 0))
-cor()
-ggcorrplot(corr, type = "upper", tl.cex = 8)
-
-set.seed(1)
-trainRows <- createDataPartition(y = cancer$diagnosis, p = 0.8, list = FALSE)
-train <- cancer[trainRows, ]
-test <-  cancer[-trainRows, ]
-glm.fit <- glm(diagnosis ~ ., 
-               data = train, 
-               subset = trainRows, 
-               family = binomial(link = "logit"))
-summary(glm.fit)
-pred <- predict(glm.fit, newdata = test, type = "response")
-y_test <- factor(test$diagnosis)
-auc_full <- auc(y_test, pred)
-auc_full 
-```
-
-- Final AUC of full model reaches 0.9641. 
-
-- And if we remove correlated variables, the AUC is uplifted to 0.9962.
-
-
-
-
 ## Task 2 - Objective
 **Objective:**\par
 Develop a Newton-Raphson algorithm to estimate your model

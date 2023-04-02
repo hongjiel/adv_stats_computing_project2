@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.9.22)  1 APR 2023 00:38
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.9.15)  1 APR 2023 23:21
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1186,7 +1186,7 @@ File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
 )
-Overfull \hbox (21.96188pt too wide) detected at line 312
+Overfull \hbox (22.21748pt too wide) detected at line 312
 []
  []
 
@@ -1198,18 +1198,13 @@ LaTeX Font Info:    Font shape `T1/lmss/bx/it' in size <10.95> not available
 
 [12
 
-]
-\openout4 = `presentation.vrb'.
-
-(./presentation.vrb) [13
-
-] [14
+] [13
 
 ]
-Overfull \vbox (6.48187pt too high) detected at line 415
+Overfull \vbox (6.48187pt too high) detected at line 376
  []
 
-[15
+[14
 
 ]
 \openout4 = `presentation.vrb'.
@@ -1217,96 +1212,96 @@ Overfull \vbox (6.48187pt too high) detected at line 415
 (./presentation.vrb
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <6> not available
 (Font)              Font shape `T1/lmtt/b/n' tried instead on input line 7.
-) [16
+) [15
 
-] [17
+] [16
 
 ]
-<images/complete_separation.jpeg, id=144, 451.6875pt x 346.29375pt>
+<images/complete_separation.jpeg, id=138, 451.6875pt x 346.29375pt>
 File: images/complete_separation.jpeg Graphic file (type jpg)
 <use images/complete_separation.jpeg>
-Package pdftex.def Info: images/complete_separation.jpeg  used on input line 48
-5.
+Package pdftex.def Info: images/complete_separation.jpeg  used on input line 44
+6.
 (pdftex.def)             Requested size: 245.83282pt x 188.47536pt.
-[18
+[17
 
  <./images/complete_separation.jpeg>]
 \openout4 = `presentation.vrb'.
 
-(./presentation.vrb) [19
+(./presentation.vrb) [18
 
 ]
 \openout4 = `presentation.vrb'.
 
-(./presentation.vrb) [20
+(./presentation.vrb) [19
+
+] [20
 
 ] [21
 
 ] [22
 
-] [23
-
 ]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <9> on input line 635.
+(Font)              <9> on input line 596.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 635.
+(Font)              <5> on input line 596.
 LaTeX Font Info:    Font shape `T1/lmss/b/n' in size <9> not available
-(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 635.
+(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 596.
 LaTeX Font Info:    Font shape `T1/lmss/b/n' in size <5> not available
-(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 635.
+(Font)              Font shape `T1/lmss/bx/n' tried instead on input line 596.
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <9> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 635.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 596.
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <5> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 635.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 596.
 LaTeX Font Info:    Font shape `OT1/lmss/b/n' in size <9> not available
-(Font)              Font shape `OT1/lmss/bx/n' tried instead on input line 635.
+(Font)              Font shape `OT1/lmss/bx/n' tried instead on input line 596.
 
 LaTeX Font Info:    Font shape `OT1/lmss/b/n' in size <5> not available
-(Font)              Font shape `OT1/lmss/bx/n' tried instead on input line 635.
+(Font)              Font shape `OT1/lmss/bx/n' tried instead on input line 596.
 
 LaTeX Font Info:    Font shape `T1/lmss/b/it' in size <9> not available
-(Font)              Font shape `T1/lmss/bx/it' tried instead on input line 635.
+(Font)              Font shape `T1/lmss/bx/it' tried instead on input line 596.
 
 LaTeX Font Info:    Font shape `T1/lmss/bx/it' in size <9> not available
-(Font)              Font shape `T1/lmss/bx/sl' tried instead on input line 635.
+(Font)              Font shape `T1/lmss/bx/sl' tried instead on input line 596.
 
 LaTeX Font Info:    Font shape `T1/lmss/b/it' in size <5> not available
-(Font)              Font shape `T1/lmss/bx/it' tried instead on input line 635.
+(Font)              Font shape `T1/lmss/bx/it' tried instead on input line 596.
 
 LaTeX Font Info:    Font shape `T1/lmss/bx/it' in size <5> not available
-(Font)              Font shape `T1/lmss/bx/sl' tried instead on input line 635.
+(Font)              Font shape `T1/lmss/bx/sl' tried instead on input line 596.
 
 
-Overfull \hbox (11.2094pt too wide) detected at line 635
+Overfull \hbox (11.2094pt too wide) detected at line 596
 []
  []
 
-[24
+[23
+
+] [24
 
 ] [25
 
 ] [26
 
-] [27
-
 ]
-<images/task3_algorithm.jpeg, id=222, 888.31876pt x 668.4975pt>
+<images/task3_algorithm.jpeg, id=216, 888.31876pt x 668.4975pt>
 File: images/task3_algorithm.jpeg Graphic file (type jpg)
 <use images/task3_algorithm.jpeg>
-Package pdftex.def Info: images/task3_algorithm.jpeg  used on input line 692.
+Package pdftex.def Info: images/task3_algorithm.jpeg  used on input line 653.
 (pdftex.def)             Requested size: 307.28987pt x 231.24391pt.
-[28
+[27
 
- <./images/task3_algorithm.jpeg>] [29
+ <./images/task3_algorithm.jpeg>] [28
+
+] [29
 
 ] [30
 
 ] [31
 
 ] [32
-
-] [33
 
 ]
 \tf@nav=\write6
@@ -1320,10 +1315,10 @@ Package pdftex.def Info: images/task3_algorithm.jpeg  used on input line 692.
 
 (./presentation.aux) ) 
 Here is how much of TeX's memory you used:
- 27668 strings out of 478268
- 530140 string characters out of 5846347
- 805946 words of memory out of 5000000
- 44970 multiletter control sequences out of 15000+600000
+ 27661 strings out of 478268
+ 530041 string characters out of 5846347
+ 805958 words of memory out of 5000000
+ 44968 multiletter control sequences out of 15000+600000
  598669 words of font info for 196 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,17n,122p,1009b,620s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1354,10 +1349,10 @@ exlive/2022/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texlive/202
 2/texmf-dist/fonts/type1/public/lm/lmtt8.pfb></usr/local/texlive/2022/texmf-dis
 t/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/texlive/2022/texmf
 -dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on presentation.pdf (33 pages, 703873 bytes).
+Output written on presentation.pdf (32 pages, 700126 bytes).
 PDF statistics:
- 402 PDF objects out of 1000 (max. 8388607)
- 301 compressed objects within 4 object streams
- 106 named destinations out of 1000 (max. 500000)
+ 395 PDF objects out of 1000 (max. 8388607)
+ 296 compressed objects within 3 object streams
+ 103 named destinations out of 1000 (max. 500000)
  79925 words of extra memory for PDF output out of 89155 (max. 10000000)
 
