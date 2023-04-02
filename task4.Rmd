@@ -196,7 +196,15 @@ as.matrix(res_cv %>% arrange(-lambda))
 # best lambda
 best_lambda <- max(res_cv$lambda[res_cv$auc_ranking == 1])
 best_lambda
-plot(log(res_cv$lambda), res_cv$auc_mean, pch = 16, col = "red")
+
+plot(log(res_cv$lambda), 
+     res_cv$auc_mean, 
+     pch = 16, 
+     xlab = "lambda",
+     ylab = "AUC",
+     col = "red")
+abline(v = log(res_cv$lambda[which((res_cv$auc_ranking == 1))]), col = "gray", lty = 3)
+
 # coefficients of the best model
 res_coef <- LogisticLASSO(dat = Training, start = rep(0, ncol(Training)),
                           lambda = lambdas) %>% as.data.frame
