@@ -188,8 +188,18 @@ Compare the results of cross-validation using `glmnet` and using our algorithm.
 1. Our function `cv.logit.lasso`:
 
 ```{r message=FALSE, warning=FALSE}
-lambda_max <- max(abs(t(x) %*% (y - mean(y)))) / floor(length(y) * 4/5) # cv trains model on 4/5 of the training data for 5 times
-lambdas <- exp(seq(log(lambda_max), log(lambda_max) - 8, length = 30))
+set.seed(1)
+folds <- createFolds(y, k = 5)
+lambda_max_i <- rep(NA, 5) # lambda_max for each training set in CV (4/5 of the whole training data)
+for (i in 1:5) {
+    valid_index <- folds[[i]]
+    x_training <- x[-valid_index, ]
+    y_training <- y[-valid_index]
+    lambda_max_i[i] <- max(abs(t(x_training) %*% (y_training - mean(y_training)))) / length(y_training)
+    }
+lambda_max <- max(lambda_max_i) + 1e-10 # max of lambda_max's so that all beta_i's = 0 except intercept
+lambdas <- exp(seq(log(lambda_max), log(lambda_max) - 6, length = 30))
+
 set.seed(1)
 res_cv = cv.logit.lasso(x, y, nfolds = 5, lambda = lambdas)
 as.matrix(res_cv %>% arrange(-lambda))
