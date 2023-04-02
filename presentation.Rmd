@@ -49,8 +49,6 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 
 - Discussions
 
-- Limitations and Future Work
-
 - Reference
 
 - Q&A
@@ -405,25 +403,18 @@ Use 5-fold cross-validation to select the best $\lambda$. Compare the prediction
 
 ## Discussions
 
-- There is much freedom when designing the simulations.
+- Lasso-logistic model performed better than the full logistic model.
 
-- In our algorithm, we have 5 parameters. n, p, ratio, c, corr
+- The most ideal performance is to classify each patient correctly, i.e. Specificity = Sensitivity = 1
 
-- More parameters can be adjusted.
-
-## Limitations and Future Work
-
-- Limitation: We reproduced high-dimensional scenarios, but we still don't know the solution.
-
-- Future Work: We may adjust other parameters to investigate further.
+- Future work: Predictors need to be interpreted or have some important clinical significance.
 
 ## Reference
 
-1. Li Y, Hong HG, Ahmed SE, Li Y. Weak signals in high‐dimensional regression: Detection, estimation and prediction. Appl Stochastic Models Bus Ind. 2018;1–16. https://doi.org/10.1002/asmb.2340
+1. Hothorn et al. The design and analysis of benchmark experiments. Journal of Computational and Graphical Statistics (2005) vol. 14 (3) pp. 675-699
 
+2. Friedman J, Hastie T, Tibshirani R. Regularization Paths for Generalized Linear Models via Coordinate Descent. J Stat Softw. 2010;33(1):1-22. PMID: 20808728; PMCID: PMC2929880.
 
 ## Q&A
 
 - Thanks for listening!
-
-- Any questions?
