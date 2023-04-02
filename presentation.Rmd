@@ -352,12 +352,56 @@ Keep updating estimates of $\beta_j$'s repeatedly for $j = 0,1,2,...,p,0,1,2,...
 ```
 
 
-## Task 4
+## Task 4 - Objective
+**Objective:**\par
 
-```{r include=FALSE}
-# Task 4
-```
+Use 5-fold cross-validation to select the best $\lambda$. Compare the prediction performance between the ’optimal’ model and ’full’ model.
 
+- Select the best $\lambda$: our function `cv.logit.lasso` and `cv.glmnet`.
+
+- Use the best lambda to select predictors and refit logistic regression model --'optimal' model.
+
+- Compare the 'optimal' model and the 'full' model from Task 2 in Specificity, Sensitivity, and AUC.
+
+## Task 4 - Our CV function
+\begin{figure}[H] 
+\includegraphics[width=1.0\textwidth]{images/task4_ourfunc.png} 
+\end{figure}
+
+## Task 4 - Our CV function -- coefficient shrinkage
+\begin{figure}[H] 
+\includegraphics[width=1.0\textwidth]{images/task4_coefshr.png} 
+\end{figure}
+
+## Task 4 - Our CV function -- selecting the best lambda
+\begin{figure}[H] 
+\includegraphics[width=1.0\textwidth]{images/task4_bestlmd.png} 
+\end{figure}
+
+## Task 4 - glmnet -- selecting the best lambda
+\begin{figure}[H] 
+\includegraphics[width=1.0\textwidth]{images/task4_glmbestlmd.png} 
+\end{figure}
+
+## Task 4 - Best lambda by the two methods
+\begin{figure}[H] 
+\includegraphics[width=0.5\textwidth]{images/task4_lambdacom.png} 
+\end{figure}
+
+## Task 4 - Selecting predictors
+\begin{figure}[H] 
+\includegraphics[width=0.5\textwidth]{images/task4_selectpred.png} 
+\end{figure}
+
+## Task 4 - Compare 'optimal' and 'full' models - Table
+\begin{figure}[H] 
+\includegraphics[width=1.0\textwidth]{images/task4_twomodel.png} 
+\end{figure}
+
+## Task 4 - Compare 'optimal' and 'full' models - Plot
+\begin{figure}[H] 
+\includegraphics[width=1.0\textwidth]{images/task4_roc.png} 
+\end{figure}
 
 ## Discussions
 

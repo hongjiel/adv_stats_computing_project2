@@ -214,7 +214,7 @@ best_lambda
 plot(log(res_cv$lambda), 
      res_cv$auc_mean, 
      pch = 16, 
-     xlab = "lambda",
+     xlab = "log(lambda)",
      ylab = "AUC",
      col = "red")
 abline(v = log(res_cv$lambda[which((res_cv$auc_ranking == 1))]), col = "gray", lty = 3)
@@ -266,7 +266,7 @@ coef(fit.logit.lasso, fit.logit.lasso$lambda.min)
 
 The results are slightly different (mean AUC values).
 
-```{r}
+```{r echo=FALSE}
 tibble(
   lambda = lambdas,
   ours_AUC = res_cv %>% arrange(-lambda) %>% .$auc_mean,
@@ -277,7 +277,7 @@ tibble(
 
 The best $\lambda$'s are the same, and the coefficients are very similar.
 
-```{r}
+```{r echo=FALSE}
 # our best lambda
 best_lambda
 # cv.glmnet's best lambda
@@ -306,6 +306,8 @@ betavec_logit <- res_logit[nrow(res_logit), 3:ncol(res_logit)]
 u <- X_test %*% betavec_logit
 phat <- sigmoid(u)[, 1]
 roc.logit <- roc(response = y_test, predictor = phat)
+logit_spec <- specificity(as.factor(y_test), as.factor(round(phat)))
+logit_sens <- sensitivity(as.factor(y_test), as.factor(round(phat)))
 
 # logistic LASSO model
 betavec_logit.lasso <- res_coef[res_coef$lambda == best_lambda, -c(1, 2)]
@@ -319,6 +321,8 @@ betavec_lasso.refit <- as.numeric(betavec_lasso.refit)
 u <- X_test %*% betavec_lasso.refit
 phat <- sigmoid(u)[, 1]
 roc.logitlasso <- roc(response = y_test, predictor = phat)
+ll_spec <- specificity(as.factor(y_test), as.factor(round(phat)))
+ll_sens <- sensitivity(as.factor(y_test), as.factor(round(phat)))
 
 # logistic LASSO model (cv.glmnet)
 betavec_logit.lasso.glm_temp <- coef(fit.logit.lasso, fit.logit.lasso$lambda.min)
@@ -344,6 +348,23 @@ plot(roc.logitlasso.glm, col = 3, add = TRUE)
 modelNames <- c("logistic", "logistic LASSO", "logistic LASSO (cv.glmnet)")
 legend("bottomright", legend = paste0(modelNames, ": ", round(auc, 3)),
 col = 1:3, lwd = 2)
+
+# draw rocs(only 2)
+auc <- c(roc.logit$auc[1], roc.logitlasso$auc[1])
+auc
+plot(roc.logit, legacy.axes = TRUE)
+plot(roc.logitlasso, col = 2, add = TRUE)
+modelNames <- c("logistic", "logistic LASSO")
+legend("bottomright", legend = paste0(modelNames, ": ", round(auc, 3)),
+col = 1:2, lwd = 2)
+
+
+tibble(Model = c("full", "optimal"),
+       specificity = c(logit_spec, ll_spec),
+       sensitivity = c(logit_sens, ll_sens),
+       AUC = c(roc.logit$auc[1], roc.logitlasso$auc[1])) %>% 
+  knitr::kable(
+  )
 ```
 
 ### Correlation Plot

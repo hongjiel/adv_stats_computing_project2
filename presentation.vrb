@@ -1,35 +1,20 @@
-\frametitle{Task 2 - Comparison}
-\protect\hypertarget{task-2---comparison}{}
-Comparison of using \texttt{glm} function and our algorithm (part of)
+\frametitle{Task 4 - Objective}
+\protect\hypertarget{task-4---objective}{}
+\textbf{Objective:}
 
-\tiny
+\par
 
-\begin{longtable}[]{@{}lrr@{}}
-\toprule()
-predictor & ours & glm \\
-\midrule()
-\endhead
-(Intercept) & 111.7230206 & 90.9690365 \\
-radius\_mean & -3646.8235387 & -2560.3938902 \\
-texture\_mean & -2.8949199 & 0.8812037 \\
-perimeter\_mean & 1257.9481173 & 789.2724398 \\
-area\_mean & 2091.5001210 & 1539.8345650 \\
-smoothness\_mean & 180.4591375 & 128.8762247 \\
-compactness\_mean & -471.3749334 & -346.6691873 \\
-concavity\_mean & -0.3063034 & 9.0810082 \\
-concave.points\_mean & 287.3555092 & 215.4808031 \\
-symmetry\_mean & 10.8459784 & 10.4772590 \\
-fractal\_dimension\_mean & -40.6413497 & -28.6916549 \\
-radius\_se & 854.4290933 & 617.5687358 \\
-texture\_se & -105.8920782 & -79.9788638 \\
-perimeter\_se & -1231.6514585 & -917.3916527 \\
-area\_se & 789.0550146 & 628.6222313 \\
-smoothness\_se & -83.3449730 & -63.7660367 \\
-compactness\_se & 473.1970464 & 344.3180183 \\
-concavity\_se & -440.6629325 & -323.8533730 \\
-concave.points\_se & 503.3728692 & 374.7610875 \\
-symmetry\_se & -144.4580558 & -108.6211792 \\
-\bottomrule()
-\end{longtable}
+Use 5-fold cross-validation to select the best \(\lambda\). Compare the
+prediction performance between the 'optimal' model and 'full' model.
 
-\normalsize
+\begin{itemize}
+\item
+  Select the best \(\lambda\): our function \texttt{cv.logit.lasso} and
+  \texttt{cv.glmnet}.
+\item
+  Use the best lambda to select predictors and refit logistic regression
+  model --`optimal' model.
+\item
+  Compare the `optimal' model and the `full' model from Task 2 in
+  Specificity, Sensitivity, and AUC.
+\end{itemize}
