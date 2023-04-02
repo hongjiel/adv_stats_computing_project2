@@ -139,7 +139,7 @@ Assume such $\boldsymbol{\beta}^*$ exists, then $\forall \boldsymbol{\beta}\in\m
 First, we prove that: there exists a vector of coefficients $\tilde{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}} < 0$.
 
 Let $A_1=\{i: Y_i = 1\}= \{i:\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}> 0\}$ and $A_0=\{i: Y_i = 0\}=\{i:\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}\le0\}$. Then we have $$\epsilon:=\min_{i\in A_1}(\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}) > 0.$$
-Let $\tilde{\boldsymbol{\beta}}=\hat{\boldsymbol{\beta}}-(\epsilon/2,0,\ldots,0)^\top$. Given that $X_{i1}=1$ for all $i$, we have 
+Let $\tilde{\boldsymbol{\beta}}=\hat{\boldsymbol{\beta}}-(\epsilon/2,0,\ldots,0)^\top$. Given that $X_{i0}=1$ for all $i$, we have 
 $$\begin{aligned}
 \mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}=\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}-\epsilon/2\cdot1\ge \epsilon-\epsilon/2=\epsilon/2>0,\quad \forall i\in A_1\\
 \mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}=\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}-\epsilon/2\cdot1\le 0-\epsilon/2=-\epsilon/2<0,\quad \forall i\in A_0\\
