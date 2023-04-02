@@ -41,7 +41,7 @@ Denote $w_i=p_i(1-p_i)\in(0,1)$ and $\mathbf{W}=\mathrm{diag}(w_1,\ldots,w_n)$. 
 \sum_{i=1}^nw_i & \sum_{i=1}^nw_iX_{i1} & \cdots & \sum_{i=1}^nw_iX_{i1} \\ 
 \sum_{i=1}^nw_iX_{i1} & \sum_{i=1}^nw_iX_{i1}^2 & \cdots & \sum_{i=1}^nw_iX_{i1}X_{ip} \\ 
 \vdots & \vdots & \ddots & \vdots \\ 
-\sum_{i=1}^nw_iX_{ip} & \sum_{i=1}^nw_iX_{in}X_{i1} & \cdots & \sum_{i=1}^nw_iX_{ip}^2
+\sum_{i=1}^nw_iX_{ip} & \sum_{i=1}^nw_iX_{ip}X_{i1} & \cdots & \sum_{i=1}^nw_iX_{ip}^2
 \end{pmatrix}.
 \end{align*}
 Next, we show that the Hessian matrix $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ is a negative-definite matrix if $\mathbf{X}$ has full rank.
@@ -56,6 +56,8 @@ Thus, $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ is negative-definit
 
 Hence, the optimization problem (\ref{opt}) is a well-defined problem.
 
+Variable selection is automatically conducted by LASSO in task 3 and 4.
+
 
 ```{r}
 knitr::opts_chunk$set(echo = TRUE)
@@ -66,84 +68,10 @@ cancer <- read.csv("C:/Users/yujia/Downloads/breast-cancer.csv") %>%
   select(-1,-33) %>%
   mutate(diagnosis = recode(diagnosis, "M" = 1, "B" = 0)) 
 #ID labels individual breast tissue images; 
-
 #The second column 'Diagnonsis' identifies if the image is coming from cancer tissue or benign cases (M=malignant, B = benign). There are 357 benign and 212 malignant cases. 
-
 #The other 30 columns correspond to mean, standard deviation and the largest values (points on the tails) of the distributions of the following 10 features computed for the cellnuclei;
 corr = cancer[2:31] %>% 
   cor()
 ggcorrplot(corr, type = "upper", tl.cex = 8)
 ```
-
-
-```{r logstic full model}
-library(caret)
-library(pROC)
-set.seed(1)
-trainRows <- createDataPartition(y = cancer$diagnosis, p = 0.8, list = FALSE)
-train <- cancer[trainRows, ]
-test <-  cancer[-trainRows, ]
-glm.fit <- glm(diagnosis ~ ., 
-               data = train, 
-               subset = trainRows, 
-               family = binomial(link = "logit"))
-summary(glm.fit)
-pred <- predict(glm.fit, newdata = test, type = "response")
-y_test <- factor(test$diagnosis)
-auc_full <- auc(y_test, pred)
-auc_full #0.9641
-```
-
-
-```{r}
-#if removing variables collinearity 
-cancer1 <- cancer %>%
-  select(-area_se, 
-         -perimeter_se, 
-         -area_worst, 
-         -perimeter_mean, 
-         -perimeter_worst, 
-         -area_mean, 
-         -radius_worst, 
-         -concave_points_mean, 
-         -texture_worst, 
-         -compactness_mean, 
-         -smoothness_worst)
-corr1 = cancer1[2:20] %>% 
-  cor()
-ggcorrplot(corr1, type = "upper", tl.cex = 8)
-
-set.seed(2)
-trainRows1 <- createDataPartition(y = cancer1$diagnosis, 
-                                 p = 0.8, list = FALSE)
-train1 <- cancer1[trainRows1, ]
-test1 <-  cancer1[-trainRows1, ]
-glm.fit1 <- glm(diagnosis ~ ., 
-               data = train1, 
-               subset = trainRows1, 
-               family = binomial(link = "logit"))
-summary(glm.fit1)
-pred1 <- predict(glm.fit1, newdata = test1, type = "response")
-y_test1 <- factor(test1$diagnosis)
-auc_full1 <- auc(y_test1, pred1)
-auc_full1 #0.9962
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
