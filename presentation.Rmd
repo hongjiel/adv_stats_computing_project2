@@ -251,7 +251,9 @@ NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
 
 - If there is no complete separation, the parameters output by `glm` function and our algorithm are demonstrated to be the same
 
-- In practice, if complete separation occurs, we randomly pick the parameters which satisfy complete separation as our full model
+- In this case, given the perfect separation does exist, we choose the $\beta$ based on the pre-defined `tol = 1e-8` in the algorithm.
+
+- The difference of $\beta$ in our algorithm output and `glm` function is out of the different termination condition
 
 ## Task 2 - Comparison
 Comparison of using `glm` function and our algorithm (part of)
