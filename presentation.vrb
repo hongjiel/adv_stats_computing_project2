@@ -1,20 +1,12 @@
-\frametitle{Task 4 - Objective}
-\protect\hypertarget{task-4---objective}{}
-\textbf{Objective:}
-
-\par
-
-Use 5-fold cross-validation to select the best \(\lambda\). Compare the
-prediction performance between the 'optimal' model and 'full' model.
-
+\frametitle{Task 4 - lambda Range}
+\protect\hypertarget{task-4---lambda-range}{}
 \begin{itemize}
 \item
-  Select the best \(\lambda\): our function \texttt{cv.logit.lasso} and
-  \texttt{cv.glmnet}.
+  \(\lambda_{max}\): makes \(\beta_k\) = 0 for all
+  \(k\in\{1,2,...,p\}\).
 \item
-  Use the best lambda to select predictors and refit logistic regression
-  model --`optimal' model.
+  \(\lambda_{min}\): \(\lambda_{max} / 10^6\).
 \item
-  Compare the `optimal' model and the `full' model from Task 2 in
-  Specificity, Sensitivity, and AUC.
+  We use \texttt{seq} to produce 30 \(\lambda\) candidates, on a log
+  scale.
 \end{itemize}

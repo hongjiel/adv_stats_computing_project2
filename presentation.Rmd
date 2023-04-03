@@ -368,6 +368,13 @@ Use 5-fold cross-validation to select the best $\lambda$. Compare the prediction
 \includegraphics[width=1.0\textwidth]{images/task4_ourfunc.png} 
 \end{figure}
 
+## Task 4 - lambda Range
+- $\lambda_{max}$: makes $\beta_k$ = 0 for all $k\in\{1,2,...,p\}$.
+
+- $\lambda_{min}$: $\lambda_{max} / 10^6$.
+
+- We use `seq` to produce 30 $\lambda$ candidates, on a log scale.
+
 ## Task 4 - Our CV function -- coefficient shrinkage
 \begin{figure}[H] 
 \includegraphics[width=1.0\textwidth]{images/task4_coefshr.png} 
