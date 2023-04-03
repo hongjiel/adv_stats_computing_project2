@@ -74,7 +74,7 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 - The first column `ID` labels individual breast tissue images; The second column `Diagnosis` identifies if the image is coming from cancer tissue or benign
 cases (M = malignant, B = benign). There are 357 benign and 212 malignant cases
 
-- The other 30 columns correspond to mean, standard deviation and the largest values (points on the tails) of the distributions of the following 10 features computed for the cellnuclei
+- The other 30 columns correspond to mean, standard deviation and the largest values (points on the tails) of the distributions of 10 features computed for the cellnuclei
 
 
 ## Task Introduction
@@ -85,7 +85,7 @@ cases (M = malignant, B = benign). There are 357 benign and 212 malignant cases
 
 - Task 3: Build a logistic-LASSO model to select features, and implement a path-wise coordinate-wise optimization algorithm to obtain a path of solutions with a sequence of descending $\lambda$’s.
 
-- Task 4: Use 5-fold cross-validation to select the best $\lambda$. Compare the prediction performance between the ’optimal’ model and ’full’ model
+- Task 4: Use 5-fold cross-validation to select the best $\lambda$. Compare the prediction performance between the ’optimal’ model and ’full’ model.
 
 
 ## Task 1 - Objective
@@ -95,7 +95,7 @@ Build a logistic model to classify the images into malignant/benign, and write d
 
 
 ## Task 1 - Build a logistic model
-Define the "Diagnosis" variable will be coded as 1 for malignant cases and 0 for benign cases.\par
+"Diagnosis" variable will be coded as 1 for malignant cases and 0 for benign cases.\par
 
 Given $n$ i.i.d. observations with $p$ predictors, we consider a logistic regression model
 \begin{equation}\label{model}
@@ -235,9 +235,9 @@ NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
 ## Task 2 - Complete separtion
 - Sometimes our algorithm does not converge because of the complete separation.
 
-- A complete separation in a logistic regression, sometimes also referred as perfect prediction, occurs whenever there exists some vector of coefficients $\boldsymbol{\beta}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\boldsymbol{\beta} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\boldsymbol{\beta} \le 0$. 
+- A complete separation in a logistic regression, sometimes also referred to as perfect prediction, occurs whenever there exists some vector of coefficients $\boldsymbol{\beta}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\boldsymbol{\beta} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\boldsymbol{\beta} \le 0$. 
 
-- Complete separation occur when a linear function of predictors can perfectly classify the response.
+- Complete separation occurs when a linear function of predictors can perfectly classify the response.
 
 
 ## Task 2 - Complete separation
@@ -249,11 +249,11 @@ NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
 ## Task 2 - Complete separation
 - We have proved that: when there exists a vector of coefficients $\hat{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} \le 0$, there does not exist $\boldsymbol{\beta}^*\in\mathbb{R}^{(p+1)}$ such that $\boldsymbol{\beta}^* = \arg\max_{\boldsymbol{\beta}}f(\boldsymbol{\beta})$, where $f$ is given in (\ref{func}). Thus our algorithm does not converge. (proof is attached in report appendix) \par
 
-- If there is no complete separation, the parameters output by `glm` function and our algorithm are demonstrated to be the same
+- If there is no complete separation, the parameters output by `glm` function and our algorithm are demonstrated to be the same.
 
 - In this case, given the perfect separation does exist, we choose the $\beta$ based on the pre-defined `tol = 1e-8` in the algorithm.
 
-- The difference of $\beta$ in our algorithm output and `glm` function is out of the different termination condition
+- The difference of $\beta$ in our algorithm output and `glm` function is out of the different termination condition.
 
 ## Task 2 - Comparison
 Comparison of using `glm` function and our algorithm (part of)
@@ -272,9 +272,9 @@ c_t[1:20, ]%>% knitr::kable()
 
 ## Task 3 - Objective
 **Objective:**\par
-Build a logistic-LASSO model to select features by implementing a path-wise coordinate-wise optimization algorithm
+Build a logistic-LASSO model to select features by implementing a path-wise coordinate-wise optimization algorithm.
 
-- Recall Log-likelihood $f$ in task 1:
+- Log-likelihood $f$ in task 1:
 $$f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\top\boldsymbol{\beta}-\log\left(1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}\right)\right].$$
 
 - LASSO estimates the logistic model parameters $\boldsymbol{\beta}$ by optimizing a penalized loss function:
@@ -283,54 +283,50 @@ $$f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^
 \end{equation}
 where $\lambda\ge 0$ is the tuning parameter. Note that the intercept is not penalized and all predictors are standardized.
 
-## Task 3 - Algorithm of Logistic-LASSO Model
-**Algorithm Structure:**\par
 
-- OUTER LOOP: Decrement $\lambda$.
-
-- MIDDLE LOOP: Update $\tilde{w}_i$, $\tilde{p}_i$, and thus the quadratic approximation $\ell$ using the current
-parameters $\tilde{\boldsymbol{\beta}}$.
-
-- INNER LOOP: Run the coordinate descent algorithm on the penalized weighted-least-squares problem.
-
-## Task 3 - OUTER LOOP
-**OUTER LOOP: **\par
-Compute the solutions of the optimization problem (\ref{opt.lasso}) for a decreasing sequence of values for $\lambda$: $\{\lambda_1,\ldots,\lambda_m\}$, starting at the smallest value $\lambda_1 = \lambda_{max}$
+## Task 3 - Outer Loop
+- Compute the solutions of the optimization problem (\ref{opt.lasso}) for a decreasing sequence of values for $\lambda$: $\{\lambda_1,\ldots,\lambda_m\}$, starting at the smallest value $\lambda_1 = \lambda_{max}$ such that $\hat{\beta}_j=0,\ j=1,\ldots,p$.
 \begin{equation}\label{maxlambda}
-\lambda_{max} = \frac{1}{n}\max_j\left|\left \langle \mathbf{x}_{\cdot j}, \mathbf{y} \right \rangle\right|,
+\lambda_{max} = \max_{j\in\{1,\ldots,p\}}\left|\frac{1}{n}\sum_{i=1}^n X_{ij}(Y_i-\bar{Y})\right|,
 \end{equation}
-where $\mathbf{x}_{\cdot j}$ is the $j$-th column of the design matrix $\mathbf{X}$, for $j=1,\ldots,p$. \par
-For tuning parameter value $\lambda_{k+1}$, we initialize coordinate descent algorithm at the computed solution for $\lambda_k$ (warm start).
+where $\bar{Y}=\frac{1}{n}\sum_{i=1}^nY_i$. \par
+- For tuning parameter value $\lambda_{k+1}$, we initialize coordinate descent algorithm at the computed solution for $\lambda_k$ (warm start).
 
-## Task 3 - MIDDLE LOOP
-**MIDDLE LOOP: **\par
+
+
+## Task 3 - Middle Loop
 - For a fixed $\lambda$, find the estimates of $\boldsymbol{\beta}$ by solving the optimization problem (\ref{opt.lasso}).
 
-Based on current parameter estimates $\tilde{\boldsymbol{\beta}}$, we we form a quadratic approximation to the log-likelihood $f$ using a Taylor expansion:
+- Based on current parameter estimates $\tilde{\boldsymbol{\beta}}$, we form a quadratic approximation to the log-likelihood $f$ using a Taylor expansion:
 \fontsize{9pt}{12pt}\selectfont
 \begin{align*}
 f(\boldsymbol{\beta})\approx\ell(\boldsymbol{\beta})&=f(\tilde{\boldsymbol{\beta}})+(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})^\top\nabla f(\tilde{\boldsymbol{\beta}})+\frac{1}{2}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})^\top\nabla^2 f(\tilde{\boldsymbol{\beta}})(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})\\
+&=f(\tilde{\boldsymbol{\beta}})+[\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})]^\top(\mathbf{y}-\tilde{\mathbf{p}})-\frac{1}{2}[\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})]^\top\tilde{\mathbf{W}}\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})\\
 &=-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})+\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\right]+\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left(\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\right)^2+f(\tilde{\boldsymbol{\beta}}),
 \end{align*}
 where $\tilde{\mathbf{p}}=(\tilde{p}_1,\ldots,\tilde{p}_n)^\top$ and $\tilde{\mathbf{W}}=\mathrm{diag}(\tilde{w}_1,\ldots,\tilde{w}_n)$ are the estimates of $\mathbf{p}$ and $\mathbf{W}$ based on $\tilde{\boldsymbol{\beta}}$. 
 
-## Task 3 - MIDDLE LOOP
-- Let $\tilde{z}_i=\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}+\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}$, we have
+## Task 3 - Middle Loop
+Let $\tilde{z}_i=\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}+\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}$, we have
 \begin{equation}\label{func.lasso}
 \ell(\boldsymbol{\beta})=-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i(\tilde{z}_i-\mathbf{x}_i^\top\boldsymbol{\beta})^2+C(\tilde{\boldsymbol{\beta}}),
 \end{equation}
 where is $\tilde{z}_i$ the working response, $\tilde{w}_i$ is the working weight, and $C$ is a function that does not depend on $\boldsymbol{\beta}$.
 
-## Task 3 - INNER LOOP
-**INNER LOOP: **\par
-With fixed $\tilde{w}_i$'s, $\tilde{z}_i$'s, and a fixed form of $\ell$ based on the estimates of $\boldsymbol{\beta}$ in the previous iteration of the middle loop, we use coordinate descent to update $\boldsymbol{\beta}$ by solving
-\begin{equation}\label{opt.inner}
+
+
+## Task 3 - Inner Loop
+With fixed $\tilde{w}_i$'s, $\tilde{z}_i$'s, and a fixed form of $\ell$ based on the estimates of $\boldsymbol{\beta}$ in the previous iteration of the middle loop, we use coordinate descent method to update $\boldsymbol{\beta}$ by solving
+$$
 \min_{\boldsymbol{\beta}}\; -\frac{1}{n}\ell(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|,
+$$
+which is equivalent to
+\begin{equation}\label{opt.inner}
+\min_{\boldsymbol{\beta}}\; \frac{1}{2n}\sum_{i=1}^n\tilde{w}_i(\tilde{z}_i-\mathbf{x}_i^\top\boldsymbol{\beta})^2+\lambda\sum_{k=1}^{p}|\beta_k|,
 \end{equation}
 
-## Task 3 - INNER LOOP
-- Coordinate-wise objective function
-Based the current estimates $\tilde{\beta}_k$ for $k\ne j$:
+## Task 3 - Inner Loop
+- Based on the current estimates $\tilde{\beta}_k$ for $k\ne j$:
 $$\min_{\beta_j}\; \frac{1}{2n}\sum_{i=1}^n\tilde{w}_i\left(\tilde{z}_i-x_{ij}\beta_j-\sum_{k\ne j}x_{ik}\tilde{\beta}_k\right)^2+\lambda|\beta_j|+\lambda\sum_{k\ne j}|\tilde\beta_k|.$$
 - Updates:
 \begin{align*}
@@ -340,15 +336,88 @@ $$\min_{\beta_j}\; \frac{1}{2n}\sum_{i=1}^n\tilde{w}_i\left(\tilde{z}_i-x_{ij}\b
 \footnotesize
 where $S(z,\gamma)$ is the soft-thresholding operator with value
 $$S(z,\gamma)=\mathrm{sign}(z)(|z|-\gamma)_+=\begin{cases}z-\gamma,&\text{if }z>0\text{ and }\gamma<|z|\\z+\gamma,&\text{if }z<0\text{ and }\gamma<|z|\\0,&\text{if }\gamma\ge|z|\end{cases}$$
-Keep updating estimates of $\beta_j$'s repeatedly for $j = 0,1,2,...,p,0,1,2,...$ until convergence.
+- Keep updating estimates of $\beta_j$'s repeatedly for $j = 0,1,2,...,p,0,1,2,...$ until convergence.
 
-## Task 3 - Path-wise coordinate-wise optimization algorithm
+## Task 3 - Algorithm Structure
+**Algorithm Structure:**\par
+
+- Outer Loop: Decrement $\lambda$.
+
+- Middle Loop: Update the quadratic approximation $\ell$ using the current parameters estimates.
+
+- Inner Loop: Run the coordinate descent algorithm on the penalized weighted-least-squares problem.
+
+
+## Task 3 - Algorithm Structure
 \begin{figure}[H] 
 \includegraphics[width=1.0\textwidth]{images/task3_algorithm.jpeg} 
 \end{figure}
 
-```{r include=FALSE}
-# Task 3
+
+## Task 3 - Outer Loop R Code
+```{r eval=FALSE, size = "tiny"}
+LogisticLASSO <- function(dat, start, lambda) {
+  r <- length(lambda)
+  X <- as.matrix(cbind(rep(1, nrow(dat)), dat[, -1])) # design matrix
+  y <- dat[, 1] # response vector
+  res <- matrix(NA, nrow = r, ncol = ncol(dat) + 1)
+  for (i in 1:r) {
+    betavec <- MiddleLoop(X = X, y = y, start = start, lambda = lambda[i])
+    res[i, ] <- c(lambda[i], betavec)
+    start <- betavec
+  }
+  colnames(res) <- c("lambda", "(Intercept)", names(dat)[-1])
+  return(res)
+}
+```
+
+## Task 3 - Middle Loop R Code
+```{r eval=FALSE, size = "tiny"}
+MiddleLoop <- function(X, y, start, lambda, maxiter = 100) {
+  betavec <- start
+  u <- X %*% betavec
+  p_vec <- sigmoid(u) # function `sigmoid` to compute exp(x)/(1 + exp(x))
+  w <- p_vec * (1 - p_vec)
+  eps <- 1e-5
+  p_vec[p_vec < eps] <- 0
+  p_vec[p_vec > 1 - eps] <- 1
+  w[p_vec == 1 | p_vec == 0] <- eps
+  z <- u + (y - p_vec) / w
+  s <- 0
+  t <- 2
+  while (t > 1 && s < maxiter) { # if number of iterations of inner loop = 1, converge.
+    s <- s + 1
+    betavec <- InnerLoop(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
+    t <- betavec[1]
+    betavec <- betavec[-1]
+    u <- X %*% betavec
+  }
+  return(betavec)
+}
+```
+
+## Task 3 - Inner Loop R Code
+```{r eval=FALSE, size = "tiny"}
+InnerLoop <- function(X, z, w, betavec, lambda, tol = 1e-10, maxiter = 1000) {
+  prevfunc <- Inf
+  curfunc <- coordinate_func(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
+  t <- 0
+  while (abs(curfunc - prevfunc) > tol && t < maxiter) {
+    t <- t + 1
+    prevfunc <- curfunc
+    betavec[1] <- sum(w * (z - X[, -1] %*% betavec[-1])) / sum(w)
+    for (j in 2:length(betavec)) {
+      betavec[j] <- 
+        soft.threshold(
+          z = sum(w * X[, j] * (z - X[, -j] %*% betavec[-j])) / nrow(X),
+          gamma = lambda
+          ) *
+        nrow(X) / sum(w * X[, j]^2)
+    }
+    curfunc <- coordinate_func(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
+  }
+  return(c(t, betavec))
+}
 ```
 
 
@@ -371,7 +440,7 @@ Use 5-fold cross-validation to select the best $\lambda$. Compare the prediction
 ## Task 4 - lambda Range
 - $\lambda_{max}$: makes $\beta_k$ = 0 for all $k\in\{1,2,...,p\}$.
 
-- $\lambda_{min}$: $\lambda_{max} / 10^6$.
+- $\lambda_{min}$: $\lambda_{max} / e^6$.
 
 - We use `seq` to produce 30 $\lambda$ candidates, on a log scale.
 
@@ -420,9 +489,7 @@ Use 5-fold cross-validation to select the best $\lambda$. Compare the prediction
 
 ## Reference
 
-1. Hothorn et al. The design and analysis of benchmark experiments. Journal of Computational and Graphical Statistics (2005) vol. 14 (3) pp. 675-699
-
-2. Friedman J, Hastie T, Tibshirani R. Regularization Paths for Generalized Linear Models via Coordinate Descent. J Stat Softw. 2010;33(1):1-22. PMID: 20808728; PMCID: PMC2929880.
+Friedman J, Hastie T, Tibshirani R. Regularization Paths for Generalized Linear Models via Coordinate Descent. J Stat Softw. 2010;33(1):1-22. PMID: 20808728; PMCID: PMC2929880.
 
 ## Q&A
 
