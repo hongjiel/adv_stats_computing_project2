@@ -159,23 +159,24 @@ LogisticLASSO <- function(dat, start, lambda) {
 
 MiddleLoop <- function(X, y, start, lambda, maxiter = 100) {
   betavec <- start
-  u <- X %*% betavec
-  p_vec <- sigmoid(u) # function `sigmoid` to compute exp(x)/(1 + exp(x))
-  w <- p_vec * (1 - p_vec)
-  eps <- 1e-5
-  # see note
-  p_vec[p_vec < eps] <- 0
-  p_vec[p_vec > 1 - eps] <- 1
-  w[p_vec == 1 | p_vec == 0] <- eps
-  z <- u + (y - p_vec) / w
   s <- 0
-  t <- 2
-  while (t > 1 && s < maxiter) { # if number of iterations of inner loop = 1, converge.
+  eps <- 1e-5
+  repeat {
     s <- s + 1
+    u <- X %*% betavec
+    p_vec <- sigmoid(u) # function `sigmoid` to compute exp(x)/(1 + exp(x))
+    w <- p_vec * (1 - p_vec)
+    # see note
+    p_vec[p_vec < eps] <- 0
+    p_vec[p_vec > 1 - eps] <- 1
+    w[p_vec == 1 | p_vec == 0] <- eps
+    z <- u + (y - p_vec) / w
     betavec <- InnerLoop(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
     t <- betavec[1]
     betavec <- betavec[-1]
-    u <- X %*% betavec
+    if (t == 1 || s >= maxiter) { # if number of iterations of inner loop = 1, converge.
+      break
+    }
   }
   return(betavec)
 }
