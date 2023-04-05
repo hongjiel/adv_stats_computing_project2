@@ -1,7 +1,7 @@
 ---
 title: "P8160 - Breast Cancer Diagnosis"
 author: "Hongjie Liu, Xicheng Xie, Jiajun Tao, Shaohan Chen, Yujia Li"
-date: "3/31/2023"
+date: "4/5/2023"
 output:
   pdf_document:
     toc: yes
@@ -56,7 +56,6 @@ cancer <- read.csv("breast-cancer.csv") %>%
 corr = cancer[2:31] %>% 
   cor()
 corr=ggcorrplot(corr, type = "upper", tl.cex = 8)
-
 cancer1 <- cancer %>%
   select(-area_se, 
          -perimeter_se, 
@@ -162,7 +161,7 @@ We develop a modified Newton-Raphson algorithm including a step-halving step. *(
 \end{algorithm}
 
 ## 2.3. Logistic-LASSO Model
-Regularization is the common approach for variable selection, in which LASSO is to add L-1 penalty to the objective function. In the context of logistic regression, we turn to maximize the penalized loglikelihood as following: 
+Regularization is the common approach for variable selection, in which LASSO is to add L-1 penalty to the objective function. In the context of logistic regression, we turn to maximize the penalized log-likelihood as following: 
 
 * Log-likelihood $f$ of logistic regression:
 
@@ -177,8 +176,39 @@ $$
 \end{equation}
 where $\lambda\ge 0$ is the tuning parameter. Note that the intercept is not penalized and all predictors are standardized.
 
-
 Then we could develop a path-wise coordinate descent algorithm to the penalized weighted-least-squares-problem with a sequence of nested loops:\par
+\begin{algorithm}
+	\caption{Path-wise coordinate-wise optimization algorithm}
+	\begin{algorithmic}
+	  \Require $g(\boldsymbol{\beta},\lambda)=-\frac{1}{n}f(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|$ - target function, where $f(\boldsymbol{\beta})$ is given in (\ref{func}); $\boldsymbol{\beta}_0$ - starting value; $\{\lambda_1,\ldots,\lambda_m\}$ - a sequence of descending $\lambda$'s, where $\lambda_1=\lambda_{max}$ is given in (\ref{maxlambda}); $\epsilon$ - tolerance; $N_s$, $N_t$ - maximum number of iterations of the middle and inner loops
+	  \Ensure $\widehat{\boldsymbol{\beta}}(\lambda_r)$ such that $\widehat{\boldsymbol{\beta}}(\lambda_r) \approx \arg\min_{\boldsymbol{\beta}}\; g(\boldsymbol{\beta},\lambda_r),\; r=1,\ldots,m$
+	  \State $\tilde{\boldsymbol{\beta}}_0(\lambda_{1})\leftarrow\boldsymbol{\beta}_0$
+	  \State OUTER LOOP
+	  \For {$r\in\{1,\ldots,m\}$, where $r$ is the current number of iterations of the outer loop,}
+	    \State $s \leftarrow 0$, where $s$ is the current number of iterations of the middle loop
+	    \State $g(\tilde{\boldsymbol{\beta}}_{-1}(\lambda_{r}),\lambda_{r})\leftarrow \infty$
+	    \State MIDDLE LOOP
+	  	\While {$t\ge2$ and $s<N_s$}
+	  	  \State $s \leftarrow s+1$
+	      \State Update $\tilde{w}_i^{(s)}$, $\tilde{z}_i^{(s)}$ ($i=1,\ldots,n$), and thus $\ell_{s}(\boldsymbol{\beta})$ as given in (\ref{func.lasso}) based on $\tilde{\boldsymbol{\beta}}_{s-1}(\lambda_{r})$
+	      \State $t \leftarrow 0$, where $t$ is the current number of iterations of the inner loop
+	      \State $\tilde{\boldsymbol{\beta}}_s^{(0)}(\lambda_{r})\leftarrow \tilde{\boldsymbol{\beta}}_{s-1}(\lambda_{r})$
+	      \State $h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(-1)}(\lambda_{r}),\lambda_{r})\leftarrow \infty$, where $h_{s}(\boldsymbol{\beta},\lambda)=-\frac{1}{n}\ell_{s}(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|$
+	      \State INNER LOOP
+	      \While {$\left|h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(t)}(\lambda_{r}),\lambda_{r}) - h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(t-1)}(\lambda_{r}),\lambda_{r})\right|>\epsilon$ and $t<N_t$}
+	  	    \State $t \leftarrow t+1$
+	        \State $\tilde{\beta}_0^{(t)}(\lambda_{r})\leftarrow\sum_{i=1}^n\tilde{w}_{i}^{(s)}\left(\tilde{z}_{i}^{(s)}-\sum_{k= 1}^pX_{ik}\tilde{\beta}_k^{(t-1)}(\lambda_{r})\right)\bigg/\sum_{i=1}^n\tilde{w}_{i}^{(s)}$
+	        \For {$j \in\{1,\ldots,p\}$}
+	        \State $\tilde{\beta}_j^{(t)}(\lambda_{r})\leftarrow S\left(\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}^{(s)}X_{ij}\left(\tilde{z}_{i}^{(s)}-\sum_{k<j}X_{ik}\tilde{\beta}_k^{(t)}(\lambda_{r})-\sum_{k>j}X_{ik}\tilde{\beta}_k^{(t-1)}(\lambda_{r})\right),\lambda_r\right)\bigg/\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}^{(s)}X_{ij}^2$
+	        \EndFor
+	      \EndWhile
+	      \State $\tilde{\boldsymbol{\beta}}_s(\lambda_{r})\leftarrow\tilde{\boldsymbol{\beta}}_s^{(t)}(\lambda_{r})$
+	    \EndWhile
+	    \State $\widehat{\boldsymbol{\beta}}(\lambda_r)\leftarrow\tilde{\boldsymbol{\beta}}_s(\lambda_r)$
+	    \State $\tilde{\boldsymbol{\beta}}_0(\lambda_{r+1})\leftarrow\widehat{\boldsymbol{\beta}}(\lambda_r)$
+	  \EndFor
+	\end{algorithmic}
+\end{algorithm}
 
 **OUTER LOOP** 
 In the outer loop, we compute the solutions of the optimization problem (\ref{opt.lasso}) for a decreasing sequence of values for $\lambda$: $\{\lambda_1,\ldots,\lambda_m\}$, starting at the smallest value $\lambda_1 = \lambda_{max}$ for which the estimates of all coefficients $\hat{\beta}_j = 0,\; j=1,2,\ldots,p$, which is
@@ -225,39 +255,6 @@ convergence.
 
 * Note: Care is taken to avoid coefficients diverging in order to achieve fitted probabilities of 0 or 1. When a probability is within $\epsilon=10^{-5}$ of 1, we set it to 1, and set the weights to $\epsilon$. 0 is treated similarly.
 
-\begin{algorithm}
-	\caption{Path-wise coordinate-wise optimization algorithm}
-	\begin{algorithmic}
-	  \Require $g(\boldsymbol{\beta},\lambda)=-\frac{1}{n}f(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|$ - target function, where $f(\boldsymbol{\beta})$ is given in (\ref{func}); $\boldsymbol{\beta}_0$ - starting value; $\{\lambda_1,\ldots,\lambda_m\}$ - a sequence of descending $\lambda$'s, where $\lambda_1=\lambda_{max}$ is given in (\ref{maxlambda}); $\epsilon$ - tolerance; $N_s$, $N_t$ - maximum number of iterations of the middle and inner loops
-	  \Ensure $\widehat{\boldsymbol{\beta}}(\lambda_r)$ such that $\widehat{\boldsymbol{\beta}}(\lambda_r) \approx \arg\min_{\boldsymbol{\beta}}\; g(\boldsymbol{\beta},\lambda_r),\; r=1,\ldots,m$
-	  \State $\tilde{\boldsymbol{\beta}}_0(\lambda_{1})\leftarrow\boldsymbol{\beta}_0$
-	  \State OUTER LOOP
-	  \For {$r\in\{1,\ldots,m\}$, where $r$ is the current number of iterations of the outer loop,}
-	    \State $s \leftarrow 0$, where $s$ is the current number of iterations of the middle loop
-	    \State $g(\tilde{\boldsymbol{\beta}}_{-1}(\lambda_{r}),\lambda_{r})\leftarrow \infty$
-	    \State MIDDLE LOOP
-	  	\While {$t\ge2$ and $s<N_s$}
-	  	  \State $s \leftarrow s+1$
-	      \State Update $\tilde{w}_i^{(s)}$, $\tilde{z}_i^{(s)}$ ($i=1,\ldots,n$), and thus $\ell_{s}(\boldsymbol{\beta})$ as given in (\ref{func.lasso}) based on $\tilde{\boldsymbol{\beta}}_{s-1}(\lambda_{r})$
-	      \State $t \leftarrow 0$, where $t$ is the current number of iterations of the inner loop
-	      \State $\tilde{\boldsymbol{\beta}}_s^{(0)}(\lambda_{r})\leftarrow \tilde{\boldsymbol{\beta}}_{s-1}(\lambda_{r})$
-	      \State $h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(-1)}(\lambda_{r}),\lambda_{r})\leftarrow \infty$, where $h_{s}(\boldsymbol{\beta},\lambda)=-\frac{1}{n}\ell_{s}(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|$
-	      \State INNER LOOP
-	      \While {$\left|h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(t)}(\lambda_{r}),\lambda_{r}) - h_{s}(\tilde{\boldsymbol{\beta}}_{s}^{(t-1)}(\lambda_{r}),\lambda_{r})\right|>\epsilon$ and $t<N_t$}
-	  	    \State $t \leftarrow t+1$
-	        \State $\tilde{\beta}_0^{(t)}(\lambda_{r})\leftarrow\sum_{i=1}^n\tilde{w}_{i}^{(s)}\left(\tilde{z}_{i}^{(s)}-\sum_{k= 1}^pX_{ik}\tilde{\beta}_k^{(t-1)}(\lambda_{r})\right)\bigg/\sum_{i=1}^n\tilde{w}_{i}^{(s)}$
-	        \For {$j \in\{1,\ldots,p\}$}
-	        \State $\tilde{\beta}_j^{(t)}(\lambda_{r})\leftarrow S\left(\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}^{(s)}X_{ij}\left(\tilde{z}_{i}^{(s)}-\sum_{k<j}X_{ik}\tilde{\beta}_k^{(t)}(\lambda_{r})-\sum_{k>j}X_{ik}\tilde{\beta}_k^{(t-1)}(\lambda_{r})\right),\lambda_r\right)\bigg/\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}^{(s)}X_{ij}^2$
-	        \EndFor
-	      \EndWhile
-	      \State $\tilde{\boldsymbol{\beta}}_s(\lambda_{r})\leftarrow\tilde{\boldsymbol{\beta}}_s^{(t)}(\lambda_{r})$
-	    \EndWhile
-	    \State $\widehat{\boldsymbol{\beta}}(\lambda_r)\leftarrow\tilde{\boldsymbol{\beta}}_s(\lambda_r)$
-	    \State $\tilde{\boldsymbol{\beta}}_0(\lambda_{r+1})\leftarrow\widehat{\boldsymbol{\beta}}(\lambda_r)$
-	  \EndFor
-	\end{algorithmic}
-\end{algorithm}
-
 
 ## 2.4. Five-fold Cross Validation for LASSO
 
@@ -265,21 +262,30 @@ Since the Logistic-Lasso model depend on penalty term $\lambda$ for selection, w
 
 To select the optimal tuning parameter λ, the original data is randomly shuffled and split into five equally sized groups. One of the groups is used as a test set, while the remaining groups are used as training data. The path-wise coordinate-wise optimization algorithm is then applied to the training data, and AUC scores are calculated for each $\lambda$ using the test data. This process is repeated until each of the five groups has been used as the test set, and the mean AUC for each $\lambda$ is computed.
 
+In order to evaluate developed models, the data is partitioned into train and test with a ratio of 80% to 20%.
 
 # 3. Results
-## 5-fold CV Results for Logistic-LASSO
+## Newton-Raphson 
+complete separation 
 
-## Model Comparison
-
+comparison of using glm function and developed algorithm
+## Five-fold CV for Logistic-LASSO
+Comparing optimal with full model 
 
 
 # 4. Discussion
+Lasso-logistic model performed better than the full logistic
+model.
 
-## 4.1. Summary
+The most ideal performance is to classify each patient
+correctly, i.e. Specificity = Sensitivity = 1
 
-## 4.2. Limitations
+Future work: Predictors need to be interpreted or have some
+important clinical significance.
 
-## 4.3. Group Contributions
+
+
+## Group Contributions
 
 \newpage 
 # References
