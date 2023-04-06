@@ -45,38 +45,7 @@ The other 30 columns correspond to mean, standard deviation and the largest valu
 \item fractal dimension: "coastline approximation" - 1
 \end{itemize}
 
-```{r include=FALSE, echo=FALSE}
-library(tidyverse)
-library(ggcorrplot)
-library(dplyr)
-cancer <- read.csv("breast-cancer.csv") %>%
-  select(-1,-33) %>%
-  janitor::clean_names()%>%
-  mutate(diagnosis = recode(diagnosis, "M" = 1, "B" = 0)) 
-corr = cancer[2:31] %>% 
-  cor()
-corr=ggcorrplot(corr, type = "upper", tl.cex = 8)
-cancer1 <- cancer %>%
-  select(-area_se, 
-         -perimeter_se, 
-         -area_worst, 
-         -perimeter_mean, 
-         -perimeter_worst, 
-         -area_mean, 
-         -radius_worst, 
-         -concave_points_mean, 
-         -texture_worst, 
-         -compactness_mean, 
-         -smoothness_worst)
-corr1 = cancer1[2:20] %>% 
-  cor()
-corr1=ggcorrplot(corr1, type = "upper", tl.cex = 8)
-```
-
-```{r echo=FALSE}
-ggpubr::ggarrange(corr,corr1, ncol=2, nrow=1, common.legend = TRUE, legend = "bottom", labels = "AUTO")
-```
-As exploring the breast cancer data, there are many predictors are highly correlated to each other as shown in the Figure A, such as 'area_mean', 'perimeter_worst', 'radius_mean' and so on, that could cause unstable parameter estimation as well as perplexing the interpretation of logistic model. While we could eliminate some correlated features for modeling as shown in the Figure B, regularized logistic regression also help to tackle with it, which would be further explore in the following parts. 
+As exploring the breast cancer data, there are many predictors are highly correlated to each other as shown in the Figure \hyperlink{Figure 0}{0}, such as 'area_mean', 'perimeter_worst', 'radius_mean' and so on, that could cause unstable parameter estimation as well as perplexing the interpretation of logistic model. While we could eliminate some correlated features for modeling as shown in the Figure B, regularized logistic regression also help to tackle with it, which would be further explore in the following parts. 
 
 # 2. Methods
 ## 2.1. Logistic Model
@@ -132,6 +101,7 @@ Thus, $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ is negative-definit
 Hence, the optimization problem (\ref{opt}) is a well-defined problem.
 
 ## 2.2. Newton-Raphson Algorithm 
+### 2.2.1 Algorithm Design
 While derivative of the likelihood function with respect to the parameters is nonlinear and difficult to solve analytically for maximum likelihood, it requires Newton-Raphson iterations.The target function $f$ given in task 1:
 \begin{equation}\label{func}
 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\top\boldsymbol{\beta}-\log\left(1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}\right)\right].
@@ -159,6 +129,46 @@ We develop a modified Newton-Raphson algorithm including a step-halving step. *(
 	  \State $\widehat{\boldsymbol{\beta}}\leftarrow \boldsymbol{\beta}_i$
 	\end{algorithmic}
 \end{algorithm}
+
+### 2.2.2 Complete Separation Problem
+However, the function does not converge when a complete separation occurs. A complete separation in a logistic regression, also referred as perfect prediction, which occurs whenever there exists some vector of coefficients $\beta$ such that $Y_i = 1$ whenever $X^T\beta > 0$ and $Y_i = 0$ whenever $X_i^T\beta \leq 0$. In other words, complete separation occurs whenever a linear function of predictors can generate perfect predictions of response.
+
+To further explain this problem, we prove that: if there exists a vector of coefficients $\hat{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} \le 0$, there does not exist $\boldsymbol{\beta}^*\in\mathbb{R}^{(p+1)}$ such that $\boldsymbol{\beta}^* = \arg\max_{\boldsymbol{\beta}}f(\boldsymbol{\beta})$, where $f$ is given in (\ref{func}). Thus our Newton-Raphson algorithm does not converge.
+
+***Proof.*** Assume such $\boldsymbol{\beta}^*$ exists, then $\forall \boldsymbol{\beta}\in\mathbb{R}^{p+1}$, we have $f(\boldsymbol{\beta})\le f(\boldsymbol{\beta}^*)$.
+
+First, we prove that: there exists a vector of coefficients $\tilde{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}} < 0$.
+
+Let $A_1=\{i: Y_i = 1\}= \{i:\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}> 0\}$ and $A_0=\{i: Y_i = 0\}=\{i:\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}\le0\}$. Then we have $$\epsilon:=\min_{i\in A_1}(\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}) > 0.$$
+Let $\tilde{\boldsymbol{\beta}}=\hat{\boldsymbol{\beta}}-(\epsilon/2,0,\ldots,0)^\top$. Given that $X_{i0}=1$ for all $i$, we have 
+$$\begin{aligned}
+\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}=\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}-\epsilon/2\cdot1\ge \epsilon-\epsilon/2=\epsilon/2>0,\quad \forall i\in A_1\\
+\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}=\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}-\epsilon/2\cdot1\le 0-\epsilon/2=-\epsilon/2<0,\quad \forall i\in A_0\\
+\end{aligned}$$
+Thus we have $A_1=\{i: Y_i = 1\}= \{i:\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}> 0\}$ and $A_0=\{i: Y_i = 0\}=\{i:\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}< 0\}$.
+
+Next, we prove that 
+\begin{equation}\label{loglik}
+\lim_{k\rightarrow\infty}f(k\tilde{\boldsymbol{\beta}})=0.
+\end{equation}
+$\forall k>0$, we have $A_1= \{i:\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})> 0\}$ and $A_0==\{i:\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})< 0\}$.
+
+Thus,
+$$\begin{aligned}
+\lim_{k\rightarrow\infty}f(k\tilde{\boldsymbol{\beta}})&=\lim_{k\rightarrow\infty}\sum_{i\in A_1}\left[Y_i\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta})}-\log\left(1+e^{\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})}\right)\right]+\lim_{k\rightarrow\infty}\sum_{i\in A_0}\left[Y_i\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})-\log\left(1+e^{\mathbf{x}_i^\top (k\tilde{\boldsymbol{\beta}})}\right)\right]\\
+&=\sum_{i\in A_1}\lim_{k\rightarrow\infty}\left[k\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}-\log\left(1+e^{k\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}}\right)\right]+\sum_{i\in A_0}\lim_{k\rightarrow\infty}\left[-\log\left(1+e^{k\mathbf{x}_i^\top \tilde{\boldsymbol{\beta}}}\right)\right]\\
+&=\sum_{i\in A_1}\lim_{z\rightarrow\infty}\left[z-\log\left(1+e^z\right)\right]+\sum_{i\in A_0}\left(-\log1\right)\\
+&=0+0=0.
+\end{aligned}$$
+
+Last, we prove that: there exists $\boldsymbol{\beta}\in\mathbb{R}^{p+1}$ such that $f(\boldsymbol{\beta})>f(\boldsymbol{\beta}^*)$, which is contradictory to the statement that $\forall \boldsymbol{\beta}\in\mathbb{R}^{p+1}$, $f(\boldsymbol{\beta})\le f(\boldsymbol{\beta}^*)$.
+
+Note that $f(\boldsymbol{\beta})<0$ holds for any $\boldsymbol{\beta}\in\mathbb{R}$, then we have $f(\boldsymbol{\beta}^*)<0$.
+
+Given that $f(\boldsymbol{\beta}^*)<0$ and (\ref{loglik}) holds, there exists $N\in \mathbb{R}$ such that $\forall k>N$, $f(k\tilde{\boldsymbol{\beta}})>f(\boldsymbol{\beta}^*)$.
+
+Thus our assumption must be false. \hfill$\square$
+
 
 ## 2.3. Logistic-LASSO Model
 Regularization is the common approach for variable selection, in which LASSO is to add L-1 penalty to the objective function. In the context of logistic regression, we turn to maximize the penalized log-likelihood as following: 
@@ -291,22 +301,72 @@ Friedman J, Hastie T, Tibshirani R. Regularization Paths for Generalized Linear 
 \newpage 
 # Appendices
 
+```{r include=FALSE, echo=FALSE}
+library(tidyverse)
+library(ggcorrplot)
+library(dplyr)
+cancer <- read.csv("breast-cancer.csv") %>%
+  select(-1,-33) %>%
+  janitor::clean_names() %>%
+  mutate(diagnosis = recode(diagnosis, "M" = 1, "B" = 0)) 
+corr = cancer[2:31] %>% 
+  cor()
+corr=ggcorrplot(corr, type = "upper", tl.cex = 8)
+cancer1 <- cancer %>%
+  select(-area_se, 
+         -perimeter_se, 
+         -area_worst, 
+         -perimeter_mean, 
+         -perimeter_worst, 
+         -area_mean, 
+         -radius_worst, 
+         -concave_points_mean, 
+         -texture_worst, 
+         -compactness_mean, 
+         -smoothness_worst)
+corr1 = cancer1[2:20] %>% 
+  cor()
+corr1=ggcorrplot(corr1, type = "upper", tl.cex = 8)
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(corr,corr1, ncol = 2, nrow = 1, common.legend = TRUE, legend = "bottom", labels = "AUTO")
+```
+\begin{center}
+\hypertarget{Figure 0}{Figure 0: Correlation Table}
+\end{center}
+
 \begin{figure}[H] 
+\centering
 \includegraphics[width=1.0\textwidth]{images/task4_coefshr.png} 
+\caption{Task 4 Coefficients Shrinkage}
+\label{Figure 2}
 \end{figure}
 
 \begin{figure}[H] 
+\centering
 \includegraphics[width=0.5\textwidth]{images/task4_lambdacom.png} 
+\caption{Task 4 Lambda}
+\label{Figure 3}
 \end{figure}
 
 \begin{figure}[H] 
+\centering
 \includegraphics[width=0.5\textwidth]{images/task4_selectpred.png} 
+\caption{Task 4 Selected Predictors}
+\label{Figure 4}
 \end{figure}
 
 \begin{figure}[H] 
-\includegraphics[width=1.0\textwidth]{images/task4_twomodel.png} 
+\centering
+\includegraphics[width=1.0\textwidth]{images/task4_twomodel.png}
+\caption{Task 4 Two Model Comparison}
+\label{Figure 5}
 \end{figure}
 
 \begin{figure}[H] 
+\centering
 \includegraphics[width=1.0\textwidth]{images/task4_roc.png} 
+\caption{Task 4 ROC Curve}
+\label{Figure 6}
 \end{figure}
