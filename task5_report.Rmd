@@ -4,6 +4,7 @@ author: "Hongjie Liu, Xicheng Xie, Jiajun Tao, Shaohan Chen, Yujia Li"
 date: "4/5/2023"
 output:
   pdf_document:
+    number_sections: true
     toc: yes
     toc_depth: 2
   html_document:
@@ -25,11 +26,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 \newpage 
-# 1. Objectives
-Mammography is recognized as the most effective screening method for early breast cancer detection, but its accuracy remains limited. And as the number of variables that help predict breast cancer increases, doctors are forced to rely more on their subjective experiences to make decisions. The use of computer models can detect abnormalities in mammograms to aid radiologists in breast cancer diagnosis (Freer et al. 2001). The purpose of this study was to predict breast cancer benign/malignant status by quantitative modeling based on logistic regression, which may help radiologists manage the large amount of available information, make effective decisions to detect breast cancers and reduce unnecessary biopsy.
+# Background and Objectives
+Mammography is recognized as the most effective screening method for early breast cancer detection, but its accuracy remains limited. And as the number of variables that help predict breast cancer increases, doctors are forced to rely more on their subjective experiences to make decisions. The use of computer models can detect abnormalities in mammograms to aid radiologists in breast cancer diagnosis (Freer et al. 2001). The purpose of this study was to predict breast cancer benign/malignant status by quantitative modeling based on logistic regression, which may help radiologists manage a large amount of available information, make effective decisions to detect breast cancers and reduce unnecessary biopsy.
 
-# 2. Background 
-The data given has 569 observations. The column 'Diagnosis' which identifies if the image is coming from cancer tissue or benign cases (M=malignant, B = benign) would be used as outcome for modeling. We denote malignant as 1 and benign cases as 0 for prediction.
+The data given has 569 observations. The column 'Diagnosis' which identifies if the image is coming from cancer tissue or benign cases (M = malignant, B = benign) would be used as outcome for modeling. We denote malignant as 1 and benign cases as 0 for prediction.
 The other 30 columns correspond to mean, standard deviation and the largest values (points on the tails) of the distributions of the following 10 features computed for the cell nuclei:
 \begin{itemize}
 \item radius: mean of distances from center to points on the perimeter
@@ -44,11 +44,11 @@ The other 30 columns correspond to mean, standard deviation and the largest valu
 \item fractal dimension: "coastline approximation" - 1
 \end{itemize}
 
-As exploring the breast cancer data, there are many predictors are highly correlated to each other as shown in the Figure \ref{Figure 1.1}, such as 'area_mean', 'perimeter_worst', 'radius_mean' and so on, that could cause unstable parameter estimation as well as perplexing the interpretation of logistic model. While we could eliminate some correlated features for modeling as shown in the Figure \ref{Figure 1.2}, regularized logistic regression also help to tackle with it, which would be further explore in the following parts. 
+As exploring the breast cancer data, there are many predictors highly correlated to each other as shown in Figure \ref{Figure 1.1}, such as 'area_mean', 'perimeter_worst', 'radius_mean' and so on, that could cause unstable parameter estimation as well as perplexing the interpretation of logistic model. While we could eliminate some correlated features for modeling as shown in Figure \ref{Figure 1.2}, regularized logistic regression also helps to tackle with it, which would be further explored in the following parts. 
 
-# 2. Methods
-## 2.1. Logistic Model
-Logistic model measure the probability of an event taking place by having the log-odds for the event be a linear combination of one or more independent variables, and commonly used in classifying binary response variables.\par
+# Methods
+## Logistic Model
+Logistic model measures the probability of an event taking place by having the log-odds for the event be a linear combination of one or more independent variables, and is commonly used in classifying binary response variables.\par
 
 Hereby, the variable "Diagnosis" is a binary response variable indicating if the image is coming from cancer tissue or benign cases (M = malignant, B = benign). In the following logistic regression model, the "Diagnosis" variable will be coded as 1 for malignant cases and 0 for benign cases.\par
 
@@ -99,14 +99,11 @@ Thus, $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ is negative-definit
 
 Hence, the optimization problem (\ref{opt}) is a well-defined problem.
 
-## 2.2. Newton-Raphson Algorithm 
-### 2.2.1 Algorithm Design
-While derivative of the likelihood function with respect to the parameters is nonlinear and difficult to solve analytically for maximum likelihood, it requires Newton-Raphson iterations.The target function $f$ given in task 1:
-\begin{equation}\label{func}
-f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\top\boldsymbol{\beta}-\log\left(1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}\right)\right].
-\end{equation}
+## Newton-Raphson Algorithm 
+### Algorithm Design
+Given that the derivative of the log-likelihood function with respect to each parameter is nonlinear and difficult to solve analytically for maximum likelihood, we use the Newton-Raphson algorithm to solve the optimization problem (\ref{opt}) numerically.
 
-We develop a modified Newton-Raphson algorithm including a step-halving step. *(we probably don't need to ensure that the direction of the step is an ascent direction, since in this example Hessian is always negative-definite. but Hessian could be computationally singular when the starting points are bad)*
+We develop a modified Newton-Raphson algorithm including a step-halving step. Given that the Hessian matrix is negative-definite in this case, we don't need to ensure that the direction of the step is an ascent direction.
 
 \begin{algorithm}
 	\caption{Newton-Raphson algorithm including a step-halving step}
@@ -129,10 +126,10 @@ We develop a modified Newton-Raphson algorithm including a step-halving step. *(
 	\end{algorithmic}
 \end{algorithm}
 
-### 2.2.2 Complete Separation Problem
-However, the function does not converge when a complete separation occurs. A complete separation in a logistic regression, also referred as perfect prediction, which occurs whenever there exists some vector of coefficients $\beta$ such that $Y_i = 1$ whenever $X^T\beta > 0$ and $Y_i = 0$ whenever $X_i^T\beta \leq 0$. In other words, complete separation occurs whenever a linear function of predictors can generate perfect predictions of response.
+### Complete Separation Problem
+However, the function does not converge when a complete separation occurs. A complete separation in a logistic regression, also referred to as perfect prediction, occurs whenever there exists some vector of coefficients $\hat{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} \le 0$. In other words, complete separation occurs whenever a linear function of predictors can generate perfect predictions of response.
 
-To further explain this problem, we prove that: if there exists a vector of coefficients $\hat{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} \le 0$, there does not exist $\boldsymbol{\beta}^*\in\mathbb{R}^{(p+1)}$ such that $\boldsymbol{\beta}^* = \arg\max_{\boldsymbol{\beta}}f(\boldsymbol{\beta})$, where $f$ is given in (\ref{func}). Thus our Newton-Raphson algorithm does not converge.
+To further explain this problem, we prove that: if there exists a vector of coefficients $\hat{\boldsymbol{\beta}}$ that can generate perfect predictions, there does not exist $\boldsymbol{\beta}^*\in\mathbb{R}^{p+1}$ such that $\boldsymbol{\beta}^* = \arg\max_{\boldsymbol{\beta}}f(\boldsymbol{\beta})$, where $f$ is given in (\ref{func}). Thus our Newton-Raphson algorithm does not converge.
 
 ***Proof.*** Assume such $\boldsymbol{\beta}^*$ exists, then $\forall \boldsymbol{\beta}\in\mathbb{R}^{p+1}$, we have $f(\boldsymbol{\beta})\le f(\boldsymbol{\beta}^*)$.
 
@@ -150,7 +147,7 @@ Next, we prove that
 \begin{equation}\label{loglik}
 \lim_{k\rightarrow\infty}f(k\tilde{\boldsymbol{\beta}})=0.
 \end{equation}
-$\forall k>0$, we have $A_1= \{i:\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})> 0\}$ and $A_0==\{i:\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})< 0\}$.
+$\forall k>0$, we have $A_1= \{i:\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})> 0\}$ and $A_0=\{i:\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})< 0\}$.
 
 Thus,
 $$\begin{aligned}
@@ -169,21 +166,15 @@ Given that $f(\boldsymbol{\beta}^*)<0$ and (\ref{loglik}) holds, there exists $N
 Thus our assumption must be false. \hfill$\square$
 
 
-## 2.3. Logistic-LASSO Model
-Regularization is the common approach for variable selection, in which LASSO is to add L-1 penalty to the objective function. In the context of logistic regression, we turn to maximize the penalized log-likelihood as following: 
-
-* Log-likelihood $f$ of logistic regression:
-
-$$
-f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})=\sum_{i=1}^n\left[Y_i\mathbf{x}_i^\top\boldsymbol{\beta}-\log\left(1+e^{\mathbf{x}_i^\top\boldsymbol{\beta}}\right)\right].
-$$
+## Logistic-LASSO Model
+Regularization is the common approach for variable selection, in which LASSO is to add L-1 penalty to the objective function. In the context of logistic regression, we turn to minimize the penalized log-likelihood as following: 
 
 * LASSO estimates the logistic model parameters $\boldsymbol{\beta}$ by optimizing a penalized loss function:
 
 \begin{equation}\label{opt.lasso}
 \min_{\boldsymbol{\beta}}\; -\frac{1}{n}f(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|.
 \end{equation}
-where $\lambda\ge 0$ is the tuning parameter. Note that the intercept is not penalized and all predictors are standardized.
+where $\lambda\ge 0$ is the tuning parameter and $f$ is the log-likelihood function given in (\ref{func}). Note that the intercept is not penalized and all predictors are standardized.
 
 Then we could develop a path-wise coordinate descent algorithm to the penalized weighted-least-squares-problem with a sequence of nested loops:\par
 \begin{algorithm}
@@ -265,7 +256,7 @@ convergence.
 * Note: Care is taken to avoid coefficients diverging in order to achieve fitted probabilities of 0 or 1. When a probability is within $\epsilon=10^{-5}$ of 1, we set it to 1, and set the weights to $\epsilon$. 0 is treated similarly.
 
 
-## 2.4. Five-fold Cross Validation for LASSO
+## Five-fold Cross Validation for LASSO
 
 Since the Logistic-Lasso model depend on penalty term $\lambda$ for selection, we further develop 5-fold cross validation to select the parameter $\lambda$ to obtain the optimized result.
 
@@ -277,28 +268,30 @@ We select the best $\lambda$ in two ways. One way is that we wrote a function to
 
 Here we take the $\lambda$ with the greatest mean AUC as the best $\lambda$. Further, we look at the predictors that the best $\lambda$ choose and take them to re-fit the logistic regression model on the training data which is the 'optimal' model. We also run the training data by Newton-Raphson algorithm to get the 'full' model. After that, we compare the two models' prediction performance on the test data in specificity, sensitivity, and AUC.
 
-# 3. Results
-## 3.1. Five-fold CV for Logistic-LASSO
+# Results
+## Five-fold CV for Logistic-LASSO
 Both our cross-validation function and `cv.glmnet` function reach the greatest mean AUC when $\lambda=0.0099322$, thus this is the best $\lambda$ we choose. As for the predictors, when $\lambda = \lambda_{best}$, both methods select ten same predictors, which are `texture_mean`, `concave.points_mean`, `radius_se`, `fractal_dimension_se`, `radius_worst`, `texture_worst`, `smoothness_worst`, `concavity_worst`, `concave.points_worst`, and `symmetry_worst`.
 
-## 3.2. Model Comparison
+## Model Comparison
 The ten selected predictors are used to re-fit the logistic regression model as the 'optimal' model, which is then compared with the 'full' model generated by Newton-Raphson algorithm. The result turns out that the two models differ in prediction performance. The 'optimal' model out-performed the 'full' model with higher specificity, sensitivity, larger AUC, and fewer predictors.
 
-# 4. Discussion
+# Discussion
 The main conclusion is that Lasso-logistic model performed better than the full logistic model in this case. Recall that our goal is to build a predictive model to classify each patient's cancer diagnosis accurately according to the information extracted from the images. The specificity and sensitivity should be as high as possible. 
 
 For the future work, now that we have selected the ten predictors, we want to know why do these ten matter. What's the interpretation of this model? Do these predictors have any clinical significance? These questions may need to be answered by a cancer expert.
 
-## Group Contributions
+## Group Contributions {-}
 
 \newpage 
-# References
+# References {-}
 Freer, Timothy W., and Michael J. Ulissey. "Screening mammography with computer-aided detection: prospective study of 12,860 patients in a community breast center." Radiology 220.3 (2001): 781-786.
 
 Friedman J, Hastie T, Tibshirani R. Regularization Paths for Generalized Linear Models via Coordinate Descent. J Stat Softw. 2010;33(1):1-22. PMID: 20808728; PMCID: PMC2929880.
 
 \newpage 
-# Appendices
+# Appendices {-}
+
+## Figures and Tables {-}
 
 ```{r include=FALSE, echo=FALSE}
 library(tidyverse)
@@ -328,14 +321,13 @@ corr1 = cancer1[2:20] %>%
 corr1 = ggcorrplot(corr1, type = "upper", tl.cex = 8)
 ```
 
-```{r echo=FALSE, fig.cap = "\\label{Figure 1.1} Variables Correlation Part I"}
+```{r echo=FALSE, fig.height=4, fig.width=9, fig.cap = "\\label{Figure 1.1} Variables Correlation Part I"}
 corr
 ```
 
-```{r echo=FALSE, fig.cap = "\\label{Figure 1.2} Variables Correlation Part II"}
+```{r echo=FALSE, fig.height=4, fig.width=9, fig.cap = "\\label{Figure 1.2} Variables Correlation Part II"}
 corr1
 ```
-
 
 \begin{figure}[H] 
 \centering
@@ -379,6 +371,8 @@ corr1
 \label{Figure 7}
 \end{figure}
 
+\newpage
+## R functions {-}
 
 ```{r eval = FALSE}
 NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
