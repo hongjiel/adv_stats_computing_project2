@@ -1,7 +1,7 @@
 ---
 title: "P8160 - Breast Cancer Diagnosis"
 author: "Hongjie Liu, Xicheng Xie, Jiajun Tao, Shaohan Chen, Yujia Li"
-date: "4/5/2023"
+date: "4/7/2023"
 output:
   pdf_document:
     number_sections: true
@@ -77,7 +77,7 @@ Denote $p_i=P(Y_i=1\mid\mathbf{x}_i)$ as given in (\ref{model}) and $\mathbf{p}=
 &=\begin{pmatrix}
 \sum_{i=1}^n(Y_i-p_i)\\ \sum_{i=1}^n(Y_i-p_i)X_{i1}\\ \vdots\\ \sum_{i=1}^n(Y_i-p_i)X_{ip}\end{pmatrix}.
 \end{align*}
-Denote $w_i=p_i(1-p_i)\in(0,1)$ and $\mathbf{W}=\mathrm{diag}(w_1,\ldots,w_n)$. The Hessian matrix of $f$ is given by
+Denote $w_i=p_i(1-p_i)\in(0,\frac{1}{4}]$ and $\mathbf{W}=\mathrm{diag}(w_1,\ldots,w_n)$. The Hessian matrix of $f$ is given by
 \begin{align}
 \nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})&=-\mathbf{X}^\top\mathbf{W}\mathbf{X} \label{hess}\\
 &=-\sum_{i=1}^nw_i\mathbf{x}_i\mathbf{x}_i^\top \nonumber\\
@@ -115,9 +115,10 @@ We develop a modified Newton-Raphson algorithm including a step-halving step. Gi
 	  \State $\widehat{\boldsymbol{\beta}}\leftarrow \boldsymbol{\beta}_i$
 	\end{algorithmic}
 \end{algorithm}
+We implement the algorithm in R (see \hyperlink{Code 1}{Code 1}). The starting values of $\boldsymbol\beta$ is set to all 0's.
 
 ### Complete Separation Problem
-However, the function does not converge when a complete separation occurs. A complete separation in a logistic regression, also referred to as perfect prediction, occurs whenever there exists some vector of coefficients $\hat{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} \le 0$. In other words, complete separation occurs whenever a linear function of predictors can generate perfect predictions of response.
+However, the algorithm does not converge when a complete separation occurs. A complete separation in a logistic regression, also referred to as perfect prediction, occurs whenever there exists some vector of coefficients $\hat{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} \le 0$. In other words, complete separation occurs whenever a linear function of predictors can generate perfect predictions of response.
 
 To further explain this problem, we prove that: if there exists a vector of coefficients $\hat{\boldsymbol{\beta}}$ that can generate perfect predictions, there does not exist $\boldsymbol{\beta}^*\in\mathbb{R}^{p+1}$ such that $\boldsymbol{\beta}^* = \arg\max_{\boldsymbol{\beta}}f(\boldsymbol{\beta})$, where $f$ is given in (\ref{func}) (see Theorem \ref{t2}). Thus our Newton-Raphson algorithm does not converge.
 
@@ -134,15 +135,6 @@ Then we could develop a path-wise coordinate descent algorithm to solve the opti
 	\caption{Path-wise coordinate-wise optimization algorithm}
 	\begin{algorithmic}
 	  \Require $g(\boldsymbol{\beta},\lambda)=-\frac{1}{n}f(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|$ - target function, where $f(\boldsymbol{\beta})$ is given in (\ref{func}); $\boldsymbol{\beta}_0$ - starting value; $\{\lambda_1,\ldots,\lambda_m\}$ - a sequence of descending $\lambda$'s, where $\lambda_1=\lambda_{max}$ is given in (\ref{maxlambda}); $\epsilon$ - tolerance; $N_s$, $N_t$ - maximum number of iterations of the middle and inner loops
-  \algstore{ag1}
-  \end{algorithmic}
-\end{algorithm}
-
-\pagebreak
-
-\begin{algorithm}
-  \begin{algorithmic}
-  \algrestore{ag1}
 	  \Ensure $\widehat{\boldsymbol{\beta}}(\lambda_r)$ such that $\widehat{\boldsymbol{\beta}}(\lambda_r) \approx \arg\min_{\boldsymbol{\beta}}\; g(\boldsymbol{\beta},\lambda_r),\; r=1,\ldots,m$
 	  \State $\tilde{\boldsymbol{\beta}}_0(\lambda_{1})\leftarrow\boldsymbol{\beta}_0$
 	  \State OUTER LOOP
@@ -182,9 +174,9 @@ where $\bar{Y}=\frac{1}{n}\sum_{i=1}^nY_i$. For tuning parameter value $\lambda_
 In the middle loop, we find the estimates of $\boldsymbol{\beta}$ by solving the optimization problem (\ref{opt.lasso}) for a fixed $\lambda$. For each iteration of the middle loop, based on the current parameter estimates $\tilde{\boldsymbol{\beta}}$, we form a quadratic approximation to the log-likelihood $f$ using a Taylor expansion:
 \begin{align*}
 f(\boldsymbol{\beta})\approx\ell(\boldsymbol{\beta})&=f(\tilde{\boldsymbol{\beta}})+(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})^\top\nabla f(\tilde{\boldsymbol{\beta}})+\frac{1}{2}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})^\top\nabla^2 f(\tilde{\boldsymbol{\beta}})(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})\\
-&=f(\tilde{\boldsymbol{\beta}})+[\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})]^\top(\mathbf{y}-\tilde{\mathbf{p}})-\frac{1}{2}[\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})]^\top\tilde{\mathbf{W}}\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})\\
+&=f(\tilde{\boldsymbol{\beta}})+[\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})]^\top(\mathbf{y}-\tilde{\mathbf{p}})-\frac{1}{2}[\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})]^\top\tilde{\mathbf{W}}\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})\displaybreak\\
 &=f(\tilde{\boldsymbol{\beta}})+\sum_{i=1}^n(Y_i-\tilde{p}_i)\mathbf{x}_i^\top(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}} )-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left[\mathbf{x}_i^\top(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})\right]^2\\
-&=-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left\{\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})\right]^2+2\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})\right]\right\}+f(\tilde{\boldsymbol{\beta}})\displaybreak\\
+&=-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left\{\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})\right]^2+2\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})\right]\right\}+f(\tilde{\boldsymbol{\beta}})\\
 &=-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})+\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\right]+\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left(\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\right)^2+f(\tilde{\boldsymbol{\beta}}),
 \end{align*}
 where $\tilde{\mathbf{p}}=(\tilde{p}_1,\ldots,\tilde{p}_n)^\top$ and $\tilde{\mathbf{W}}=\mathrm{diag}(\tilde{w}_1,\ldots,\tilde{w}_n)$ are the estimates of $\mathbf{p}$ and $\mathbf{W}$ based on $\tilde{\boldsymbol{\beta}}$.  
@@ -228,7 +220,7 @@ We implement the algorithm in R (see \hyperlink{Code 2}{Code 2}). Here are some 
 
 Since the Logistic-Lasso model depends on penalty term for variable selection, we further develop 5-fold cross-validation to select the tuning parameter $\lambda$ to obtain the optimized result.
 
-For the initial $\lambda$ range, which is a sequence of descending $\lambda$'s, where $\lambda_{max}$ is given in (\ref{maxlambda}). We set $\lambda_{min}=\lambda_{max}/e^6$, and create 30 $\lambda$ candidates on a log scale.
+For the initial $\lambda$ range, we use a sequence of descending $\lambda$'s, starting with the largest $\lambda_1$, which is the maximum value of $\lambda_{max}$ in each training set as given in (\ref{maxlambda}). We set $\lambda_{min}=\lambda_1/e^6$, and create 30 $\lambda$ candidates on a log scale.
 
 To select the optimal tuning parameter $\lambda$, the original data is randomly shuffled and split into five equally sized groups. One of the groups is used as the validation set, while the remaining groups are used as the training set. The path-wise coordinate-wise optimization algorithm is then applied to the training set, and AUC scores are calculated for each $\lambda$ using the validation set. This process is repeated until each of the five groups has been used as the validation set, and the mean AUC for each $\lambda$ is computed.
 
@@ -300,42 +292,42 @@ corr1
 \begin{figure}[H] 
 \centering
 \includegraphics[width=1.0\textwidth]{images/task4_coefshr.png} 
-\caption{Task 4 Coefficients Shrinkage}
+\caption{LASSO coefficients shrinkage using our function}
 \label{Figure 2}
 \end{figure}
 
 \begin{figure}[H] 
 \centering
 \includegraphics[width=1.0\textwidth]{images/task4_auc_lambda.png} 
-\caption{Task 4 AUC vs. Lambda}
+\caption{5-fold CV plot for varying values of tuning paramter $\lambda$ using our function}
 \label{Figure 3}
 \end{figure}
 
 \begin{figure}[H] 
 \centering
 \includegraphics[width=0.5\textwidth]{images/task4_lambdacom.png} 
-\caption{Task 4 Lambda}
+\caption{5-fold CV results for varying values of tuning paramter $\lambda$ using our function and `cv.glmnet`}
 \label{Figure 4}
 \end{figure}
 
 \begin{figure}[H] 
 \centering
 \includegraphics[width=0.5\textwidth]{images/task4_selectpred.png} 
-\caption{Task 4 Selected Predictors}
+\caption{Selected predictors by LASSO using our function and `cv.glmnet`}
 \label{Figure 5}
 \end{figure}
 
 \begin{figure}[H] 
 \centering
 \includegraphics[width=1.0\textwidth]{images/task4_twomodel.png}
-\caption{Task 4 Two Model Comparison}
+\caption{Comparison of the two models' performance on the test dataset}
 \label{Figure 6}
 \end{figure}
 
 \begin{figure}[H] 
 \centering
 \includegraphics[width=1.0\textwidth]{images/task4_roc.png} 
-\caption{Task 4 ROC Curve}
+\caption{ROC curve of the two models on the test dataset}
 \label{Figure 7}
 \end{figure}
 
@@ -542,7 +534,7 @@ $$\begin{aligned}
 
 Last, we prove that: there exists $\boldsymbol{\beta}\in\mathbb{R}^{p+1}$ such that $f(\boldsymbol{\beta})>f(\boldsymbol{\beta}^*)$, which is contradictory to the statement that $\forall \boldsymbol{\beta}\in\mathbb{R}^{p+1}$, $f(\boldsymbol{\beta})\le f(\boldsymbol{\beta}^*)$.
 
-Note that $f(\boldsymbol{\beta})<0$ holds for any $\boldsymbol{\beta}\in\mathbb{R}$, then we have $f(\boldsymbol{\beta}^*)<0$.
+Notice that $f(\boldsymbol{\beta})<0$ holds for any $\boldsymbol{\beta}\in\mathbb{R}$, then we have $f(\boldsymbol{\beta}^*)<0$.
 
 Given that $f(\boldsymbol{\beta}^*)<0$ and (\ref{limit}) holds, there exists $N\in \mathbb{R}$ such that $\forall k>N$, $f(k\tilde{\boldsymbol{\beta}})>f(\boldsymbol{\beta}^*)$.
 
@@ -550,16 +542,43 @@ Thus our assumption must be false.
 \end{proof}
 
 \begin{thm}\label{t3}
-Given that the coordinate descent has updates
-\begin{align*}
+Given that the starting values of $\boldsymbol{\beta}$ of the path-wise coordinate-wise descent algorithm are all 0's, and the coordinate descent in the inner loop has updates
+$$\begin{aligned}
 \tilde{\beta}_0&\leftarrow\frac{\sum_{i=1}^n\tilde{w}_{i}(\tilde{z}_{i}-\sum_{k= 1}^pX_{ik}\tilde{\beta}_k)}{\sum_{i=1}^n\tilde{w}_{i}},\\
 \tilde{\beta}_j&\leftarrow\frac{S\left(\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}X_{ij}(\tilde{z}_{i}-\sum_{k\ne j}X_{ik}\tilde{\beta}_k),\lambda\right)}{\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}X_{ij}^2},\; j=1,\ldots,p
-\end{align*}
-the $\lambda_{max}$ for which the estimates of all coefficients $\hat{\beta}_j = 0,\; j=1,2,\ldots,p$ is
+\end{aligned}$$
+the smallest $\lambda$ for which the updates of all slope coefficient estimates $\tilde{\beta}_j = 0,\; j=1,2,\ldots,p$ in every iteration of the inner loop is given by
 $$\lambda_{max} = \max_{j\in\{1,\ldots,p\}}\left|\frac{1}{n}\sum_{i=1}^n X_{ij}(Y_i-\bar{Y})\right|,$$
 where $\bar{Y}=\frac{1}{n}\sum_{i=1}^nY_i$.
 \end{thm}
 
 \begin{proof}
-working on it.
+Denote $\tilde{\boldsymbol\beta}^{(s,t)}$ as the current estimates of $\boldsymbol\beta$ in the first outer loop after the $s$-th iteration of the middle loop and the $t$-th iteration of the inner loop, $s,t\in\{0,1,\ldots\}$. Then $\tilde{\boldsymbol\beta}^{(0,0)}=\mathbf{0}$ denotes the starting values, and $\tilde{\boldsymbol\beta}^{(s-1,N_s)}=\tilde{\boldsymbol\beta}^{(s,0)}$, where $N_s$ is the total number of iterations of inner loop in the $s$-th middle loop. We want to prove that $\lambda_{max}$ as given in the theorem is the smallest value that can ensure that $\forall s,t$, $\tilde{\beta}^{(s,t)}_j=0$, $j=1,\ldots,p$.
+
+We prove it by induction. Assume that $\forall k_t < N_{k_s}$ when $k_s < s$ and $\forall k_t < t$ when $k_s =s$, we have $\tilde{\beta}^{(k_s,k_t)}_j=0$, $j=1,\ldots,p$, where $t<N_s$. We want to find the smallest $\lambda$ such that $\tilde{\beta}^{(s,t)}_j=0$, $j=1,\ldots,p$.
+
+Let $\tilde{z}_i^{(s)}$, $\tilde{p}_i^{(s)}$, and $\tilde{w}_i^{(s)}$ denote the updates of $z_i$, $p_i$, and $w_i$ in the $\ell$ function in the $s$-th middle loop as given in (\ref{func.lasso}). Then we have  $$\tilde{p}_i^{(s)}=\frac{e^{\tilde\beta_0^{(s,0)}}}{1+e^{\tilde\beta_0^{(s,0)}}}$$
+is a constant value for all $i$'s. Denote this value as $\tilde{p}^{(s)}$, then $\forall i = 1,\ldots,n$, we have
+$$\begin{aligned}
+\tilde{w}^{(s)}:=\tilde{w}_i^{(s)}&=\tilde{p}^{(s)}(1-\tilde{p}^{(s)}),\\
+\tilde{z}_i^{(s)}&=\tilde\beta_0^{(s,0)}+\frac{Y_i-\tilde{p}^{(s)}}{\tilde{w}^{(s)}}.
+\end{aligned}$$
+Then we have
+$$
+\tilde{\beta}^{(s,k_t)}_0=\frac{\sum_{i=1}^n\tilde{w}^{(s)}\tilde{z}_{i}}{n\tilde{w}^{(s)}}=\tilde\beta_0^{(s,0)}+\frac{\bar{Y}-\tilde{p}^{(s)}}{\tilde{w}^{(s)}},\ k_t=1,2,\ldots,t
+$$
+Since the soft-thresholding operator $S(z,\gamma)=0$ if and only if $\gamma\ge|z|$, $\tilde{\beta}^{(s,t)}_j=0,\ j=1,\ldots,p$ if and only if
+$$\frac{1}{n}\left|\sum_{i=1}^n\tilde{w}^{(s)}X_{ij}\left(\tilde{z}_{i}^{(s)}-\sum_{k< j}X_{ik}\tilde{\beta}_k^{(s,t)}-\sum_{k> j}X_{ik}\tilde{\beta}_k^{(s,t-1)}\right)\right|\le \lambda,\ j=1,\ldots,p$$
+Since we have 
+$$\begin{aligned}
+\frac{1}{n}\left|\sum_{i=1}^n\tilde{w}^{(s)}X_{ij}\left(\tilde{z}_{i}^{(s)}-\sum_{k< j}X_{ik}\tilde{\beta}_k^{(s,t)}-\sum_{k> j}X_{ik}\tilde{\beta}_k^{(s,t-1)}\right)\right|
+&=\frac{1}{n}\left|\sum_{i=1}^n\tilde{w}^{(s)}X_{ij}\left(\tilde\beta_0^{(s,0)}+\frac{Y_i-\tilde{p}^{(s)}}{\tilde{w}^{(s)}}-\tilde\beta_0^{(s,t)}\right)\right|\\
+&=\frac{1}{n}\left|\sum_{i=1}^n\tilde{w}^{(s)}X_{ij}\left(\frac{Y_i-\tilde{p}^{(s)}}{\tilde{w}^{(s)}}-\frac{\bar{Y}-\tilde{p}^{(s)}}{\tilde{w}^{(s)}}\right)\right|\\
+&=\frac{1}{n}\left|\sum_{i=1}^nX_{ij}\left(Y_i-\bar{Y}\right)\right|,
+\end{aligned}$$
+$\tilde{\beta}^{(s,t)}_j=0,\ j=1,\ldots,p$ if and only if
+$$\lambda\ge\max_{j\in\{1,\ldots,p\}}\frac{1}{n}\left|\sum_{i=1}^nX_{ij}\left(Y_i-\bar{Y}\right)\right|.$$
+Thus, $\lambda_{max}$ as given in the theorem is the smallest value that can ensure that $\tilde{\beta}^{(s,t)}_j=0$, $j=1,\ldots,p$.
+
+Given that $\tilde{\boldsymbol\beta}^{(0,0)}=\mathbf{0}$, and $\tilde{\boldsymbol\beta}^{(s-1,N_s)}=\tilde{\boldsymbol\beta}^{(s,0)}$, by induction, $\lambda_{max}$ as given in the theorem is the smallest value that can ensure that $\forall s,t$, $\tilde{\beta}^{(s,t)}_j=0$, $j=1,\ldots,p$.
 \end{proof}
