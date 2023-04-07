@@ -172,11 +172,14 @@ Thus our assumption must be false. \hfill$\square$
 We compare the results of using the `glm` function and our `NewtonRaphson` function. (meaningless, since both do not converge)
 
 ```{r warning=FALSE}
-tibble(
+task2_compare<-
+  tibble(
   predictor = c("(Intercept)", names(Training)[-1]),
   ours = res[nrow(res), -c(1, 2)],
   glm = glm(diagnosis ~ ., family = binomial(link = "logit"), data = Training)$coefficients
-) %>% 
+)
+write_csv(task2_compare,"data/task2_compare.csv")
+task2_compare%>% 
   knitr::kable()
 ```
 
