@@ -243,7 +243,12 @@ For future work, now that we have selected the ten predictors, we want to know w
 
 ## Group Contributions {-}
 
-Hongjie Liu worked on developing the algorithms, writing the R functions and mathematical proofs, as well as writing the corresponding sections of the reports. He was also responsible for delivering the presentation of task 3.
+Hongjie Liu worked on developing the algorithms, writing the R functions and mathematical proofs, as well as writing the corresponding sections of the report. He was also responsible for delivering the presentation of task 3.
+
+
+
+Shaohan Chen worked on function visualization, organizing the first two parts of the presentation slides and some sections of the report. Hongjie Liu was more than modest about his group contribution in the above statements, while he actually finished most of the significant parts of the project. Therefore, I would like to emphasize his extraordinary contribution, study attitude and the research ability he demonstrated during the project.
+
 
 \newpage 
 # References {-}
