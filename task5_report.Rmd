@@ -243,6 +243,8 @@ For future work, now that we have selected the ten predictors, we want to know w
 
 ## Group Contributions {-}
 
+Hongjie Liu worked on developing the algorithms, writing the R functions and mathematical proofs, as well as writing the corresponding sections of the reports. He was also responsible for delivering the presentation of task 3.
+
 \newpage 
 # References {-}
 \hypertarget{1}{Freer, Timothy W., and Michael J. Ulissey. "Screening mammography with computer-aided detection: prospective study of 12,860 patients in a community breast center." Radiology 220.3 (2001): 781-786.}
