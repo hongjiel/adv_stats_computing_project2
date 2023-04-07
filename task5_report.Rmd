@@ -253,7 +253,7 @@ Jiajun Tao worked mainly on the presentation as well as the report of task 4, i.
 
 Xicheng Xie worked on making and amending two parts of the slides, writing some sections of the report, and doing the presentation. I must emphasize the exceptional work of my teammate, Hongjie Liu. He was more than modest in his statements about his contribution to the project. In fact, he completed most of the significant parts of the project during spring break. His dedication to the project, coupled with his exceptional mathematical skills, was commendable.
 
-
+Yujia Li gave extra thought on task 1, wrapped up the intro and method part of reports. Thanks for my teammates who are all constantly commit to this project and communicate effctively, especially Hongjie Liu who was in charge of most things.
 
 
 \newpage 
@@ -411,9 +411,7 @@ LogisticLASSO <- function(dat, start, lambda) {
   colnames(res) <- c("lambda", "(Intercept)", names(dat)[-1])
   return(res)
 }
-
 # middle loop
-
 MiddleLoop <- function(X, y, start, lambda, maxiter = 100) {
   betavec <- start
   s <- 0
@@ -437,7 +435,6 @@ MiddleLoop <- function(X, y, start, lambda, maxiter = 100) {
   }
   return(betavec)
 }
-
 # inner loop
 InnerLoop <- function(X, z, w, betavec, lambda, tol = 1e-10, maxiter = 1000) {
   prevfunc <- Inf
