@@ -378,3 +378,150 @@ corr1
 \caption{Task 4 ROC Curve}
 \label{Figure 7}
 \end{figure}
+
+
+```{r eval = FALSE}
+NewtonRaphson <- function(dat, func, start, tol = 1e-8, maxiter = 200) {
+  i <- 0
+  cur <- start
+  stuff <- func(dat, cur)
+  res <- c(0, stuff$f, cur)
+  prevf <- -Inf
+  X <- cbind(rep(1, nrow(dat)), as.matrix(dat[, -1]))
+  y <- dat[, 1]
+  warned <- 0
+  while (abs(stuff$f - prevf) > tol && i < maxiter) {
+    i <- i + 1
+    prevf <- stuff$f
+    prev <- cur
+    d <- -solve(stuff$Hess) %*% stuff$grad
+    cur <- prev + d
+    lambda <- 1
+    maxhalv <- 0
+    while (func(dat, cur)$f < prevf && maxhalv < 50) {
+      maxhalv <- maxhalv + 1
+      lambda <- lambda / 2
+      cur <- prev + lambda * d
+    }
+    stuff <- func(dat, cur)
+    res <- rbind(res, c(i, stuff$f, cur))
+    y_hat <- ifelse(X %*% cur > 0, 1, 0)
+    if (warned == 0 && sum(y - y_hat) == 0) {
+      warning("Complete separation occurs. Algorithm does not converge.")
+      warned <- 1
+    }
+  }
+  colnames(res) <- c("iter", "target_function", "(Intercept)", names(dat)[-1])
+  return(res)
+}
+```
+\begin{center}
+\hypertarget{Code 1}{Code 1: Newton-Raphson Algorithm}
+\end{center}
+\ \par
+\ \par
+
+```{r eval = FALSE}
+# outer loop
+LogisticLASSO <- function(dat, start, lambda) {
+  r <- length(lambda)
+  X <- as.matrix(cbind(rep(1, nrow(dat)), dat[, -1])) # design matrix
+  y <- dat[, 1] # response vector
+  res <- matrix(NA, nrow = r, ncol = ncol(dat) + 1)
+  for (i in 1:r) {
+    betavec <- MiddleLoop(X = X, y = y, start = start, lambda = lambda[i])
+    res[i, ] <- c(lambda[i], betavec)
+    start <- betavec
+  }
+  colnames(res) <- c("lambda", "(Intercept)", names(dat)[-1])
+  return(res)
+}
+
+# middle loop
+
+MiddleLoop <- function(X, y, start, lambda, maxiter = 100) {
+  betavec <- start
+  s <- 0
+  eps <- 1e-5
+  repeat {
+    s <- s + 1
+    u <- X %*% betavec
+    p_vec <- sigmoid(u) # function `sigmoid` to compute exp(x)/(1 + exp(x))
+    w <- p_vec * (1 - p_vec)
+    # see note
+    p_vec[p_vec < eps] <- 0
+    p_vec[p_vec > 1 - eps] <- 1
+    w[p_vec == 1 | p_vec == 0] <- eps
+    z <- u + (y - p_vec) / w
+    betavec <- InnerLoop(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
+    t <- betavec[1]
+    betavec <- betavec[-1]
+    if (t == 1 || s >= maxiter) { # if number of iterations of inner loop = 1, converge.
+      break
+    }
+  }
+  return(betavec)
+}
+
+# inner loop
+InnerLoop <- function(X, z, w, betavec, lambda, tol = 1e-10, maxiter = 1000) {
+  prevfunc <- Inf
+  curfunc <- coordinate_func(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
+  t <- 0
+  while (abs(curfunc - prevfunc) > tol && t < maxiter) {
+    t <- t + 1
+    prevfunc <- curfunc
+    betavec[1] <- sum(w * (z - X[, -1] %*% betavec[-1])) / sum(w)
+    for (j in 2:length(betavec)) {
+      betavec[j] <- soft.threshold(z = sum(w * X[, j] * (z - X[, -j] %*% betavec[-j])) 
+                                   / nrow(X), gamma = lambda) * nrow(X) 
+      / sum(w * X[, j]^2)
+    }
+    curfunc <- coordinate_func(X = X, z = z, w = w, betavec = betavec, lambda = lambda)
+  }
+  return(c(t, betavec))
+}
+```
+\begin{center}
+\hypertarget{Code 2}{Code 2: Logistic Lasso Algorithm}
+\end{center}
+\ \par
+\ \par
+
+```{r eval  = FALSE}
+cv.logit.lasso <- function(x, y, nfolds = 5, lambda) {
+  auc <- data.frame(matrix(ncol = 3, nrow = 0))
+  folds <- createFolds(y, k = nfolds)
+  for (i in 1:nfolds) {
+    valid_index <- folds[[i]]
+    x_training <- x[-valid_index, ]
+    y_training <- y[-valid_index]
+    training_dat <- data.frame(cbind(y_training, x_training))
+    x_valid <- cbind(rep(1, length(valid_index)), x[valid_index, ])
+    y_valid <- y[valid_index]
+    res <- LogisticLASSO(dat = training_dat, 
+                         start = rep(0, ncol(training_dat)),
+                         lambda = lambda)
+    for (k in 1:nrow(res)) {
+      betavec <- res[k, 2:ncol(res)]
+      u_valid <- x_valid %*% betavec
+      phat_valid <- sigmoid(u_valid)[, 1]
+      roc <- roc(response = y_valid, predictor = phat_valid)
+      auc <- rbind(auc, c(lambda[k], i, roc$auc[1]))
+    }
+  }
+  colnames(auc) <- c("lambda", "fold", "auc")
+  cv_res <- auc %>% 
+    group_by(lambda) %>% 
+    summarize(auc_mean = mean(auc),
+              auc_se = sd(auc) / sqrt(5),
+              auc_low = auc_mean - auc_se,
+              auc_high = auc_mean + auc_se) %>% 
+    mutate(auc_ranking = min_rank(desc(auc_mean)))
+  bestlambda <- max(cv_res$lambda[cv_res$auc_ranking == 1])
+  return(cv_res)
+}
+```
+\begin{center}
+\hypertarget{Code 3}{Code 3: 5-fold cross-validation to select best lambda}
+\end{center}

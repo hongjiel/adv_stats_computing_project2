@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.9.15)  6 APR 2023 21:47
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.9.15)  6 APR 2023 22:04
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -207,6 +207,21 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 \Gm@layouthoffset=\dimen155
 \Gm@layoutvoffset=\dimen156
 \Gm@dimlist=\toks25
+) (/usr/local/texlive/2022/texmf-dist/tex/latex/fancyvrb/fancyvrb.sty
+Package: fancyvrb 2021/12/21 4.1b verbatim text (tvz,hv)
+\FV@CodeLineNo=\count277
+\FV@InFile=\read2
+\FV@TabBox=\box53
+\c@FancyVerbLine=\count278
+\FV@StepNumber=\count279
+\FV@OutFile=\write3
+) (/usr/local/texlive/2022/texmf-dist/tex/latex/framed/framed.sty
+Package: framed 2011/10/22 v 0.96: framed or shaded text with page breaks
+\OuterFrameSep=\skip53
+\fb@frw=\dimen157
+\fb@frh=\dimen158
+\FrameRule=\dimen159
+\FrameSep=\dimen160
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/graphics/graphicx.sty
 Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
 (/usr/local/texlive/2022/texmf-dist/tex/latex/graphics/graphics.sty
@@ -218,66 +233,66 @@ File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 107.
 )
-\Gin@req@height=\dimen157
-\Gin@req@width=\dimen158
+\Gin@req@height=\dimen161
+\Gin@req@width=\dimen162
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 Package: fancyhdr 2021/01/28 v4.0.1 Extensive control of page headers and foote
 rs
-\f@nch@headwidth=\skip53
-\f@nch@O@elh=\skip54
-\f@nch@O@erh=\skip55
-\f@nch@O@olh=\skip56
-\f@nch@O@orh=\skip57
-\f@nch@O@elf=\skip58
-\f@nch@O@erf=\skip59
-\f@nch@O@olf=\skip60
-\f@nch@O@orf=\skip61
+\f@nch@headwidth=\skip54
+\f@nch@O@elh=\skip55
+\f@nch@O@erh=\skip56
+\f@nch@O@olh=\skip57
+\f@nch@O@orh=\skip58
+\f@nch@O@elf=\skip59
+\f@nch@O@erf=\skip60
+\f@nch@O@olf=\skip61
+\f@nch@O@orf=\skip62
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/lipsum/lipsum.sty (/usr/local/t
 exlive/2022/texmf-dist/tex/latex/l3packages/l3keys2e/l3keys2e.sty (/usr/local/t
 exlive/2022/texmf-dist/tex/latex/l3kernel/expl3.sty
 Package: expl3 2022-02-24 L3 programming layer (loader) 
 (/usr/local/texlive/2022/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2022-02-07 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count277
-\l__pdf_internal_box=\box53
+\l__color_backend_stack_int=\count280
+\l__pdf_internal_box=\box54
 ))
 Package: l3keys2e 2022-01-12 LaTeX2e option processing using LaTeX3 keys
 )
 Package: lipsum 2021-09-20 v2.7 150 paragraphs of Lorem Ipsum dummy text
-\g__lipsum_par_int=\count278
-\l__lipsum_a_int=\count279
-\l__lipsum_b_int=\count280
+\g__lipsum_par_int=\count281
+\l__lipsum_a_int=\count282
+\l__lipsum_b_int=\count283
 (/usr/local/texlive/2022/texmf-dist/tex/latex/lipsum/lipsum.ltd.tex)) (/usr/loc
 al/texlive/2022/texmf-dist/tex/latex/algorithms/algorithm.sty
 Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
 nment
 (/usr/local/texlive/2022/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count281
+\c@float@type=\count284
 \float@exts=\toks26
-\float@box=\box54
+\float@box=\box55
 \@float@everytoks=\toks27
-\@floatcapt=\box55
+\@floatcapt=\box56
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/base/ifthen.sty
 Package: ifthen 2020/11/24 v1.1c Standard LaTeX ifthen package (DPC)
 )
 \@float@every@algorithm=\toks28
-\c@algorithm=\count282
+\c@algorithm=\count285
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/algorithmicx/algpseudocode.sty
 Package: algpseudocode 
 (/usr/local/texlive/2022/texmf-dist/tex/latex/algorithmicx/algorithmicx.sty
 Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
 Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
-\c@ALG@line=\count283
-\c@ALG@rem=\count284
-\c@ALG@nested=\count285
-\ALG@tlm=\skip62
-\ALG@thistlm=\skip63
-\c@ALG@Lnr=\count286
-\c@ALG@blocknr=\count287
-\c@ALG@storecount=\count288
-\c@ALG@tmpcounter=\count289
-\ALG@tmplength=\skip64
+\c@ALG@line=\count286
+\c@ALG@rem=\count287
+\c@ALG@nested=\count288
+\ALG@tlm=\skip63
+\ALG@thistlm=\skip64
+\c@ALG@Lnr=\count289
+\c@ALG@blocknr=\count290
+\c@ALG@storecount=\count291
+\c@ALG@tmpcounter=\count292
+\ALG@tmplength=\skip65
 )
 Document Style - pseudocode environments for use with the `algorithmicx' style
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/bookmark/bookmark.sty
@@ -304,9 +319,9 @@ Package: letltxmacro 2019/12/03 v1.6 Let assignment for LaTeX macros (HO)
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/auxhook/auxhook.sty
 Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
 )
-\@linkdim=\dimen159
-\Hy@linkcounter=\count290
-\Hy@pagecounter=\count291
+\@linkdim=\dimen163
+\Hy@linkcounter=\count293
+\Hy@pagecounter=\count294
 (/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/pd1enc.def
 File: pd1enc.def 2022-02-21 v7.00n Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
@@ -316,7 +331,7 @@ Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 ) (/usr/local/texlive/2022/texmf-dist/tex/generic/etexcmds/etexcmds.sty
 Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
 )
-\Hy@SavedSpaceFactor=\count292
+\Hy@SavedSpaceFactor=\count295
 (/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/puenc.def
 File: puenc.def 2022-02-21 v7.00n Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
@@ -330,22 +345,22 @@ Package hyperref Info: Plain pages OFF on input line 4152.
 Package hyperref Info: Backreferencing OFF on input line 4157.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4390.
-\c@Hy@tempcnt=\count293
+\c@Hy@tempcnt=\count296
 (/usr/local/texlive/2022/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip17
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4749.
-\XeTeXLinkMargin=\dimen160
+\XeTeXLinkMargin=\dimen164
 (/usr/local/texlive/2022/texmf-dist/tex/generic/bitset/bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
 (/usr/local/texlive/2022/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
 )
 ))
-\Fld@menulength=\count294
-\Field@Width=\dimen161
-\Fld@charsize=\dimen162
+\Fld@menulength=\count297
+\Field@Width=\dimen165
+\Fld@charsize=\dimen166
 Package hyperref Info: Hyper figures OFF on input line 6027.
 Package hyperref Info: Link nesting OFF on input line 6032.
 Package hyperref Info: Hyper index ON on input line 6035.
@@ -359,9 +374,9 @@ LaTeX Info: Redefining \pageref on input line 6101.
 Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
 package with kernel methods
 )
-\Hy@abspage=\count295
-\c@Item=\count296
-\c@Hfootnote=\count297
+\Hy@abspage=\count298
+\c@Item=\count299
+\c@Hfootnote=\count300
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/hpdftex.def
@@ -371,8 +386,8 @@ Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend pac
 kage
 with kernel methods
 )
-\Fld@listcount=\count298
-\c@bookmark@seq@number=\count299
+\Fld@listcount=\count301
+\c@bookmark@seq@number=\count302
 
 (/usr/local/texlive/2022/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
 Package: rerunfilecheck 2019/12/05 v1.9 Rerun checks for auxiliary files (HO)
@@ -383,10 +398,10 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 86.
 )
-\Hy@SectionHShift=\skip65
+\Hy@SectionHShift=\skip66
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/bookmark/bkm-pdftex.def
 File: bkm-pdftex.def 2020-11-06 v1.29 bookmark driver for pdfTeX (HO)
-\BKM@id=\count300
+\BKM@id=\count303
 )) (/usr/local/texlive/2022/texmf-dist/tex/latex/xurl/xurl.sty
 Package: xurl 2022/01/09 v 0.10 modify URL breaks
 ) (./task5_report.aux
@@ -396,36 +411,36 @@ LaTeX Warning: Label `func' multiply defined.
 )
 \openout1 = `task5_report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Info: Redefining \microtypecontext on input line 77.
-Package microtype Info: Applying patch `item' on input line 77.
-Package microtype Info: Applying patch `toc' on input line 77.
-Package microtype Info: Applying patch `eqnum' on input line 77.
-Package microtype Info: Applying patch `footnote' on input line 77.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 117.
+LaTeX Font Info:    ... okay on input line 117.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 117.
+LaTeX Font Info:    ... okay on input line 117.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 117.
+LaTeX Font Info:    ... okay on input line 117.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 117.
+LaTeX Font Info:    ... okay on input line 117.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 117.
+LaTeX Font Info:    ... okay on input line 117.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 117.
+LaTeX Font Info:    ... okay on input line 117.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 117.
+LaTeX Font Info:    ... okay on input line 117.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 117.
+LaTeX Font Info:    ... okay on input line 117.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 117.
+LaTeX Font Info:    ... okay on input line 117.
+LaTeX Info: Redefining \microtypecontext on input line 117.
+Package microtype Info: Applying patch `item' on input line 117.
+Package microtype Info: Applying patch `toc' on input line 117.
+Package microtype Info: Applying patch `eqnum' on input line 117.
+Package microtype Info: Applying patch `footnote' on input line 117.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `alltext-nott'.
-LaTeX Info: Redefining \showhyphens on input line 77.
+LaTeX Info: Redefining \showhyphens on input line 117.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
@@ -434,16 +449,16 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 (RS)
 ) (/usr/local/texlive/2022/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count301
-\scratchdimen=\dimen163
-\scratchbox=\box56
-\nofMPsegments=\count302
-\nofMParguments=\count303
+\scratchcounter=\count304
+\scratchdimen=\dimen167
+\scratchbox=\box57
+\nofMPsegments=\count305
+\nofMParguments=\count306
 \everyMPshowfont=\toks29
-\MPscratchCnt=\count304
-\MPscratchDim=\dimen164
-\MPnumerator=\count305
-\makeMPintoPDFobject=\count306
+\MPscratchCnt=\count307
+\MPscratchDim=\dimen168
+\MPnumerator=\count308
+\makeMPintoPDFobject=\count309
 \everyMPtoPDFconversion=\toks30
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
@@ -487,7 +502,7 @@ e
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring OFF on input line 77.
+Package hyperref Info: Link coloring OFF on input line 117.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
 (/usr/local/texlive/2022/texmf-dist/tex/latex/refcount/refcount.sty
@@ -497,46 +512,46 @@ Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 ty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count307
+\c@section@level=\count310
 )
-LaTeX Info: Redefining \ref on input line 77.
-LaTeX Info: Redefining \pageref on input line 77.
-LaTeX Info: Redefining \nameref on input line 77.
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 7
-9.
+LaTeX Info: Redefining \ref on input line 117.
+LaTeX Info: Redefining \pageref on input line 117.
+LaTeX Info: Redefining \nameref on input line 117.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 1
+19.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 7
-9.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 1
+19.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-79.
+119.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-79.
+119.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 79.
+(Font)              <12> on input line 119.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 79.
+(Font)              <8> on input line 119.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 79.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 79.
-
+(Font)              <6> on input line 119.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 119
+.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 79.
-
+LaTeX Font Info:    Trying to load font information for U+msb on input line 119
+.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/microtype/mt-msb.cfg
@@ -549,28 +564,28 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <5> on input line 4.
 )
-\tf@toc=\write3
-\openout3 = `task5_report.toc'.
+\tf@toc=\write4
+\openout4 = `task5_report.toc'.
 
 [1{/usr/local/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 ]
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1
-13.
+53.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [2] [3]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 234.
+put line 274.
 [4]
-Overfull \hbox (52.55072pt too wide) in paragraph at lines 388--389
+Overfull \hbox (52.55072pt too wide) in paragraph at lines 428--429
 [] $[]\OT1/lmr/m/n/10 (-20) (\OML/lmm/m/it/10 ^^U[]\OT1/lmr/m/n/10 (-20) ) \OMS
 /lmsy/m/n/10   \OML/lmm/m/it/10 S [] [][] [][] []X[]$ 
  []
 
 [5] [6] [7]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 4
-91.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 5
+31.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [8] [9]
@@ -580,7 +595,7 @@ File: task5_report_files/figure-latex/unnamed-chunk-2-1.pdf Graphic file (type
 pdf)
 <use task5_report_files/figure-latex/unnamed-chunk-2-1.pdf>
 Package pdftex.def Info: task5_report_files/figure-latex/unnamed-chunk-2-1.pdf 
- used on input line 565.
+ used on input line 605.
 (pdftex.def)             Requested size: 391.47346pt x 313.17877pt.
 <task5_report_files/figure-latex/unnamed-chunk-3-1.pdf, id=141, 391.4625pt x 31
 3.17pt>
@@ -588,62 +603,73 @@ File: task5_report_files/figure-latex/unnamed-chunk-3-1.pdf Graphic file (type
 pdf)
 <use task5_report_files/figure-latex/unnamed-chunk-3-1.pdf>
 Package pdftex.def Info: task5_report_files/figure-latex/unnamed-chunk-3-1.pdf 
- used on input line 571.
+ used on input line 611.
 (pdftex.def)             Requested size: 391.47346pt x 313.17877pt.
 <images/task4_coefshr.png, id=142, 749.80125pt x 415.5525pt>
 File: images/task4_coefshr.png Graphic file (type png)
 <use images/task4_coefshr.png>
-Package pdftex.def Info: images/task4_coefshr.png  used on input line 577.
+Package pdftex.def Info: images/task4_coefshr.png  used on input line 617.
 (pdftex.def)             Requested size: 469.7573pt x 260.34741pt.
 [10 <./task5_report_files/figure-latex/unnamed-chunk-2-1.pdf>] [11 <./task5_rep
 ort_files/figure-latex/unnamed-chunk-3-1.pdf>]
 <images/task4_auc_lambda.png, id=170, 1509.64pt x 820.06375pt>
 File: images/task4_auc_lambda.png Graphic file (type png)
 <use images/task4_auc_lambda.png>
-Package pdftex.def Info: images/task4_auc_lambda.png  used on input line 584.
+Package pdftex.def Info: images/task4_auc_lambda.png  used on input line 624.
 (pdftex.def)             Requested size: 469.75728pt x 255.18065pt.
 <images/task4_lambdacom.png, id=171, 329.73187pt x 590.95781pt>
 File: images/task4_lambdacom.png Graphic file (type png)
 <use images/task4_lambdacom.png>
-Package pdftex.def Info: images/task4_lambdacom.png  used on input line 591.
+Package pdftex.def Info: images/task4_lambdacom.png  used on input line 631.
 (pdftex.def)             Requested size: 234.88608pt x 420.97163pt.
 [12 <./images/task4_coefshr.png> <./images/task4_auc_lambda.png>]
 <images/task4_selectpred.png, id=180, 457.71pt x 630.10406pt>
 File: images/task4_selectpred.png Graphic file (type png)
 <use images/task4_selectpred.png>
-Package pdftex.def Info: images/task4_selectpred.png  used on input line 598.
+Package pdftex.def Info: images/task4_selectpred.png  used on input line 638.
 (pdftex.def)             Requested size: 234.87473pt x 323.33904pt.
 [13 <./images/task4_lambdacom.png>]
 <images/task4_twomodel.png, id=188, 312.41719pt x 83.5622pt>
 File: images/task4_twomodel.png Graphic file (type png)
 <use images/task4_twomodel.png>
-Package pdftex.def Info: images/task4_twomodel.png  used on input line 605.
+Package pdftex.def Info: images/task4_twomodel.png  used on input line 645.
 (pdftex.def)             Requested size: 312.44025pt x 83.56834pt.
 <images/task4_roc.png, id=189, 749.80125pt x 472.76625pt>
 File: images/task4_roc.png Graphic file (type png)
 <use images/task4_roc.png>
-Package pdftex.def Info: images/task4_roc.png  used on input line 612.
+Package pdftex.def Info: images/task4_roc.png  used on input line 652.
 (pdftex.def)             Requested size: 469.7573pt x 296.19234pt.
-[14 <./images/task4_selectpred.png> <./images/task4_twomodel.png>] [15 <./image
-s/task4_roc.png>] (./task5_report.aux)
+[14 <./images/task4_selectpred.png> <./images/task4_twomodel.png>]
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 659.
+
+Overfull \vbox (1.27348pt too high) detected at line 693
+ []
+
+[15 <./images/task4_roc.png>]
+LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 
+733.
+(/usr/local/texlive/2022/texmf-dist/tex/latex/lm/ts1lmtt.fd
+File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+) [16] [17] [18] (./task5_report.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 14813 strings out of 478268
- 239116 string characters out of 5846347
- 670353 words of memory out of 5000000
- 32526 multiletter control sequences out of 15000+600000
- 550377 words of font info for 160 fonts, out of 8000000 for 9000
+ 15367 strings out of 478268
+ 247997 string characters out of 5846347
+ 680375 words of memory out of 5000000
+ 33060 multiletter control sequences out of 15000+600000
+ 551321 words of font info for 163 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  74i,16n,77p,1009b,383s stack positions out of 10000i,1000n,20000p,200000b,200000s
-{/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/
-texlive/2022/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/texlive/2022/t
-exmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{/usr/local/texlive/2022/texmf-dist/
-fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/local/texlive/2022/texmf-dist/fonts/enc/
-dvips/lm/lm-mathit.enc}{/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/lm/l
-m-ts1.enc}</usr/local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmbx10.pfb>
+{/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/local
+/texlive/2022/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/texlive/2022/
+texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/texlive/2022/texmf-dist/fon
+ts/enc/dvips/lm/lm-mathex.enc}{/usr/local/texlive/2022/texmf-dist/fonts/enc/dvi
+ps/lm/lm-mathsy.enc}{/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/lm/lm-m
+athit.enc}</usr/local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmbx10.pfb>
 </usr/local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/loca
 l/texlive/2022/texmf-dist/fonts/type1/public/lm/lmbx7.pfb></usr/local/texlive/2
 022/texmf-dist/fonts/type1/public/lm/lmbxi10.pfb></usr/local/texlive/2022/texmf
@@ -661,13 +687,15 @@ e1/public/lm/lmr5.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/lm
 l/texlive/2022/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/
 2022/texmf-dist/fonts/type1/public/lm/lmsy5.pfb></usr/local/texlive/2022/texmf-
 dist/fonts/type1/public/lm/lmsy7.pfb></usr/local/texlive/2022/texmf-dist/fonts/
-type1/public/lm/lmtt10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/publ
-ic/amsfonts/symbols/msam10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/
-public/amsfonts/symbols/msbm10.pfb>
-Output written on task5_report.pdf (15 pages, 753893 bytes).
+type1/public/lm/lmtk10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/publ
+ic/lm/lmtt10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/lm/lmtt
+i10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/symbols
+/msam10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/sym
+bols/msbm10.pfb>
+Output written on task5_report.pdf (18 pages, 808529 bytes).
 PDF statistics:
- 371 PDF objects out of 1000 (max. 8388607)
- 282 compressed objects within 3 object streams
- 68 named destinations out of 1000 (max. 500000)
+ 402 PDF objects out of 1000 (max. 8388607)
+ 304 compressed objects within 4 object streams
+ 74 named destinations out of 1000 (max. 500000)
  45209 words of extra memory for PDF output out of 51595 (max. 10000000)
 
