@@ -6,7 +6,6 @@ output:
   pdf_document:
     toc: yes
     toc_depth: 2
-    latex_engine: xelatex
   html_document:
     df_print: paged
     toc: yes
@@ -45,7 +44,7 @@ The other 30 columns correspond to mean, standard deviation and the largest valu
 \item fractal dimension: "coastline approximation" - 1
 \end{itemize}
 
-As exploring the breast cancer data, there are many predictors are highly correlated to each other as shown in the Figure \hyperlink{Figure 0}{0}, such as 'area_mean', 'perimeter_worst', 'radius_mean' and so on, that could cause unstable parameter estimation as well as perplexing the interpretation of logistic model. While we could eliminate some correlated features for modeling as shown in the Figure B, regularized logistic regression also help to tackle with it, which would be further explore in the following parts. 
+As exploring the breast cancer data, there are many predictors are highly correlated to each other as shown in the Figure \ref{Figure 1.1}, such as 'area_mean', 'perimeter_worst', 'radius_mean' and so on, that could cause unstable parameter estimation as well as perplexing the interpretation of logistic model. While we could eliminate some correlated features for modeling as shown in the Figure \ref{Figure 1.2}, regularized logistic regression also help to tackle with it, which would be further explore in the following parts. 
 
 # 2. Methods
 ## 2.1. Logistic Model
@@ -326,15 +325,17 @@ cancer1 <- cancer %>%
          -smoothness_worst)
 corr1 = cancer1[2:20] %>% 
   cor()
-corr1=ggcorrplot(corr1, type = "upper", tl.cex = 8)
+corr1 = ggcorrplot(corr1, type = "upper", tl.cex = 8)
 ```
 
-```{r echo=FALSE}
-ggpubr::ggarrange(corr,corr1, ncol = 2, nrow = 1, common.legend = TRUE, legend = "bottom", labels = "AUTO")
+```{r echo=FALSE, fig.cap = "\\label{Figure 1.1} Variables Correlation Part I"}
+corr
 ```
-\begin{center}
-\hypertarget{Figure 0}{Figure 0: Correlation Table}
-\end{center}
+
+```{r echo=FALSE, fig.cap = "\\label{Figure 1.2} Variables Correlation Part II"}
+corr1
+```
+
 
 \begin{figure}[H] 
 \centering
@@ -345,28 +346,35 @@ ggpubr::ggarrange(corr,corr1, ncol = 2, nrow = 1, common.legend = TRUE, legend =
 
 \begin{figure}[H] 
 \centering
+\includegraphics[width=1.0\textwidth]{images/task4_auc_lambda.png} 
+\caption{Task 4 AUC vs. Lambda}
+\label{Figure 3}
+\end{figure}
+
+\begin{figure}[H] 
+\centering
 \includegraphics[width=0.5\textwidth]{images/task4_lambdacom.png} 
 \caption{Task 4 Lambda}
-\label{Figure 3}
+\label{Figure 4}
 \end{figure}
 
 \begin{figure}[H] 
 \centering
 \includegraphics[width=0.5\textwidth]{images/task4_selectpred.png} 
 \caption{Task 4 Selected Predictors}
-\label{Figure 4}
+\label{Figure 5}
 \end{figure}
 
 \begin{figure}[H] 
 \centering
 \includegraphics[width=1.0\textwidth]{images/task4_twomodel.png}
 \caption{Task 4 Two Model Comparison}
-\label{Figure 5}
+\label{Figure 6}
 \end{figure}
 
 \begin{figure}[H] 
 \centering
 \includegraphics[width=1.0\textwidth]{images/task4_roc.png} 
 \caption{Task 4 ROC Curve}
-\label{Figure 6}
+\label{Figure 7}
 \end{figure}
