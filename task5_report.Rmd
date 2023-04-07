@@ -249,6 +249,8 @@ Hongjie Liu worked on developing the algorithms, writing the R functions and mat
 
 Shaohan Chen worked on function visualization, organizing the first two parts of the presentation slides and some sections of the report. Hongjie Liu was more than modest about his group contribution in the above statements, while he actually finished most of the significant parts of the project. Therefore, I would like to emphasize his extraordinary contribution, study attitude and the research ability he demonstrated during the project.
 
+Jiajun Tao worked mainly on the presentation as well as the report of task 4, i.e. choosing the best lambda to pick predictors and comparing the models. Here I would like to give much credit to Hongjie Liu, as he finished most of the project during the spring break. I was impressed by his learning ability and mathematical skills. Furthermore, he was also willing to help other members in the group understand the content and solve any problem. I think he deserves the praise.
+
 
 \newpage 
 # References {-}
