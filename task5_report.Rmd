@@ -44,7 +44,7 @@ The other 30 columns correspond to mean, standard deviation and the largest valu
 \item fractal dimension: "coastline approximation" - 1
 \end{itemize}
 
-As exploring the breast cancer data, there are many predictors highly correlated to each other as shown in Figure \ref{Figure 1.1}, such as 'area_mean', 'perimeter_worst', 'radius_mean' and so on, that could cause unstable parameter estimation as well as perplexing the interpretation of logistic model. While we could eliminate some correlated features for modeling as shown in Figure \ref{Figure 1.2}, regularized logistic regression also helps to tackle with it, which would be further explored in the following parts. 
+We partitioned the data into training data (80%) and test data (20%). As exploring the training data, there are many predictors highly correlated to each other as shown in Figure \ref{Figure 1.1}, such as 'area_mean', 'perimeter_worst', 'radius_mean' and so on, that could cause unstable parameter estimation as well as perplexing the interpretation of logistic model. While we could eliminate some correlated features for modeling as shown in Figure \ref{Figure 1.2}, regularized logistic regression also helps to tackle with it, which would be further explored in the following parts. 
 
 # Methods
 ## Logistic Model
@@ -256,32 +256,32 @@ convergence.
 Note: 
 
 1. In the outer loop, the value of $\lambda_{max}$ is different from the form given in \hyperlink{2}{Friedman et al. (2010)}. This is because we also take the update of $\tilde{\beta}_0$ into consideration in the inner loop. Proof is attached in the appendix. In practice, we add a very small value (e.g., $10^{-10}$) to $\lambda_{max}$ to avoid computational errors that may cause one slope coefficient estimate not equal to zero.
-2. In the middle loop, care is taken to avoid coefficients diverging in order to achieve fitted probabilities of 0 or 1. When a probability is within $\epsilon=10^{-5}$ of 1, we set it to 1, and set the weights to $\epsilon$. 0 is treated similarly.
+2. In the middle loop, care is taken to avoid coefficients diverging in order to achieve fitted probabilities of 0 or 1. When $\tilde{p}_i$ is within $\epsilon=10^{-5}$ of 1, we set it to 1, and set the corresponding weight $\tilde{w}_i$ to $\epsilon$. 0 is treated similarly.
 
 
 ## Five-fold Cross Validation for LASSO
 
-Since the Logistic-Lasso model depend on penalty term $\lambda$ for selection, we further develop 5-fold cross validation to select the parameter $\lambda$ to obtain the optimized result.
+Since the Logistic-Lasso model depends on penalty term for variable selection, we further develop 5-fold cross-validation to select the parameter $\lambda$ to obtain the optimized result.
 
-For the initial $\lambda$ range, which is a sequence of descending $\lambda$'s, where $\lambda_1=\lambda_{max}$. We set $\lambda_{min}=\frac{\lambda_{max}}{e^6}$, and create 30 $\lambda$ candidates on a log scale.
+For the initial $\lambda$ range, which is a sequence of descending $\lambda$'s, where $\lambda_{max}$ is given in (\ref{maxlambda}). We set $\lambda_{min}=\lambda_{max}/e^6$, and create 30 $\lambda$ candidates on a log scale.
 
-To select the optimal tuning parameter $\lambda$, the original data is randomly shuffled and split into five equally sized groups. One of the groups is used as a test set, while the remaining groups are used as training data. The path-wise coordinate-wise optimization algorithm is then applied to the training data, and AUC scores are calculated for each $\lambda$ using the test data. This process is repeated until each of the five groups has been used as the test set, and the mean AUC for each $\lambda$ is computed.
+To select the optimal tuning parameter $\lambda$, the original data is randomly shuffled and split into five equally sized groups. One of the groups is used as the validation set, while the remaining groups are used as the training set. The path-wise coordinate-wise optimization algorithm is then applied to the training set, and AUC scores are calculated for each $\lambda$ using the validation set. This process is repeated until each of the five groups has been used as the validation set, and the mean AUC for each $\lambda$ is computed.
 
 We select the best $\lambda$ in two ways. One way is that we wrote a function to do the 5-fold cross-validation and the other way is to use the `cv.glmnet` function from the popular package `caret`.
 
-Here we take the $\lambda$ with the greatest mean AUC as the best $\lambda$. Further, we look at the predictors that the best $\lambda$ choose and take them to re-fit the logistic regression model on the training data which is the 'optimal' model. We also run the training data by Newton-Raphson algorithm to get the 'full' model. After that, we compare the two models' prediction performance on the test data in specificity, sensitivity, and AUC.
+Here we take the $\lambda$ with the greatest mean AUC as the best $\lambda$. Further, we look at the predictors that the best $\lambda$ chooses and take them to re-fit the logistic regression model on the training data which is the 'optimal' model. We also fit a logsitical regression model on the training data using our Newton-Raphson algorithm to get the 'full' model. After that, we compare the two models' prediction performance on the test data in specificity, sensitivity, and AUC.
 
 # Results
 ## Five-fold CV for Logistic-LASSO
 Both our cross-validation function and `cv.glmnet` function reach the greatest mean AUC when $\lambda=0.0099322$, thus this is the best $\lambda$ we choose. As for the predictors, when $\lambda = \lambda_{best}$, both methods select ten same predictors, which are `texture_mean`, `concave.points_mean`, `radius_se`, `fractal_dimension_se`, `radius_worst`, `texture_worst`, `smoothness_worst`, `concavity_worst`, `concave.points_worst`, and `symmetry_worst`.
 
 ## Model Comparison
-The ten selected predictors are used to re-fit the logistic regression model as the 'optimal' model, which is then compared with the 'full' model generated by Newton-Raphson algorithm. The result turns out that the two models differ in prediction performance. The 'optimal' model out-performed the 'full' model with higher specificity, sensitivity, larger AUC, and fewer predictors.
+The ten selected predictors are used to re-fit the logistic regression model as the 'optimal' model, which is then compared with the 'full' model generated by the Newton-Raphson algorithm. The result turns out that the two models differ in prediction performance. The 'optimal' model outperformed the 'full' model with higher specificity, sensitivity, larger AUC, and fewer predictors.
 
 # Discussion
-The main conclusion is that Lasso-logistic model performed better than the full logistic model in this case. Recall that our goal is to build a predictive model to classify each patient's cancer diagnosis accurately according to the information extracted from the images. The specificity and sensitivity should be as high as possible. 
+The main conclusion is that the logistic Lasso model performed better than the full logistic model in this case. Recall that our goal is to build a predictive model to classify each patient's cancer diagnosis accurately according to the information extracted from the images. The specificity and sensitivity should be as high as possible. 
 
-For the future work, now that we have selected the ten predictors, we want to know why do these ten matter. What's the interpretation of this model? Do these predictors have any clinical significance? These questions may need to be answered by a cancer expert.
+For future work, now that we have selected the ten predictors, we want to know why do these ten matter. What's the interpretation of this model? Do these predictors have any clinical significance? These questions may need to be answered by a cancer expert.
 
 ## Group Contributions {-}
 
