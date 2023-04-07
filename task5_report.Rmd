@@ -19,6 +19,7 @@ header-includes:
 - \fancypagestyle{plain}{\pagestyle{fancy}}
 - \usepackage{algorithm} 
 - \usepackage{algpseudocode} 
+- \usepackage{amsthm}
 ---
 
 ```{r setup, include=FALSE}
@@ -77,34 +78,23 @@ Denote $p_i=P(Y_i=1\mid\mathbf{x}_i)$ as given in (\ref{model}) and $\mathbf{p}=
 \sum_{i=1}^n(Y_i-p_i)\\ \sum_{i=1}^n(Y_i-p_i)X_{i1}\\ \vdots\\ \sum_{i=1}^n(Y_i-p_i)X_{ip}\end{pmatrix}.
 \end{align*}
 Denote $w_i=p_i(1-p_i)\in(0,1)$ and $\mathbf{W}=\mathrm{diag}(w_1,\ldots,w_n)$. The Hessian matrix of $f$ is given by
-\begin{align*}
-\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})&=-\mathbf{X}^\top\mathbf{W}\mathbf{X}\\
-&=-\sum_{i=1}^nw_i\mathbf{x}_i\mathbf{x}_i^\top\\
+\begin{align}
+\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})&=-\mathbf{X}^\top\mathbf{W}\mathbf{X} \label{hess}\\
+&=-\sum_{i=1}^nw_i\mathbf{x}_i\mathbf{x}_i^\top \nonumber\\
 &=-\begin{pmatrix}
 \sum_{i=1}^nw_i & \sum_{i=1}^nw_iX_{i1} & \cdots & \sum_{i=1}^nw_iX_{i1} \\ 
 \sum_{i=1}^nw_iX_{i1} & \sum_{i=1}^nw_iX_{i1}^2 & \cdots & \sum_{i=1}^nw_iX_{i1}X_{ip} \\ 
 \vdots & \vdots & \ddots & \vdots \\ 
 \sum_{i=1}^nw_iX_{ip} & \sum_{i=1}^nw_iX_{ip}X_{i1} & \cdots & \sum_{i=1}^nw_iX_{ip}^2
-\end{pmatrix}.
-\end{align*}
-Next, we show that the Hessian matrix $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ is a negative-definite matrix if $\mathbf{X}$ has full rank.\par
-
-***Proof.*** For any $(p+1)$-dimensional nonzero vector $\boldsymbol{\alpha}$, given that $\mathbf{X}$ has full rank, $\mathbf{X}\boldsymbol{\alpha}$ is also a nonzero vector. Since $\mathbf{W}$ is positive-definite, we have
-\begin{align*}
-\boldsymbol{\alpha}^\top\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})\boldsymbol{\alpha}&=\boldsymbol{\alpha}^\top(-\mathbf{X}^\top\mathbf{W}\mathbf{X})\boldsymbol{\alpha}\\
-&=-(\mathbf{X}\boldsymbol{\alpha})^\top\mathbf{W}(\mathbf{X}\boldsymbol{\alpha})\\
-&<0.
-\end{align*}
-Thus, $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ is negative-definite. \hfill$\square$
-
-Hence, the optimization problem (\ref{opt}) is a well-defined problem.
+\end{pmatrix}. \nonumber
+\end{align}
+It can be shown that the Hessian matrix $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ is a negative-definite matrix if $\mathbf{X}$ has full rank (Theorem \ref{t1}). Hence, the optimization problem (\ref{opt}) is a well-defined problem.
 
 ## Newton-Raphson Algorithm 
 ### Algorithm Design
 Given that the derivative of the log-likelihood function with respect to each parameter is nonlinear and difficult to solve analytically for maximum likelihood, we use the Newton-Raphson algorithm to solve the optimization problem (\ref{opt}) numerically.
 
 We develop a modified Newton-Raphson algorithm including a step-halving step. Given that the Hessian matrix is negative-definite in this case, we don't need to ensure that the direction of the step is an ascent direction.
-
 \begin{algorithm}
 	\caption{Newton-Raphson algorithm including a step-halving step}
 	\begin{algorithmic}
@@ -129,41 +119,7 @@ We develop a modified Newton-Raphson algorithm including a step-halving step. Gi
 ### Complete Separation Problem
 However, the function does not converge when a complete separation occurs. A complete separation in a logistic regression, also referred to as perfect prediction, occurs whenever there exists some vector of coefficients $\hat{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} \le 0$. In other words, complete separation occurs whenever a linear function of predictors can generate perfect predictions of response.
 
-To further explain this problem, we prove that: if there exists a vector of coefficients $\hat{\boldsymbol{\beta}}$ that can generate perfect predictions, there does not exist $\boldsymbol{\beta}^*\in\mathbb{R}^{p+1}$ such that $\boldsymbol{\beta}^* = \arg\max_{\boldsymbol{\beta}}f(\boldsymbol{\beta})$, where $f$ is given in (\ref{func}). Thus our Newton-Raphson algorithm does not converge.
-
-***Proof.*** Assume such $\boldsymbol{\beta}^*$ exists, then $\forall \boldsymbol{\beta}\in\mathbb{R}^{p+1}$, we have $f(\boldsymbol{\beta})\le f(\boldsymbol{\beta}^*)$.
-
-First, we prove that: there exists a vector of coefficients $\tilde{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}} < 0$.
-
-Let $A_1=\{i: Y_i = 1\}= \{i:\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}> 0\}$ and $A_0=\{i: Y_i = 0\}=\{i:\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}\le0\}$. Then we have $$\epsilon:=\min_{i\in A_1}(\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}) > 0.$$
-Let $\tilde{\boldsymbol{\beta}}=\hat{\boldsymbol{\beta}}-(\epsilon/2,0,\ldots,0)^\top$. Given that $X_{i0}=1$ for all $i$, we have 
-$$\begin{aligned}
-\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}=\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}-\epsilon/2\cdot1\ge \epsilon-\epsilon/2=\epsilon/2>0,\quad \forall i\in A_1\\
-\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}=\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}-\epsilon/2\cdot1\le 0-\epsilon/2=-\epsilon/2<0,\quad \forall i\in A_0\\
-\end{aligned}$$
-Thus we have $A_1=\{i: Y_i = 1\}= \{i:\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}> 0\}$ and $A_0=\{i: Y_i = 0\}=\{i:\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}< 0\}$.
-
-Next, we prove that 
-\begin{equation}\label{limit}
-\lim_{k\rightarrow\infty}f(k\tilde{\boldsymbol{\beta}})=0.
-\end{equation}
-$\forall k>0$, we have $A_1= \{i:\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})> 0\}$ and $A_0=\{i:\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})< 0\}$.
-
-Thus,
-$$\begin{aligned}
-\lim_{k\rightarrow\infty}f(k\tilde{\boldsymbol{\beta}})&=\lim_{k\rightarrow\infty}\sum_{i\in A_1}\left[Y_i\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta})}-\log\left(1+e^{\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})}\right)\right]+\lim_{k\rightarrow\infty}\sum_{i\in A_0}\left[Y_i\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})-\log\left(1+e^{\mathbf{x}_i^\top (k\tilde{\boldsymbol{\beta}})}\right)\right]\\
-&=\sum_{i\in A_1}\lim_{k\rightarrow\infty}\left[k\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}-\log\left(1+e^{k\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}}\right)\right]+\sum_{i\in A_0}\lim_{k\rightarrow\infty}\left[-\log\left(1+e^{k\mathbf{x}_i^\top \tilde{\boldsymbol{\beta}}}\right)\right]\\
-&=\sum_{i\in A_1}\lim_{z\rightarrow\infty}\left[z-\log\left(1+e^z\right)\right]+\sum_{i\in A_0}\left(-\log1\right)\\
-&=0+0=0.
-\end{aligned}$$
-
-Last, we prove that: there exists $\boldsymbol{\beta}\in\mathbb{R}^{p+1}$ such that $f(\boldsymbol{\beta})>f(\boldsymbol{\beta}^*)$, which is contradictory to the statement that $\forall \boldsymbol{\beta}\in\mathbb{R}^{p+1}$, $f(\boldsymbol{\beta})\le f(\boldsymbol{\beta}^*)$.
-
-Note that $f(\boldsymbol{\beta})<0$ holds for any $\boldsymbol{\beta}\in\mathbb{R}$, then we have $f(\boldsymbol{\beta}^*)<0$.
-
-Given that $f(\boldsymbol{\beta}^*)<0$ and (\ref{limit}) holds, there exists $N\in \mathbb{R}$ such that $\forall k>N$, $f(k\tilde{\boldsymbol{\beta}})>f(\boldsymbol{\beta}^*)$.
-
-Thus our assumption must be false. \hfill$\square$
+To further explain this problem, we prove that: if there exists a vector of coefficients $\hat{\boldsymbol{\beta}}$ that can generate perfect predictions, there does not exist $\boldsymbol{\beta}^*\in\mathbb{R}^{p+1}$ such that $\boldsymbol{\beta}^* = \arg\max_{\boldsymbol{\beta}}f(\boldsymbol{\beta})$, where $f$ is given in (\ref{func}) (see Theorem \ref{t2}). Thus our Newton-Raphson algorithm does not converge.
 
 
 ## Logistic-LASSO Model
@@ -173,11 +129,20 @@ Regularization is the common approach for variable selection, in which LASSO is 
 \end{equation}
 where $\lambda\ge 0$ is the tuning parameter and $f$ is the log-likelihood function given in (\ref{func}). Note that the intercept is not penalized and all predictors are standardized.
 
-Then we could develop a path-wise coordinate descent algorithm to solve the optimization problem (\ref{opt.lasso}) with a sequence of nested loops:\par
+Then we could develop a path-wise coordinate descent algorithm to solve the optimization problem (\ref{opt.lasso}) with a sequence of nested loops:
 \begin{algorithm}
 	\caption{Path-wise coordinate-wise optimization algorithm}
 	\begin{algorithmic}
 	  \Require $g(\boldsymbol{\beta},\lambda)=-\frac{1}{n}f(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|$ - target function, where $f(\boldsymbol{\beta})$ is given in (\ref{func}); $\boldsymbol{\beta}_0$ - starting value; $\{\lambda_1,\ldots,\lambda_m\}$ - a sequence of descending $\lambda$'s, where $\lambda_1=\lambda_{max}$ is given in (\ref{maxlambda}); $\epsilon$ - tolerance; $N_s$, $N_t$ - maximum number of iterations of the middle and inner loops
+  \algstore{ag1}
+  \end{algorithmic}
+\end{algorithm}
+
+\pagebreak
+
+\begin{algorithm}
+  \begin{algorithmic}
+  \algrestore{ag1}
 	  \Ensure $\widehat{\boldsymbol{\beta}}(\lambda_r)$ such that $\widehat{\boldsymbol{\beta}}(\lambda_r) \approx \arg\min_{\boldsymbol{\beta}}\; g(\boldsymbol{\beta},\lambda_r),\; r=1,\ldots,m$
 	  \State $\tilde{\boldsymbol{\beta}}_0(\lambda_{1})\leftarrow\boldsymbol{\beta}_0$
 	  \State OUTER LOOP
@@ -206,7 +171,6 @@ Then we could develop a path-wise coordinate descent algorithm to solve the opti
 	  \EndFor
 	\end{algorithmic}
 \end{algorithm}
-
 **Outer Loop.** 
 In the outer loop, we compute the solutions of the optimization problem (\ref{opt.lasso}) for a decreasing sequence of values for $\lambda$: $\{\lambda_1,\ldots,\lambda_m\}$, starting at the smallest value $\lambda_1 = \lambda_{max}$ for which the estimates of all coefficients $\hat{\beta}_j = 0,\; j=1,2,\ldots,p$, which is
 \begin{equation}\label{maxlambda}
@@ -220,7 +184,7 @@ In the middle loop, we find the estimates of $\boldsymbol{\beta}$ by solving the
 f(\boldsymbol{\beta})\approx\ell(\boldsymbol{\beta})&=f(\tilde{\boldsymbol{\beta}})+(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})^\top\nabla f(\tilde{\boldsymbol{\beta}})+\frac{1}{2}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})^\top\nabla^2 f(\tilde{\boldsymbol{\beta}})(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})\\
 &=f(\tilde{\boldsymbol{\beta}})+[\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})]^\top(\mathbf{y}-\tilde{\mathbf{p}})-\frac{1}{2}[\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})]^\top\tilde{\mathbf{W}}\mathbf{X}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})\\
 &=f(\tilde{\boldsymbol{\beta}})+\sum_{i=1}^n(Y_i-\tilde{p}_i)\mathbf{x}_i^\top(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}} )-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left[\mathbf{x}_i^\top(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})\right]^2\\
-&=-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left\{\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})\right]^2+2\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})\right]\right\}+f(\tilde{\boldsymbol{\beta}})\\
+&=-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left\{\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})\right]^2+2\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})\right]\right\}+f(\tilde{\boldsymbol{\beta}})\displaybreak\\
 &=-\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left[\mathbf{x}_i^\top(\tilde{\boldsymbol{\beta}}-\boldsymbol{\beta})+\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\right]+\frac{1}{2}\sum_{i=1}^n\tilde{w}_i\left(\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}\right)^2+f(\tilde{\boldsymbol{\beta}}),
 \end{align*}
 where $\tilde{\mathbf{p}}=(\tilde{p}_1,\ldots,\tilde{p}_n)^\top$ and $\tilde{\mathbf{W}}=\mathrm{diag}(\tilde{w}_1,\ldots,\tilde{w}_n)$ are the estimates of $\mathbf{p}$ and $\mathbf{W}$ based on $\tilde{\boldsymbol{\beta}}$.  
@@ -253,21 +217,22 @@ $$S(z,\gamma)=\mathrm{sign}(z)(|z|-\gamma)_+=\begin{cases}z-\gamma,&\text{if }z>
 We can then update estimates of $\beta_j$'s repeatedly for $j = 0,1,2,...,p,0,1,2,...$ until
 convergence.
 
-Note: 
+We implement the algorithm in R (see \hyperlink{Code 2}{Code 2}). Here are some important details regarding the implementation of the algorithm: 
 
-1. In the outer loop, the value of $\lambda_{max}$ is different from the form given in \hyperlink{2}{Friedman et al. (2010)}. This is because we also take the update of $\tilde{\beta}_0$ into consideration in the inner loop. Proof is attached in the appendix. In practice, we add a very small value (e.g., $10^{-10}$) to $\lambda_{max}$ to avoid computational errors that may cause one slope coefficient estimate not equal to zero.
-2. In the middle loop, care is taken to avoid coefficients diverging in order to achieve fitted probabilities of 0 or 1. When $\tilde{p}_i$ is within $\epsilon=10^{-5}$ of 1, we set it to 1, and set the corresponding weight $\tilde{w}_i$ to $\epsilon$. 0 is treated similarly.
+* In the outer loop, the starting values of $\boldsymbol\beta$ is set to all 0's. Note that the value of $\lambda_{max}$ is different from the form given in \hyperlink{2}{Friedman et al. (2010)}, which is $\lambda_{max} = \max_j\left|\left \langle \mathbf{x}_{\cdot j}, \mathbf{y} \right \rangle\right|$, where $\mathbf{x}_{\cdot j}$ is the $j$-th column of the design matrix $\mathbf{X}$, for $j=1,\ldots,p$. This is because we also take the update of $\tilde{\beta}_0$ into consideration in the inner loop. (see Theorem \ref{t3} in the appendices) In practice, we add a very small value (e.g., $10^{-10}$) to $\lambda_{max}$ to avoid computational errors that may cause one slope coefficient estimate not equal to zero.
+* In the middle loop, care is taken to avoid coefficients diverging in order to achieve fitted probabilities of 0 or 1. When $\tilde{p}_i$ is within $\delta=10^{-5}$ of 1, we set it to 1, and set the corresponding weight $\tilde{w}_i$ to $\delta$. 0 is treated similarly.
+* The stopping criteria of the middle loop is either the number of iterations of the inner loop is exactly 1 or it reaches a maximum number of iterations $100$.  The stopping criteria of the inner loop is either the difference of the penalized loss function given in (\ref{opt.inner}) between the two iterations is less than the tolerance $\epsilon=10^{-10}$ or it reaches a maximum number of iterations $1000$.
 
 
-## Five-fold Cross Validation for LASSO
+## Five-fold Cross-validation for LASSO
 
-Since the Logistic-Lasso model depends on penalty term for variable selection, we further develop 5-fold cross-validation to select the parameter $\lambda$ to obtain the optimized result.
+Since the Logistic-Lasso model depends on penalty term for variable selection, we further develop 5-fold cross-validation to select the tuning parameter $\lambda$ to obtain the optimized result.
 
 For the initial $\lambda$ range, which is a sequence of descending $\lambda$'s, where $\lambda_{max}$ is given in (\ref{maxlambda}). We set $\lambda_{min}=\lambda_{max}/e^6$, and create 30 $\lambda$ candidates on a log scale.
 
 To select the optimal tuning parameter $\lambda$, the original data is randomly shuffled and split into five equally sized groups. One of the groups is used as the validation set, while the remaining groups are used as the training set. The path-wise coordinate-wise optimization algorithm is then applied to the training set, and AUC scores are calculated for each $\lambda$ using the validation set. This process is repeated until each of the five groups has been used as the validation set, and the mean AUC for each $\lambda$ is computed.
 
-We select the best $\lambda$ in two ways. One way is that we wrote a function to do the 5-fold cross-validation and the other way is to use the `cv.glmnet` function from the popular package `caret`.
+We select the best $\lambda$ in two ways. One way is that we wrote a function to do the 5-fold cross-validation (see \hyperlink{Code 3}{Code 3}) and the other way is to use the `cv.glmnet` function from the popular package `caret`.
 
 Here we take the $\lambda$ with the greatest mean AUC as the best $\lambda$. Further, we look at the predictors that the best $\lambda$ chooses and take them to re-fit the logistic regression model on the training data which is the 'optimal' model. We also fit a logsitical regression model on the training data using our Newton-Raphson algorithm to get the 'full' model. After that, we compare the two models' prediction performance on the test data in specificity, sensitivity, and AUC.
 
@@ -287,9 +252,9 @@ For future work, now that we have selected the ten predictors, we want to know w
 
 \newpage 
 # References {-}
-\hypertarget{1}{[1] Freer, Timothy W., and Michael J. Ulissey. "Screening mammography with computer-aided detection: prospective study of 12,860 patients in a community breast center." Radiology 220.3 (2001): 781-786.}
+\hypertarget{1}{Freer, Timothy W., and Michael J. Ulissey. "Screening mammography with computer-aided detection: prospective study of 12,860 patients in a community breast center." Radiology 220.3 (2001): 781-786.}
 
-\hypertarget{2}{[2] Friedman J, Hastie T, Tibshirani R. Regularization Paths for Generalized Linear Models via Coordinate Descent. J Stat Softw. 2010;33(1):1-22. PMID: 20808728; PMCID: PMC2929880.}
+\hypertarget{2}{Friedman J, Hastie T, Tibshirani R. Regularization Paths for Generalized Linear Models via Coordinate Descent. J Stat Softw. 2010;33(1):1-22. PMID: 20808728; PMCID: PMC2929880.}
 
 \newpage 
 # Appendices {-}
@@ -522,3 +487,79 @@ cv.logit.lasso <- function(x, y, nfolds = 5, lambda) {
 \begin{center}
 \hypertarget{Code 3}{Code 3: 5-fold cross-validation to select best lambda}
 \end{center}
+
+\newpage
+## Proofs {-}
+
+\newtheorem{thm}{Theorem}[section]
+\renewcommand{\thethm}{\arabic{thm}}
+\begin{thm}\label{t1}
+The Hessian matrix $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ as given in (\ref{hess}) is a negative-definite matrix if $\mathbf{X}$ has full rank.
+\end{thm}
+
+\begin{proof}
+For any $(p+1)$-dimensional nonzero vector $\boldsymbol{\alpha}$, given that $\mathbf{X}$ has full rank, $\mathbf{X}\boldsymbol{\alpha}$ is also a nonzero vector. Since $\mathbf{W}$ is positive-definite, we have
+\begin{align*}
+\boldsymbol{\alpha}^\top\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})\boldsymbol{\alpha}&=\boldsymbol{\alpha}^\top(-\mathbf{X}^\top\mathbf{W}\mathbf{X})\boldsymbol{\alpha}\\
+&=-(\mathbf{X}\boldsymbol{\alpha})^\top\mathbf{W}(\mathbf{X}\boldsymbol{\alpha})\\
+&<0.
+\end{align*}
+Thus, $\nabla^2 f(\boldsymbol{\beta};\mathbf{y},\mathbf{X})$ is negative-definite.
+\end{proof}
+
+\vspace{10pt}
+
+\begin{thm}\label{t2}
+If there exists a vector of coefficients $\hat{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\hat{\boldsymbol{\beta}} \le 0$, there does not exist $\boldsymbol{\beta}^*\in\mathbb{R}^{p+1}$ such that $\boldsymbol{\beta}^* = \arg\max_{\boldsymbol{\beta}}f(\boldsymbol{\beta})$, where $f$ is given in (\ref{func}).
+\end{thm}
+
+\begin{proof}
+Assume such $\boldsymbol{\beta}^*$ exists, then $\forall \boldsymbol{\beta}\in\mathbb{R}^{p+1}$, we have $f(\boldsymbol{\beta})\le f(\boldsymbol{\beta}^*)$.
+
+First, we prove that: there exists a vector of coefficients $\tilde{\boldsymbol{\beta}}$ such that $Y_i = 1$ whenever $\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}} > 0$ and $Y_i = 0$ whenever $\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}} < 0$.
+
+Let $A_1=\{i: Y_i = 1\}= \{i:\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}> 0\}$ and $A_0=\{i: Y_i = 0\}=\{i:\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}\le0\}$. Then we have $$\epsilon:=\min_{i\in A_1}(\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}) > 0.$$
+Let $\tilde{\boldsymbol{\beta}}=\hat{\boldsymbol{\beta}}-(\epsilon/2,0,\ldots,0)^\top$. Given that $X_{i0}=1$ for all $i$, we have 
+$$\begin{aligned}
+\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}=\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}-\epsilon/2\cdot1\ge \epsilon-\epsilon/2=\epsilon/2>0,\quad \forall i\in A_1\\
+\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}=\mathbf{x}_i^\top\hat{\boldsymbol{\beta}}-\epsilon/2\cdot1\le 0-\epsilon/2=-\epsilon/2<0,\quad \forall i\in A_0\\
+\end{aligned}$$
+Thus we have $A_1=\{i: Y_i = 1\}= \{i:\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}> 0\}$ and $A_0=\{i: Y_i = 0\}=\{i:\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}< 0\}$.
+
+Next, we prove that 
+\begin{equation}\label{limit}
+\lim_{k\rightarrow\infty}f(k\tilde{\boldsymbol{\beta}})=0.
+\end{equation}
+$\forall k>0$, we have $A_1= \{i:\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})> 0\}$ and $A_0=\{i:\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})< 0\}$.
+
+Thus,
+$$\begin{aligned}
+\lim_{k\rightarrow\infty}f(k\tilde{\boldsymbol{\beta}})&=\lim_{k\rightarrow\infty}\sum_{i\in A_1}\left[Y_i\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta})}-\log\left(1+e^{\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})}\right)\right]+\lim_{k\rightarrow\infty}\sum_{i\in A_0}\left[Y_i\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})-\log\left(1+e^{\mathbf{x}_i^\top (k\tilde{\boldsymbol{\beta}})}\right)\right]\\
+&=\sum_{i\in A_1}\lim_{k\rightarrow\infty}\left[k\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}-\log\left(1+e^{k\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}}\right)\right]+\sum_{i\in A_0}\lim_{k\rightarrow\infty}\left[-\log\left(1+e^{k\mathbf{x}_i^\top \tilde{\boldsymbol{\beta}}}\right)\right]\\
+&=\sum_{i\in A_1}\lim_{z\rightarrow\infty}\left[z-\log\left(1+e^z\right)\right]+\sum_{i\in A_0}\left(-\log1\right)\\
+&=0+0=0.
+\end{aligned}$$
+
+Last, we prove that: there exists $\boldsymbol{\beta}\in\mathbb{R}^{p+1}$ such that $f(\boldsymbol{\beta})>f(\boldsymbol{\beta}^*)$, which is contradictory to the statement that $\forall \boldsymbol{\beta}\in\mathbb{R}^{p+1}$, $f(\boldsymbol{\beta})\le f(\boldsymbol{\beta}^*)$.
+
+Note that $f(\boldsymbol{\beta})<0$ holds for any $\boldsymbol{\beta}\in\mathbb{R}$, then we have $f(\boldsymbol{\beta}^*)<0$.
+
+Given that $f(\boldsymbol{\beta}^*)<0$ and (\ref{limit}) holds, there exists $N\in \mathbb{R}$ such that $\forall k>N$, $f(k\tilde{\boldsymbol{\beta}})>f(\boldsymbol{\beta}^*)$.
+
+Thus our assumption must be false.
+\end{proof}
+
+\begin{thm}\label{t3}
+Given that the coordinate descent has updates
+\begin{align*}
+\tilde{\beta}_0&\leftarrow\frac{\sum_{i=1}^n\tilde{w}_{i}(\tilde{z}_{i}-\sum_{k= 1}^pX_{ik}\tilde{\beta}_k)}{\sum_{i=1}^n\tilde{w}_{i}},\\
+\tilde{\beta}_j&\leftarrow\frac{S\left(\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}X_{ij}(\tilde{z}_{i}-\sum_{k\ne j}X_{ik}\tilde{\beta}_k),\lambda\right)}{\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}X_{ij}^2},\; j=1,\ldots,p
+\end{align*}
+the $\lambda_{max}$ for which the estimates of all coefficients $\hat{\beta}_j = 0,\; j=1,2,\ldots,p$ is
+$$\lambda_{max} = \max_{j\in\{1,\ldots,p\}}\left|\frac{1}{n}\sum_{i=1}^n X_{ij}(Y_i-\bar{Y})\right|,$$
+where $\bar{Y}=\frac{1}{n}\sum_{i=1}^nY_i$.
+\end{thm}
+
+\begin{proof}
+working on it.
+\end{proof}
