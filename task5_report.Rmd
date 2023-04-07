@@ -555,7 +555,7 @@ where $\bar{Y}=\frac{1}{n}\sum_{i=1}^nY_i$.
 \begin{proof}
 Denote $\tilde{\boldsymbol\beta}^{(s,t)}$ as the current estimates of $\boldsymbol\beta$ in the first outer loop after the $s$-th iteration of the middle loop and the $t$-th iteration of the inner loop, $s,t\in\{0,1,\ldots\}$. Then $\tilde{\boldsymbol\beta}^{(0,0)}=\mathbf{0}$ denotes the starting values, and $\tilde{\boldsymbol\beta}^{(s-1,N_s)}=\tilde{\boldsymbol\beta}^{(s,0)}$, where $N_s$ is the total number of iterations of inner loop in the $s$-th middle loop. We want to prove that $\lambda_{max}$ as given in the theorem is the smallest value that can ensure that $\forall s,t$, $\tilde{\beta}^{(s,t)}_j=0$, $j=1,\ldots,p$.
 
-We prove it by induction. Assume that $\forall k_t < N_{k_s}$ when $k_s < s$ and $\forall k_t < t$ when $k_s =s$, we have $\tilde{\beta}^{(k_s,k_t)}_j=0$, $j=1,\ldots,p$, where $t<N_s$. We want to find the smallest $\lambda$ such that $\tilde{\beta}^{(s,t)}_j=0$, $j=1,\ldots,p$.
+We prove it by induction. Assume that $\forall k_t < N_{k_s}$ when $k_s < s$ and $\forall k_t < t$ when $k_s =s$, we have $\tilde{\beta}^{(k_s,k_t)}_j=0$, $j=1,\ldots,p$, where $t\le N_s$. We want to find the smallest $\lambda$ such that $\tilde{\beta}^{(s,t)}_j=0$, $j=1,\ldots,p$.
 
 Let $\tilde{z}_i^{(s)}$, $\tilde{p}_i^{(s)}$, and $\tilde{w}_i^{(s)}$ denote the updates of $z_i$, $p_i$, and $w_i$ in the $\ell$ function in the $s$-th middle loop as given in (\ref{func.lasso}). Then we have  $$\tilde{p}_i^{(s)}=\frac{e^{\tilde\beta_0^{(s,0)}}}{1+e^{\tilde\beta_0^{(s,0)}}}$$
 is a constant value for all $i$'s. Denote this value as $\tilde{p}^{(s)}$, then $\forall i = 1,\ldots,n$, we have
