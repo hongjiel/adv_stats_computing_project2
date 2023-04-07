@@ -251,6 +251,10 @@ Shaohan Chen worked on function visualization, organizing the first two parts of
 
 Jiajun Tao worked mainly on the presentation as well as the report of task 4, i.e. choosing the best lambda to pick predictors and comparing the models. Here I would like to give much credit to Hongjie Liu, as he finished most of the project during the spring break. I was impressed by his learning ability and mathematical skills. Furthermore, he was also willing to help other members in the group understand the content and solve any problem. I think he deserves the praise.
 
+Xicheng Xie worked on making and amending two parts of the slides, writing some sections of the report, and doing the presentation. I must emphasize the exceptional work of my teammate, Hongjie Liu. He was more than modest in his statements about his contribution to the project. In fact, he completed most of the significant parts of the project during spring break. His dedication to the project, coupled with his exceptional mathematical skills, was commendable.
+
+
+
 
 \newpage 
 # References {-}
