@@ -27,7 +27,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 \newpage 
 # Background and Objectives
-Mammography is recognized as the most effective screening method for early breast cancer detection, but its accuracy remains limited. And as the number of variables that help predict breast cancer increases, doctors are forced to rely more on their subjective experiences to make decisions. The use of computer models can detect abnormalities in mammograms to aid radiologists in breast cancer diagnosis (Freer et al. 2001). The purpose of this study was to predict breast cancer benign/malignant status by quantitative modeling based on logistic regression, which may help radiologists manage a large amount of available information, make effective decisions to detect breast cancers and reduce unnecessary biopsy.
+Mammography is recognized as the most effective screening method for early breast cancer detection, but its accuracy remains limited. And as the number of variables that help predict breast cancer increases, doctors are forced to rely more on their subjective experiences to make decisions. The use of computer models can detect abnormalities in mammograms to aid radiologists in breast cancer diagnosis \hyperlink{1}{(Freer et al. 2001)}. The purpose of this study was to predict breast cancer benign/malignant status by quantitative modeling based on logistic regression, which may help radiologists manage a large amount of available information, make effective decisions to detect breast cancers and reduce unnecessary biopsy.
 
 The data given has 569 observations. The column 'Diagnosis' which identifies if the image is coming from cancer tissue or benign cases (M = malignant, B = benign) would be used as outcome for modeling. We denote malignant as 1 and benign cases as 0 for prediction.
 The other 30 columns correspond to mean, standard deviation and the largest values (points on the tails) of the distributions of the following 10 features computed for the cell nuclei:
@@ -144,7 +144,7 @@ $$\begin{aligned}
 Thus we have $A_1=\{i: Y_i = 1\}= \{i:\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}> 0\}$ and $A_0=\{i: Y_i = 0\}=\{i:\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}< 0\}$.
 
 Next, we prove that 
-\begin{equation}\label{loglik}
+\begin{equation}\label{limit}
 \lim_{k\rightarrow\infty}f(k\tilde{\boldsymbol{\beta}})=0.
 \end{equation}
 $\forall k>0$, we have $A_1= \{i:\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})> 0\}$ and $A_0=\{i:\mathbf{x}_i^\top(k\tilde{\boldsymbol{\beta}})< 0\}$.
@@ -161,22 +161,19 @@ Last, we prove that: there exists $\boldsymbol{\beta}\in\mathbb{R}^{p+1}$ such t
 
 Note that $f(\boldsymbol{\beta})<0$ holds for any $\boldsymbol{\beta}\in\mathbb{R}$, then we have $f(\boldsymbol{\beta}^*)<0$.
 
-Given that $f(\boldsymbol{\beta}^*)<0$ and (\ref{loglik}) holds, there exists $N\in \mathbb{R}$ such that $\forall k>N$, $f(k\tilde{\boldsymbol{\beta}})>f(\boldsymbol{\beta}^*)$.
+Given that $f(\boldsymbol{\beta}^*)<0$ and (\ref{limit}) holds, there exists $N\in \mathbb{R}$ such that $\forall k>N$, $f(k\tilde{\boldsymbol{\beta}})>f(\boldsymbol{\beta}^*)$.
 
 Thus our assumption must be false. \hfill$\square$
 
 
 ## Logistic-LASSO Model
-Regularization is the common approach for variable selection, in which LASSO is to add L-1 penalty to the objective function. In the context of logistic regression, we turn to minimize the penalized log-likelihood as following: 
-
-* LASSO estimates the logistic model parameters $\boldsymbol{\beta}$ by optimizing a penalized loss function:
-
+Regularization is the common approach for variable selection, in which LASSO is to add L-1 penalty to the objective function. In the context of logistic regression, LASSO estimates the model parameters $\boldsymbol{\beta}$ by optimizing a penalized loss function:
 \begin{equation}\label{opt.lasso}
 \min_{\boldsymbol{\beta}}\; -\frac{1}{n}f(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|.
 \end{equation}
 where $\lambda\ge 0$ is the tuning parameter and $f$ is the log-likelihood function given in (\ref{func}). Note that the intercept is not penalized and all predictors are standardized.
 
-Then we could develop a path-wise coordinate descent algorithm to the penalized weighted-least-squares-problem with a sequence of nested loops:\par
+Then we could develop a path-wise coordinate descent algorithm to solve the optimization problem (\ref{opt.lasso}) with a sequence of nested loops:\par
 \begin{algorithm}
 	\caption{Path-wise coordinate-wise optimization algorithm}
 	\begin{algorithmic}
@@ -210,15 +207,14 @@ Then we could develop a path-wise coordinate descent algorithm to the penalized 
 	\end{algorithmic}
 \end{algorithm}
 
-**OUTER LOOP** 
+**Outer Loop.** 
 In the outer loop, we compute the solutions of the optimization problem (\ref{opt.lasso}) for a decreasing sequence of values for $\lambda$: $\{\lambda_1,\ldots,\lambda_m\}$, starting at the smallest value $\lambda_1 = \lambda_{max}$ for which the estimates of all coefficients $\hat{\beta}_j = 0,\; j=1,2,\ldots,p$, which is
 \begin{equation}\label{maxlambda}
 \lambda_{max} = \max_{j\in\{1,\ldots,p\}}\left|\frac{1}{n}\sum_{i=1}^n X_{ij}(Y_i-\bar{Y})\right|,
 \end{equation}
 where $\bar{Y}=\frac{1}{n}\sum_{i=1}^nY_i$. For tuning parameter value $\lambda_{k+1}$, we initialize coordinate descent algorithm at the computed solution for $\lambda_k$ (warm start). Apart from giving us a path of solutions, this scheme exploits warm starts, and leads to a more stable algorithm.
 
-
-**MIDDLE LOOP**
+**Middle Loop.**
 In the middle loop, we find the estimates of $\boldsymbol{\beta}$ by solving the optimization problem (\ref{opt.lasso}) for a fixed $\lambda$. For each iteration of the middle loop, based on the current parameter estimates $\tilde{\boldsymbol{\beta}}$, we form a quadratic approximation to the log-likelihood $f$ using a Taylor expansion:
 \begin{align*}
 f(\boldsymbol{\beta})\approx\ell(\boldsymbol{\beta})&=f(\tilde{\boldsymbol{\beta}})+(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})^\top\nabla f(\tilde{\boldsymbol{\beta}})+\frac{1}{2}(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})^\top\nabla^2 f(\tilde{\boldsymbol{\beta}})(\boldsymbol{\beta}-\tilde{\boldsymbol{\beta}})\\
@@ -236,14 +232,18 @@ where
 $$\tilde{z}_i=\mathbf{x}_i^\top\tilde{\boldsymbol{\beta}}+\frac{Y_i-\tilde{p}_i}{\tilde{w}_i}$$
 is the working response, $\tilde{w}_i$ is the working weight, and $C$ is a function that does not depend on $\boldsymbol{\beta}$.
 
-**INNER LOOP.**
-In the inner loop, we find the estimates of $\boldsymbol{\beta}$ by solving a modified optimization problem of (\ref{opt.lasso}). With fixed $\tilde{w}_i$'s, $\tilde{z}_i$'s, and a fixed form of $\ell$ based on the estimates of $\boldsymbol{\beta}$ in the previous iteration of the middle loop, we use coordinate descent to solve the penalized weighted least-squares problem
-\begin{equation}\label{opt.inner}
+**Inner Loop.**
+In the inner loop, with fixed $\tilde{w}_i$'s, $\tilde{z}_i$'s, and thus a fixed form of $\ell$ based on the estimates of $\boldsymbol{\beta}$ in the previous iteration of the middle loop, we update the estimates of $\boldsymbol{\beta}$ by solving a modified optimization problem of (\ref{opt.lasso}):
+$$
 \min_{\boldsymbol{\beta}}\; -\frac{1}{n}\ell(\boldsymbol{\beta})+\lambda\sum_{k=1}^{p}|\beta_k|,
+$$
+which is equivalent to the following penalized weighted least-squares problem
+\begin{equation}\label{opt.inner}
+\min_{\boldsymbol{\beta}}\; \frac{1}{2n}\sum_{i=1}^n\tilde{w}_i(\tilde{z}_i-\mathbf{x}_i^\top\boldsymbol{\beta})^2+\lambda\sum_{k=1}^{p}|\beta_k|.
 \end{equation}
-and update the estimates of $\boldsymbol{\beta}$. For each iteration of the inner loop, suppose we have the current estimates $\tilde{\beta}_k$ for $k\ne j$ and we wish to partially optimize with respect to $\beta_j$:
+We use coordinate descent to update the estimates of $\boldsymbol{\beta}$. For each iteration of the inner loop, suppose we have the current estimates $\tilde{\beta}_k$ for $k\ne j$ and we wish to partially optimize with respect to $\beta_j$:
 $$\min_{\beta_j}\; \frac{1}{2n}\sum_{i=1}^n\tilde{w}_i\left(\tilde{z}_i-X_{ij}\beta_j-\sum_{k\ne j}X_{ik}\tilde{\beta}_k\right)^2+\lambda|\beta_j|+\lambda\sum_{k\ne j}|\tilde\beta_k|.$$
-Updates:
+Thus the coordinate descent has updates
 \begin{align*}
 \tilde{\beta}_0&\leftarrow\frac{\sum_{i=1}^n\tilde{w}_{i}(\tilde{z}_{i}-\sum_{k= 1}^pX_{ik}\tilde{\beta}_k)}{\sum_{i=1}^n\tilde{w}_{i}},\\
 \tilde{\beta}_j&\leftarrow\frac{S\left(\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}X_{ij}(\tilde{z}_{i}-\sum_{k\ne j}X_{ik}\tilde{\beta}_k),\lambda\right)}{\frac{1}{n}\sum_{i=1}^n\tilde{w}_{i}X_{ij}^2},\; j=1,\ldots,p
@@ -253,7 +253,10 @@ $$S(z,\gamma)=\mathrm{sign}(z)(|z|-\gamma)_+=\begin{cases}z-\gamma,&\text{if }z>
 We can then update estimates of $\beta_j$'s repeatedly for $j = 0,1,2,...,p,0,1,2,...$ until
 convergence.
 
-* Note: Care is taken to avoid coefficients diverging in order to achieve fitted probabilities of 0 or 1. When a probability is within $\epsilon=10^{-5}$ of 1, we set it to 1, and set the weights to $\epsilon$. 0 is treated similarly.
+Note: 
+
+1. In the outer loop, the value of $\lambda_{max}$ is different from the form given in \hyperlink{2}{Friedman et al. (2010)}. This is because we also take the update of $\tilde{\beta}_0$ into consideration in the inner loop. Proof is attached in the appendix. In practice, we add a very small value (e.g., $10^{-10}$) to $\lambda_{max}$ to avoid computational errors that may cause one slope coefficient estimate not equal to zero.
+2. In the middle loop, care is taken to avoid coefficients diverging in order to achieve fitted probabilities of 0 or 1. When a probability is within $\epsilon=10^{-5}$ of 1, we set it to 1, and set the weights to $\epsilon$. 0 is treated similarly.
 
 
 ## Five-fold Cross Validation for LASSO
@@ -284,9 +287,9 @@ For the future work, now that we have selected the ten predictors, we want to kn
 
 \newpage 
 # References {-}
-Freer, Timothy W., and Michael J. Ulissey. "Screening mammography with computer-aided detection: prospective study of 12,860 patients in a community breast center." Radiology 220.3 (2001): 781-786.
+\hypertarget{1}{[1] Freer, Timothy W., and Michael J. Ulissey. "Screening mammography with computer-aided detection: prospective study of 12,860 patients in a community breast center." Radiology 220.3 (2001): 781-786.}
 
-Friedman J, Hastie T, Tibshirani R. Regularization Paths for Generalized Linear Models via Coordinate Descent. J Stat Softw. 2010;33(1):1-22. PMID: 20808728; PMCID: PMC2929880.
+\hypertarget{2}{[2] Friedman J, Hastie T, Tibshirani R. Regularization Paths for Generalized Linear Models via Coordinate Descent. J Stat Softw. 2010;33(1):1-22. PMID: 20808728; PMCID: PMC2929880.}
 
 \newpage 
 # Appendices {-}
@@ -508,7 +511,7 @@ cv.logit.lasso <- function(x, y, nfolds = 5, lambda) {
   cv_res <- auc %>% 
     group_by(lambda) %>% 
     summarize(auc_mean = mean(auc),
-              auc_se = sd(auc) / sqrt(5),
+              auc_se = sd(auc) / sqrt(nfolds),
               auc_low = auc_mean - auc_se,
               auc_high = auc_mean + auc_se) %>% 
     mutate(auc_ranking = min_rank(desc(auc_mean)))
